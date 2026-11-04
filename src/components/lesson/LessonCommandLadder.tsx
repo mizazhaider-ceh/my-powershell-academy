@@ -44,7 +44,7 @@ const CommandCard: React.FC<{ command: GuideCommand; index: number }> = ({ comma
     )}
     {command.watchOut && (
       <div className="clay-cushion-lavender p-4 text-[0.9375rem] leading-relaxed">
-        <strong>âš ï¸ Watch out:</strong> {formatInlineRichText(command.watchOut)}
+        <strong>⚠️ Watch out:</strong> {formatInlineRichText(command.watchOut)}
       </div>
     )}
   </div>
@@ -74,7 +74,7 @@ export const LessonCommandLadder: React.FC<{ guide: LessonGuide }> = ({ guide })
         </span>
         <div>
           <span className="text-[0.75rem] font-mono uppercase tracking-wider font-bold opacity-75 block">
-            Beginner â†’ Intermediate â†’ Pro
+            Beginner → Intermediate → Pro
           </span>
           <h2 id="lesson-ladder-heading" className="text-[1.5rem] sm:text-[1.75rem] font-bold">
             The Command Ladder: Every Command Explained
