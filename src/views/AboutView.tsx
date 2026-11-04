@@ -23,7 +23,7 @@ export const AboutView: React.FC<AboutViewProps> = ({ onNavigate }) => {
           <div className="clay-card p-3">
             <div className="clay-well p-2">
               <img
-                src="/assets/aistudio/image_2fc7720e.png"
+                src="/assets/aistudio/image_2fc7720e.webp"
                 alt="PowerShell Academy Mascot"
                 referrerPolicy="no-referrer"
                 className="w-full h-auto rounded-[1.25rem] object-cover"

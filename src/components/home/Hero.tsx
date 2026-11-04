@@ -91,7 +91,7 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="clay-card p-4 sm:p-6 rounded-[2.25rem] relative">
               <div className="clay-well p-2 overflow-hidden rounded-[1.75rem]">
                 <img
-                  src="/assets/aistudio/image_2fc7720e.png"
+                  src="/assets/aistudio/image_2fc7720e.webp"
                   alt="PowerShell Academy Electric Blue Dragon Artwork"
                   referrerPolicy="no-referrer"
                   className="w-full h-auto rounded-[1.35rem] object-cover"

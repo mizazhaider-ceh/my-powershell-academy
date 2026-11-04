@@ -36,7 +36,7 @@ export const AtlasClosing: React.FC<AtlasClosingProps> = ({ onNavigate, lastLess
     </div>
     <div className="clay-well p-2 overflow-hidden">
       <img
-        src="/assets/aistudio/image_2fc7720e.png"
+        src="/assets/aistudio/image_2fc7720e.webp"
         alt="PowerShell Academy electric blue dragon artwork"
         referrerPolicy="no-referrer"
         className="w-full h-auto object-cover ah-illu"
