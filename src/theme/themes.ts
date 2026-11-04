@@ -38,6 +38,9 @@ export const THEMES: ThemeMeta[] = [
 export const THEME_STORAGE_KEY = 'powershell_academy_visual_theme';
 export const MODE_STORAGE_KEY = 'powershell_academy_theme';
 
+/** The theme used on first visit, before the learner picks one. */
+export const DEFAULT_THEME: ThemeId = 'atlas';
+
 export function isThemeId(value: unknown): value is ThemeId {
   return THEMES.some((theme) => theme.id === value);
 }
@@ -45,9 +48,9 @@ export function isThemeId(value: unknown): value is ThemeId {
 export function readStoredTheme(): ThemeId {
   try {
     const saved = localStorage.getItem(THEME_STORAGE_KEY);
-    return isThemeId(saved) ? saved : 'clay';
+    return isThemeId(saved) ? saved : DEFAULT_THEME;
   } catch {
-    return 'clay';
+    return DEFAULT_THEME;
   }
 }
 
@@ -60,5 +63,5 @@ export function readStoredDarkMode(): boolean {
 }
 
 export function getThemeMeta(id: ThemeId): ThemeMeta {
-  return THEMES.find((theme) => theme.id === id) ?? THEMES[0];
+  return THEMES.find((theme) => theme.id === id) ?? THEMES.find((theme) => theme.id === DEFAULT_THEME) ?? THEMES[0];
 }

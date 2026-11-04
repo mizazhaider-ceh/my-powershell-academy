@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <nav aria-label="Primary navigation" className="hidden xl:flex items-center gap-0.5 shrink-0">
-            {NAV_ITEMS.map((item) => {
+            {NAV_ITEMS.filter((item) => item.inHeader !== false).map((item) => {
               const Icon = item.icon;
               const active = isNavActive(item.path, currentPath);
               return (

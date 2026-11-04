@@ -265,5 +265,5 @@ test('Teaching content has no em dashes or forbidden terms', () => {
 test('Theme registry offers Claymorphism and Atlas with distinct fonts', () => {
   assert.deepEqual(THEMES.map((t) => t.id), ['clay', 'atlas']);
   assert.notEqual(THEMES[0].fonts, THEMES[1].fonts);
-  assert.equal(readStoredTheme(), 'clay', 'Claymorphism stays the default theme');
+  assert.equal(readStoredTheme(), 'atlas', 'Atlas stays the default theme');
 });

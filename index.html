@@ -8,10 +8,10 @@
           var theme = localStorage.getItem('powershell_academy_visual_theme');
           var dark = localStorage.getItem('powershell_academy_theme') === 'dark';
           var root = document.documentElement;
-          if (theme === 'atlas') {
-            root.setAttribute('data-theme', 'atlas');
-          } else {
+          if (theme === 'clay') {
             root.setAttribute('data-theme', 'clay');
+          } else {
+            root.setAttribute('data-theme', 'atlas');
           }
           if (dark) root.classList.add('dark');
         } catch (_e) {}
