@@ -1,0 +1,457 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Bind "Claymorphism Instrument" directly to Instrument Sans */
+@font-face {
+  font-family: "Claymorphism Instrument";
+  src: local("Instrument Sans"), local("InstrumentSans-Regular");
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", "Claymorphism Instrument", "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-display: "Plus Jakarta Sans", "Claymorphism Instrument", "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+/* ============================================================================
+   POWERSHELL DEEP BLUE CLAYMORPHISM TOKENS (All dimensions in rem / em)
+   ============================================================================ */
+:root {
+  --dp-color-ground: #edf2fc;
+  --dp-color-ink: #0f172a;
+  --dp-color-ink-secondary: #334155;
+  --dp-color-accent: #1d4ed8;
+  --dp-color-accent-bright: #2563eb;
+  --dp-color-accent-cushion: #cfe0ff;
+  --dp-color-surface-support: #c0efdc;
+  --dp-color-surface-compare: #dbe4ff;
+  --dp-color-surface-warm: #f9e7a8;
+  --dp-color-surface-cool: #c5e5fb;
+  --dp-color-surface: #ffffff;
+
+  --dp-typography-face: "Plus Jakarta Sans", "Claymorphism Instrument", "Instrument Sans", sans-serif;
+  --dp-typography-body: 1.015rem;
+  --dp-typography-small: 0.9375rem;
+  --dp-typography-metadata: 0.8125rem;
+  --dp-typography-caption: 0.75rem;
+  --dp-typography-reading-leading: 1.65;
+  --dp-typography-emphasis: 800;
+
+  --dp-spacing-gap: 1.5rem;
+  --dp-spacing-gap-compact: 1.25rem;
+  --dp-spacing-paragraph-gap: 1.125rem;
+
+  --dp-radius-surface: 2.375rem;
+  --dp-radius-tray: 3.75rem;
+  --dp-radius-control: 62.4375rem;
+  --dp-radius-disclosure: 1.5625rem;
+
+  --dp-border-focus-width: 0.1875rem;
+  --dp-motion-interaction: 180ms;
+
+  /* Consistent Claymorphic Lighting (Broad Light from Upper Left + Cobalt Depth) */
+  --clay-shadow-tray:
+    0 1.25rem 2.75rem rgba(15, 23, 42, 0.08),
+    inset 0.25rem 0.25rem 0.625rem rgba(255, 255, 255, 0.96),
+    inset -0.25rem -0.25rem 0.75rem rgba(29, 78, 216, 0.07);
+
+  --clay-shadow-cushion:
+    0 0.875rem 1.875rem rgba(15, 23, 42, 0.08),
+    inset 0.1875rem 0.1875rem 0.4375rem rgba(255, 255, 255, 0.92),
+    inset -0.1875rem -0.25rem 0.5rem rgba(29, 78, 216, 0.08);
+
+  --clay-shadow-blue-cushion:
+    0 1.25rem 2.75rem rgba(29, 78, 216, 0.16),
+    inset 0.25rem 0.25rem 0.625rem rgba(255, 255, 255, 0.88),
+    inset -0.25rem -0.25rem 0.75rem rgba(30, 64, 175, 0.16);
+
+  --clay-shadow-pill:
+    0 0.5rem 1.125rem rgba(15, 23, 42, 0.1),
+    inset 0.125rem 0.1875rem 0.3125rem rgba(255, 255, 255, 0.9),
+    inset -0.125rem -0.1875rem 0.375rem rgba(29, 78, 216, 0.1);
+
+  --clay-shadow-blue-btn:
+    0 0.625rem 1.375rem rgba(29, 78, 216, 0.36),
+    inset 0.125rem 0.1875rem 0.3125rem rgba(255, 255, 255, 0.38),
+    inset -0.125rem -0.1875rem 0.375rem rgba(15, 23, 42, 0.32);
+
+  --clay-shadow-pill-pressed:
+    0 0.1875rem 0.5rem rgba(15, 23, 42, 0.08),
+    inset 0.1875rem 0.25rem 0.4375rem rgba(15, 23, 42, 0.18),
+    inset -0.125rem -0.125rem 0.3125rem rgba(255, 255, 255, 0.7);
+
+  --clay-shadow-well:
+    inset 0.1875rem 0.25rem 0.5rem rgba(15, 23, 42, 0.09),
+    inset -0.125rem -0.1875rem 0.375rem rgba(255, 255, 255, 0.92);
+}
+
+/* Dark Mode Adaptation (Deep PowerShell Console Midnight Blue) */
+.dark {
+  --dp-color-ground: #0b1120;
+  --dp-color-ink: #f8fafc;
+  --dp-color-ink-secondary: #cbd5e1;
+  --dp-color-accent: #3b82f6;
+  --dp-color-accent-bright: #60a5fa;
+  --dp-color-accent-cushion: #172554;
+  --dp-color-surface-support: #13382f;
+  --dp-color-surface-compare: #1e293b;
+  --dp-color-surface-warm: #423315;
+  --dp-color-surface-cool: #172e47;
+  --dp-color-surface: #111827;
+
+  --clay-shadow-tray:
+    0 1.25rem 2.75rem rgba(0, 0, 0, 0.5),
+    inset 0.1875rem 0.1875rem 0.5rem rgba(255, 255, 255, 0.08),
+    inset -0.25rem -0.25rem 0.625rem rgba(0, 0, 0, 0.5);
+
+  --clay-shadow-cushion:
+    0 0.875rem 1.875rem rgba(0, 0, 0, 0.45),
+    inset 0.125rem 0.1875rem 0.375rem rgba(255, 255, 255, 0.1),
+    inset -0.1875rem -0.25rem 0.5rem rgba(0, 0, 0, 0.48);
+
+  --clay-shadow-blue-cushion:
+    0 1.25rem 2.75rem rgba(0, 0, 0, 0.55),
+    inset 0.1875rem 0.1875rem 0.5rem rgba(147, 197, 253, 0.16),
+    inset -0.25rem -0.25rem 0.625rem rgba(0, 0, 0, 0.55);
+
+  --clay-shadow-pill:
+    0 0.5rem 1.125rem rgba(0, 0, 0, 0.48),
+    inset 0.125rem 0.1875rem 0.3125rem rgba(255, 255, 255, 0.16),
+    inset -0.125rem -0.1875rem 0.375rem rgba(0, 0, 0, 0.45);
+
+  --clay-shadow-well:
+    inset 0.1875rem 0.25rem 0.5rem rgba(0, 0, 0, 0.55),
+    inset -0.125rem -0.125rem 0.3125rem rgba(255, 255, 255, 0.05);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    font-family: var(--dp-typography-face);
+    font-size: 100%;
+    background-color: var(--dp-color-ground);
+    color: var(--dp-color-ink);
+  }
+
+  body {
+    background-color: var(--dp-color-ground);
+    color: var(--dp-color-ink);
+    font-size: var(--dp-typography-body);
+    line-height: var(--dp-typography-reading-leading);
+    overflow-x: hidden;
+    text-shadow: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--dp-typography-face);
+    color: var(--dp-color-ink);
+    font-weight: var(--dp-typography-emphasis);
+    letter-spacing: -0.025em;
+    text-shadow: none;
+  }
+
+  /* Separate visible keyboard focus ring from clay shading */
+  :focus-visible {
+    outline: var(--dp-border-focus-width) solid var(--dp-color-accent);
+    outline-offset: 0.1875rem;
+  }
+}
+
+/* ============================================================================
+   MOLDED CLAYMORPHISM SURFACES, TRAYS, CUSHIONS & PILLS (POWERSHELL BLUE)
+   ============================================================================ */
+
+/* Large Shared White/Cream Reading Tray */
+.clay-tray {
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-tray);
+  box-shadow: var(--clay-shadow-tray);
+}
+
+/* Cobalt-Indigo Decision & Comparison Tray */
+.clay-tray-lavender {
+  background: linear-gradient(145deg, #e0e7ff 0%, #dbeafe 100%);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-tray);
+  box-shadow: var(--clay-shadow-tray);
+}
+.dark .clay-tray-lavender {
+  background: linear-gradient(145deg, #1e293b 0%, #172554 100%);
+}
+
+/* PowerShell Cobalt-Blue Lead / Hero Cushion (Replaces Pink Cushion) */
+.clay-cushion-pink {
+  background: linear-gradient(135deg, #dbeafe 0%, #c7d9ff 52%, #bfdbfe 100%);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-tray);
+  box-shadow: var(--clay-shadow-blue-cushion);
+}
+.dark .clay-cushion-pink {
+  background: linear-gradient(135deg, #172554 0%, #1e3a8a 60%, #1d4ed8 100%);
+  color: #f8fafc;
+}
+
+/* Standard Cushion / Card */
+.clay-card,
+.clay-cushion-cream {
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+  transition: transform var(--dp-motion-interaction) ease,
+              box-shadow var(--dp-motion-interaction) ease;
+}
+
+.clay-card-interactive:hover {
+  transform: translateY(-0.125rem);
+}
+
+.clay-card-interactive:active {
+  transform: translateY(0.0625rem) scale(0.995);
+}
+
+/* Pastel Support Cushions (Mint, Cobalt-Lavender, Butter-Yellow, Pale-Blue) */
+.clay-cushion-mint {
+  background-color: var(--dp-color-surface-support);
+  color: #0f2922;
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+}
+.dark .clay-cushion-mint {
+  color: #e6f9f0;
+}
+
+.clay-cushion-lavender {
+  background-color: var(--dp-color-surface-compare);
+  color: #1e293b;
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+}
+.dark .clay-cushion-lavender {
+  color: #e2e8f0;
+}
+
+.clay-cushion-warm {
+  background-color: var(--dp-color-surface-warm);
+  color: #3b3319;
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+}
+.dark .clay-cushion-warm {
+  color: #fef6d8;
+}
+
+.clay-cushion-cool {
+  background-color: var(--dp-color-surface-cool);
+  color: #0f2942;
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+}
+.dark .clay-cushion-cool {
+  color: #e3f3ff;
+}
+
+/* Top Navbar Pill Cushion */
+.clay-navbar {
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-control);
+  box-shadow: var(--clay-shadow-cushion);
+}
+
+/* Primary Deep PowerShell Blue Pill Buttons */
+.clay-btn-primary,
+.clay-btn-pink {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 60%, #1e40af 100%);
+  color: #ffffff !important;
+  border-radius: var(--dp-radius-control);
+  font-weight: var(--dp-typography-emphasis);
+  box-shadow: var(--clay-shadow-blue-btn);
+  transition: transform var(--dp-motion-interaction) ease,
+              box-shadow var(--dp-motion-interaction) ease;
+}
+
+.clay-btn-primary:hover,
+.clay-btn-pink:hover {
+  transform: translateY(-0.125rem);
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 60%, #1d4ed8 100%);
+}
+
+.clay-btn-primary:active,
+.clay-btn-pink:active {
+  transform: translateY(0.0625rem) scale(0.985);
+}
+
+/* Secondary White/Cream Pill Button */
+.clay-btn-secondary,
+.clay-pill {
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-control);
+  font-weight: var(--dp-typography-emphasis);
+  box-shadow: var(--clay-shadow-pill);
+  transition: transform var(--dp-motion-interaction) ease,
+              box-shadow var(--dp-motion-interaction) ease;
+}
+
+.clay-btn-secondary:hover {
+  transform: translateY(-0.125rem);
+}
+
+.clay-btn-secondary:active {
+  transform: translateY(0.0625rem) scale(0.985);
+  box-shadow: var(--clay-shadow-pill-pressed);
+}
+
+/* Recessed / Inset Well */
+.clay-sunken,
+.clay-well {
+  background-color: var(--dp-color-ground);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-disclosure);
+  box-shadow: var(--clay-shadow-well);
+}
+
+/* Deep PowerShell Console Terminal Block */
+.clay-terminal {
+  background: linear-gradient(145deg, #0b132b 0%, #0f172a 65%, #172554 100%);
+  color: #f8fafc;
+  border-radius: 1.5rem;
+  box-shadow:
+    0 0.75rem 1.75rem rgba(15, 23, 42, 0.25),
+    inset 0.125rem 0.125rem 0.375rem rgba(147, 197, 253, 0.15);
+}
+
+/* Inline Code Token */
+.clay-code-inline {
+  padding: 0.125rem 0.5rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-weight: 700;
+  background-color: rgba(29, 78, 216, 0.1);
+  color: #1e40af;
+}
+.dark .clay-code-inline {
+  background-color: rgba(96, 165, 250, 0.18);
+  color: #93c5fd;
+}
+
+/* Disclosure Accordion Cushion */
+.clay-disclosure {
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-ink);
+  border-radius: var(--dp-radius-disclosure);
+  box-shadow: var(--clay-shadow-cushion);
+}
+
+/* Tactile Keycap */
+.clay-keycap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.65rem;
+  border-radius: 0.625rem;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: var(--dp-typography-metadata);
+  background-color: var(--dp-color-surface);
+  color: var(--dp-color-accent);
+  box-shadow: var(--clay-shadow-pill);
+}
+
+/* Icon Tile */
+.clay-icon-tile {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border-radius: 1.125rem;
+  box-shadow: var(--clay-shadow-blue-btn);
+}
+
+/* Dragon / Image Well inside Cream Card */
+.clay-dragon-stage {
+  background-color: var(--dp-color-surface);
+  border-radius: var(--dp-radius-surface);
+  box-shadow: var(--clay-shadow-cushion);
+}
+
+/* Guide Section Number Badge (Deep PowerShell Blue) */
+.guide-num-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  border-radius: var(--dp-radius-control);
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-family: var(--font-mono);
+  font-size: var(--dp-typography-small);
+  font-weight: 800;
+  box-shadow: var(--clay-shadow-blue-btn);
+}
+
+/* Wide Hero Title Scaling */
+.clay-display-title {
+  font-size: clamp(2.75rem, 5.6vw, 4.9rem);
+  line-height: 1.03;
+  letter-spacing: -0.035em;
+  font-weight: var(--dp-typography-emphasis);
+}
+
+/* Lesson Reading Prose Rhythm */
+.lesson-prose p {
+  font-size: 1.0625rem;
+  line-height: 1.72;
+  color: var(--dp-color-ink-secondary);
+}
+
+.lesson-prose p + p {
+  margin-top: var(--dp-spacing-paragraph-gap);
+}
+
+/* Responsive Breakpoints & Reduced Motion Compliance */
+@media (max-width: 68.75rem) {
+  :root {
+    --dp-radius-tray: 3.25rem;
+    --dp-radius-surface: 2rem;
+    --dp-spacing-gap: 1.25rem;
+  }
+}
+
+@media (max-width: 47.5rem) {
+  :root {
+    --dp-radius-tray: 2.25rem;
+    --dp-radius-surface: 1.625rem;
+  }
+}
+
+@media (max-width: 28.75rem) {
+  :root {
+    --dp-radius-tray: 1.75rem;
+    --dp-radius-surface: 1.375rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .clay-btn-primary:hover,
+  .clay-btn-pink:hover,
+  .clay-btn-secondary:hover,
+  .clay-card-interactive:hover {
+    transform: none !important;
+  }
+}

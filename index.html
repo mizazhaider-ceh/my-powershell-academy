@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <script>
+      (function () {
+        try {
+          var currentFetch = window.fetch ? window.fetch.bind(window) : undefined;
+          var makeWritableFetch = function (target) {
+            if (!target) return;
+            var desc = Object.getOwnPropertyDescriptor(target, 'fetch');
+            if (!desc || desc.configurable !== false) {
+              Object.defineProperty(target, 'fetch', {
+                configurable: true,
+                enumerable: true,
+                get: function () {
+                  return currentFetch;
+                },
+                set: function (val) {
+                  if (typeof val === 'function') {
+                    currentFetch = val;
+                  }
+                }
+              });
+            }
+          };
+          makeWritableFetch(window);
+          if (typeof Window !== 'undefined' && Window.prototype) {
+            makeWritableFetch(Window.prototype);
+          }
+        } catch (_e) {}
+
+        window.addEventListener(
+          'error',
+          function (event) {
+            var msg = (event && event.message) || '';
+            var file = (event && event.filename) || '';
+            if (
+              msg.indexOf('Cannot set property fetch') !== -1 ||
+              file.indexOf('chrome-extension://') === 0
+            ) {
+              event.stopImmediatePropagation();
+              event.preventDefault();
+              return false;
+            }
+          },
+          true
+        );
+      })();
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PowerShell Academy - Learn PowerShell. Understand Everything.</title>
+    <meta name="description" content="Learn PowerShell. Understand Everything. Created by Muhammad Izaz Haider. Master Windows Internals, the Object Pipeline, Server Core, Active Directory, and Red/Blue Team Security." />
+    <meta property="og:title" content="PowerShell Academy - Learn PowerShell. Understand Everything." />
+    <meta property="og:description" content="Learn PowerShell. Understand Everything. Created by Muhammad Izaz Haider. Master Windows Internals, the Object Pipeline, Server Core, Active Directory, and Red/Blue Team Security." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

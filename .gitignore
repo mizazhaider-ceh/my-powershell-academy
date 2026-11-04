@@ -1,0 +1,16 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+.playwright-cli/
+.aistudio/
+
+# Private course source material (local reference only, never published)
+source-materials/
+public/assets/aistudio/*.pdf
+public/assets/aistudio/*.html
+public/assets/aistudio/Paste_*
