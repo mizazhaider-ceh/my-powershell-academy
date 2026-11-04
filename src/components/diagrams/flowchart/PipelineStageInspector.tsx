@@ -94,15 +94,15 @@ export const PipelineStageInspector: React.FC<PipelineStageInspectorProps> = ({
               >
                 <div className="flex items-center justify-between font-bold">
                   <span>{pkt.name}.exe</span>
-                  <span className="px-2 py-0.5 rounded-full clay-pill text-[0.6875rem]">PID {pkt.pid}</span>
+                  <span className="px-2 py-0.5 rounded-full clay-pill text-[0.75rem]">PID {pkt.pid}</span>
                 </div>
-                <div className="opacity-80 text-[0.6875rem]">
+                <div className="opacity-80 text-[0.75rem]">
                   {selectedStageIdx >= 2
                     ? pkt.projectedOutput
                     : `WorkingSet: ${pkt.workingSetMB} MB · CPU: ${pkt.cpuSeconds}s`}
                 </div>
                 {isDroppedSoon && (
-                  <span className="text-[0.6875rem] font-extrabold block text-amber-900 dark:text-amber-300">
+                  <span className="text-[0.75rem] font-extrabold block text-amber-900 dark:text-amber-300">
                     Filtered out next (RAM &lt; 50 MB)
                   </span>
                 )}

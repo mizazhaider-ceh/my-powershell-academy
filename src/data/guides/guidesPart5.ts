@@ -2,6 +2,8 @@ import { LessonGuide } from '../../types';
 
 export const GUIDES_PART_5: Record<string, LessonGuide> = {
   '13-2': {
+    oneSentence:
+      'Back up GPOs, force a refresh with Invoke-GPUpdate, read what really applies with Get-GPResultantSetOfPolicy, and automate upkeep with scheduled tasks.',
     analogy:
       'Imagine a company with 5,000 desks. Group Policy is the office rulebook that gets stamped onto every desk automatically: lock your screen after 10 minutes, no USB sticks, wallpaper must be the company logo. Rules come from several levels (head office, regional office, your floor) and the closest one wins an argument. RSoP is the inspector who walks up to one desk and tells you exactly which rule is in force and who wrote it. A Scheduled Task is the office alarm clock that starts a chore for you at 2 AM so you never have to remember.',
     plainEnglish: [
@@ -40,7 +42,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       {
         title: 'Step 5: Push a refresh instead of waiting',
         detail:
-          'Policies refresh roughly every 90 minutes on their own. `Invoke-GPUpdate -Computer SRV-CORE01 -Force` asks a remote machine to refresh right now.',
+          'Policies refresh roughly every 90 minutes on their own. `Invoke-GPUpdate -Computer SRV-CORE01 -Force -RandomDelayInMinutes 0` asks a remote machine to refresh right now (without `-RandomDelayInMinutes 0` it waits a random delay of up to 10 minutes). The target\'s firewall must allow Remote Scheduled Tasks Management and WMI.',
       },
       {
         title: 'Step 6: Build a scheduled task from three pieces',
@@ -151,7 +153,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
             { part: '-Force', meaning: 'Reapply every setting, not just the ones that changed.' },
             { part: '-RandomDelayInMinutes 0', meaning: 'Skip the built-in random wait so it starts immediately.' },
           ],
-          watchOut: 'A forced refresh can apply a bad policy instantly. Test on a lab or pilot OU first.',
+          watchOut: 'A forced refresh can apply a bad policy instantly. Test on a lab or pilot OU first. Remote refresh also needs the target\'s firewall to allow Remote Scheduled Tasks Management and WMI (inbound); if it fails, test with `gpupdate /force` on the target itself.',
         },
       ],
     },
@@ -161,7 +163,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       commands: [
         {
           title: 'Create a GPO and link it to an OU',
-          code: 'New-GPO -Name "LAB-Server-Hardening" -Comment "Lab only" |\n  New-GPLink -Target "OU=Servers,DC=corp,DC=local" -LinkEnabled No',
+          code: 'New-GPO -Name "LAB-Server-Hardening" -Comment "Lab only" |\n  New-GPLink -Target "OU=Servers,DC=corp,DC=example,DC=com" -LinkEnabled No',
           whatItDoes: 'Creates a new empty GPO and links it to the Servers OU in a disabled state, so you can add settings and review before turning it on.',
           parts: [
             { part: 'New-GPO -Name ... -Comment ...', meaning: 'Creates a new Group Policy Object with a label.' },
@@ -173,15 +175,15 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
         },
         {
           title: 'Register a nightly script as a scheduled task',
-          code: '$action  = New-ScheduledTaskAction -Execute "powershell.exe" -Argument \'-NoProfile -ExecutionPolicy Bypass -File "C:\\Scripts\\NightlyCleanup.ps1"\'\n$trigger = New-ScheduledTaskTrigger -Daily -At 2:00AM\nRegister-ScheduledTask -TaskName "Lab-NightlyCleanup" -Action $action -Trigger $trigger -User "SYSTEM" -RunLevel Highest',
-          whatItDoes: 'Runs your cleanup script every night at 2 AM as SYSTEM, with no one logged in.',
+          code: '$action    = New-ScheduledTaskAction -Execute "powershell.exe" -Argument \'-NoProfile -ExecutionPolicy RemoteSigned -File "C:\\Scripts\\NightlyCleanup.ps1"\'\n$trigger   = New-ScheduledTaskTrigger -Daily -At 2:00AM\n$principal = New-ScheduledTaskPrincipal -UserId "NT AUTHORITY\\SYSTEM" -LogonType ServiceAccount -RunLevel Highest\nRegister-ScheduledTask -TaskName "Lab-NightlyCleanup" -Action $action -Trigger $trigger -Principal $principal',
+          whatItDoes: 'Runs your cleanup script every night at 2 AM as SYSTEM, with no one logged in, using a task principal and the RemoteSigned policy (not Bypass).',
           parts: [
-            { part: 'New-ScheduledTaskAction -Execute -Argument', meaning: 'Defines the program to launch. The .ps1 file goes inside -Argument with -File.' },
+            { part: 'New-ScheduledTaskAction -Execute -Argument', meaning: 'Defines the program to launch. The .ps1 file goes inside -Argument with -File. Use RemoteSigned (or AllSigned with a signed script), never Bypass.' },
             { part: 'New-ScheduledTaskTrigger -Daily -At 2:00AM', meaning: 'Defines when the task fires.' },
-            { part: 'Register-ScheduledTask -TaskName', meaning: 'Saves the task into Windows Task Scheduler with a name.' },
-            { part: '-User "SYSTEM" -RunLevel Highest', meaning: 'Runs as the SYSTEM account with full privileges.' },
+            { part: 'New-ScheduledTaskPrincipal -UserId -LogonType -RunLevel', meaning: 'Defines who the task runs as and with what privileges. Pick the least privileged account that works.' },
+            { part: 'Register-ScheduledTask -TaskName ... -Principal', meaning: 'Saves the task into Windows Task Scheduler with a name and that principal.' },
           ],
-          watchOut: 'Run it elevated in a lab VM. Anything a SYSTEM task runs has full power, so make sure only admins can edit the .ps1 file.',
+          watchOut: 'Run it elevated in a lab VM. Anything a SYSTEM task runs has full power, so keep C:\\Scripts writable only by Administrators (restrict the ACL), or any user who can edit the .ps1 can run code as SYSTEM.',
         },
         {
           title: 'Test the task, then remove it',
@@ -211,12 +213,15 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
     recap: [
       'GPOs apply in LSDOU order (Local, Site, Domain, OU) and the closest one wins unless a higher one is Enforced.',
       'Always run Backup-Gpo -All before editing, and prove results with Get-GPResultantSetOfPolicy HTML reports.',
-      'Invoke-GPUpdate -Force refreshes a machine on demand, so use it carefully and test first.',
-      'A scheduled task is Action + Trigger + Register. Run powershell.exe with -File, never the .ps1 directly.',
+      'Invoke-GPUpdate -Force -RandomDelayInMinutes 0 refreshes a machine on demand (the default random delay is up to 10 minutes), so use it carefully and test first.',
+      'A scheduled task is Action + Trigger + Principal + Register. Run powershell.exe with -File and RemoteSigned, never the .ps1 directly and never Bypass.',
+      'When you get stuck: run `gpresult /h C:\\Reports\\gp.html /f` on the target and read Applied and Denied GPOs.',
     ],
   },
 
   '14-1': {
+    oneSentence:
+      'Try/Catch only catches terminating errors, so add -ErrorAction Stop to turn silent failures into ones your script can handle, and use @Splatting to keep calls readable.',
     analogy:
       'Think of a script as a delivery driver following a route. Without error handling, a blocked road just makes the driver shrug and keep driving to the next stop, so the whole day goes wrong without anyone noticing. Try/Catch is giving the driver a rule: "If a road is blocked, stop and call me." Finally is the end-of-day rule: "No matter what happened, lock the van." Splatting is handing the driver a neat clipboard of instructions instead of shouting 12 details at them in one long sentence.',
     plainEnglish: [
@@ -410,6 +415,8 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
   },
 
   '14-2': {
+    oneSentence:
+      'Add [CmdletBinding()] and begin, process, and end blocks to make your own functions behave exactly like built-in cmdlets, complete with -Verbose and -WhatIf.',
     analogy:
       'A basic function is like a handwritten recipe card. An advanced function with [CmdletBinding()] is the same recipe turned into a professional kitchen appliance: it has a proper control panel (parameters), a "tell me what you are doing" light (-Verbose), a "pretend only" button (-WhatIf) and a conveyor belt that handles many ingredients one at a time (the pipeline).',
     plainEnglish: [
@@ -598,6 +605,8 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
   },
 
   '15-1': {
+    oneSentence:
+      'Ethical hackers gather situational awareness with only built-in cmdlets and enumerate Active Directory with the .NET adsisearcher when the AD module is absent.',
     analogy:
       'Before a security guard tests a building, they walk around with a clipboard: Which doors exist? Which are unlocked? Who holds the keys? That is reconnaissance. In this lesson you play the defender doing the same walk on your own lab machine, using only tools already built into Windows, so you can find weak spots before a real attacker does.',
     plainEnglish: [
@@ -607,8 +616,8 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       'Everything in this guide is for systems you own or have written permission to test. Use an isolated lab VM and treat every finding as a fix list, not a trophy.',
     ],
     beforeYouStart: [
-      'A lab Windows VM, ideally joined to a lab domain that you control. Do not run domain queries on a network you do not own.',
-      'Written permission if the machine belongs to anyone else. Unauthorised scanning can be illegal.',
+      'A lab Windows VM (`CLIENT01` or `SRV-CORE01`), ideally joined to the lab domain `corp.example.com` that you control. Lab setup: see the Lab Setup page. Do not run domain queries on a network you do not own.',
+      'Written permission, with a defined scope, if the machine belongs to anyone else. Unauthorised access is illegal in most countries (for example the CFAA in the US and the Computer Misuse Act in the UK). Never run any of this on a work machine.',
       'A standard (non-admin) PowerShell window first. Seeing what a normal user can see is the whole point.',
     ],
     atoZSteps: [
@@ -775,16 +784,19 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       'Unquoted service paths, loose folder permissions and weak service accounts are the classic findings to fix.',
       'ADSI with an LDAP filter lets you query a domain using only built-in tools. Use it only where you have permission.',
       'Always finish with a fix list and test changes with -WhatIf on a lab VM first.',
+      'Pair every technique with its detection: PowerShell recon shows up as 4104 (script block) and 4688 (process creation, command line only if enabled); Kerberoasting shows up on the DC as 4769 with RC4 (0x17), best caught with a honey-SPN account. Event 1644 is not a reliable recon detector.',
     ],
   },
 
   '15-2': {
+    oneSentence:
+      'Attackers run code straight from memory with IEX and hide it in Base64, but that is obfuscation, not encryption, and AMSI inspects it right before it runs.',
     analogy:
-      'Imagine a sealed envelope arriving at a mailroom. A normal letter is written on paper that is filed away, so inspectors can read it. A "fileless" message is read aloud and never written down, so there is no paper to inspect. AMSI is a clever clerk standing at the reading desk who hears every sentence just before it is acted on, even if it was scrambled on the way in. This lesson helps you recognise the scrambled envelopes and see why the clerk still catches them.',
+      'Imagine a sealed envelope arriving at a mailroom. A normal letter is written on paper that is filed away, so inspectors can read it. A "fileless" message is read aloud and never written down, so there is no paper to inspect. AMSI is a clever clerk standing at the reading desk who hears every sentence just before it is acted on, even if it was scrambled on the way in. This lesson helps you recognise the scrambled envelopes and see why the clerk often (but not always) catches them, so you keep other checks in place too.',
     plainEnglish: [
       '"Fileless" means code runs from memory instead of from a file on disk. One common building block is `Invoke-Expression` (alias `IEX`), which runs any text as PowerShell code.',
       '`-EncodedCommand` lets you pass a command as Base64 text. Base64 is not encryption, it is just a way of writing text with safe characters, and anyone can decode it in one line.',
-      'AMSI (Antimalware Scan Interface) lets Windows Defender or other antivirus inspect script content after it is decoded, right before it runs. That is why simple scrambling usually does not hide anything from it.',
+      'AMSI (Antimalware Scan Interface) lets Windows Defender or other antivirus inspect script content after it is decoded, right before it runs. That is why simple scrambling usually does not hide anything from it. But AMSI is not a guarantee: it depends on the antivirus product and can be bypassed, so logging (4104), EDR and application control matter too.',
       'This guide is defensive. You learn how the pieces work with harmless text so you can recognise and investigate them, never how to hide a real payload.',
     ],
     beforeYouStart: [
@@ -963,17 +975,19 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
     recap: [
       'Invoke-Expression runs text as code, so never run it on content you did not read and trust.',
       'Base64 and -EncodedCommand are only encoding. Anyone can decode them in one line.',
-      'AMSI inspects script content after decoding, just before it runs, which is why obfuscation rarely hides it.',
+      'AMSI inspects script content after decoding, just before it runs, so simple obfuscation rarely hides it. It is one layer, not a guarantee, so keep logging, EDR and application control too.',
       'Defenders hunt for patterns in command lines and 4104 logs, and keep Defender real-time protection on.',
     ],
   },
 
   '16-1': {
+    oneSentence:
+      'Turn on Script Block Logging (Event ID 4104) and Module Logging, and Get-WinEvent finds the decoded payload an attacker thought was hidden.',
     analogy:
       'Script Block Logging is a security camera that films every PowerShell action inside the building and keeps the footage, even if the person scrambled their notes first. Transcription is the written diary of everything typed and shown on screen. Get-WinEvent is the fast video player that lets you jump to exactly the moment you need instead of watching all day.',
     plainEnglish: [
       'Windows can record PowerShell activity in the event log. The most valuable record is Event ID 4104, which stores the actual script text after it has been decoded.',
-      'Because 4104 is written at run time, tricks like Base64 or string-splitting usually appear in plain form in the log. That is why obfuscation fails against it.',
+      'Because 4104 is written at run time, tricks like Base64 or string-splitting usually appear in plain form in the log, so obfuscation does not hide the code from this log (an attacker with enough access can still try to disable or clear logging, which is why you forward logs off the machine).',
       'Transcription saves a text file of every session (input and output), which is useful as an audit trail. Store these files somewhere users cannot edit.',
       '`Get-WinEvent -FilterHashtable` filters at the source, so it is much faster than loading every event and filtering afterwards.',
     ],
@@ -1114,7 +1128,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
             { part: '-Type DWord', meaning: 'Stores the value as a number, which this policy requires.' },
             { part: '-WhatIf', meaning: 'Shows what would change without changing it. Remove it only in your lab.' },
           ],
-          watchOut: 'Registry edits change security behaviour and expand log volume. On a real network, use the GPO setting "Turn on PowerShell Script Block Logging" and size the log appropriately.',
+          watchOut: 'Registry edits change security behaviour and expand log volume. Lab VM only. On a real network, use the GPO setting "Turn on PowerShell Script Block Logging" and size the log appropriately. Undo in the lab with `Remove-ItemProperty -Path $key -Name EnableScriptBlockLogging`.',
         },
         {
           title: 'Enlarge the PowerShell log so evidence is not overwritten',
@@ -1156,10 +1170,13 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       'Use Get-WinEvent -FilterHashtable to search quickly by log, ID and time.',
       'Transcripts give a session diary but must be stored securely because they can capture secrets.',
       'Forward logs to a central place and alert on 1102 and 104 so an intruder cannot quietly erase the evidence.',
+      'Event 4688 (process creation) only carries the command line if you enable BOTH the audit policy "Audit Process Creation" and the setting "Include command line in process creation events".',
     ],
   },
 
   '16-2': {
+    oneSentence:
+      'Harden PowerShell by blocking the version 2 downgrade, locking .NET access with Constrained Language Mode, and giving admins only JEA role capabilities.',
     analogy:
       'Hardening PowerShell is like securing a workshop full of power tools. Removing PowerShell 2.0 is taking the old, unguarded saw out of the shop so no one can use it to skip the safety rules. Constrained Language Mode is putting guards on the dangerous machines so that only approved tasks can be done. JEA (Just Enough Administration) is giving a helper a locked cabinet with only the three tools they need for today\'s job and a visitor badge instead of the master key.',
     plainEnglish: [
@@ -1182,7 +1199,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       {
         title: 'Step 2: Check whether PowerShell 2.0 is installed',
         detail:
-          'Run `Get-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root`. If State is Enabled, a downgrade path exists.',
+          'Run `Get-WindowsOptionalFeature -Online -FeatureName MicrosoftWindowsPowerShellV2Root`. If State is Enabled, a downgrade path exists. On newer builds (Windows 11 24H2, Windows Server 2025) the feature no longer exists and the command returns nothing or an error, which means there is nothing to remove.',
       },
       {
         title: 'Step 3: Preview removing PowerShell 2.0',
@@ -1243,7 +1260,7 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
             { part: 'Select-Object FeatureName, State', meaning: 'Shows only name and Enabled/Disabled.' },
           ],
           sampleOutput: 'FeatureName                       State\n-----------                       -----\nMicrosoftWindowsPowerShellV2Root Disabled',
-          watchOut: 'Needs an elevated Windows PowerShell 5.1 window. On Windows Server use Get-WindowsFeature PowerShell-V2 instead.',
+          watchOut: 'Needs an elevated Windows PowerShell 5.1 window. On Windows Server use Get-WindowsFeature PowerShell-V2 instead. On newer builds (Windows 11 24H2, Windows Server 2025) the feature is gone, so the command may return nothing or an error. That is fine: there is nothing to disable.',
         },
         {
           title: 'List existing remoting endpoints',
@@ -1316,24 +1333,24 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
         },
         {
           title: 'Build and register the JEA endpoint (lab VM)',
-          code: 'New-PSSessionConfigurationFile -Path .\\LabJea.pssc -SessionType RestrictedRemoteServer -RunAsVirtualAccount `\n  -RoleDefinitions @{ "LAB\\HelpDesk" = @{ RoleCapabilities = "SpoolerHelp" } } `\n  -TranscriptDirectory "C:\\JeaTranscripts"\nRegister-PSSessionConfiguration -Name LabJea -Path .\\LabJea.pssc -Force -WhatIf',
+          code: 'New-PSSessionConfigurationFile -Path .\\LabJea.pssc -SessionType RestrictedRemoteServer -RunAsVirtualAccount `\n  -RoleDefinitions @{ "CORP\\GRP_Helpdesk" = @{ RoleCapabilities = "SpoolerHelp" } } `\n  -TranscriptDirectory "C:\\JeaTranscripts"\nRegister-PSSessionConfiguration -Name LabJea -Path .\\LabJea.pssc -Force -WhatIf',
           whatItDoes: 'Defines who may connect, which role they get, and where transcripts go, then previews registering the endpoint.',
           parts: [
             { part: '-SessionType RestrictedRemoteServer', meaning: 'Starts from a very limited session with only a few default commands.' },
-            { part: '-RunAsVirtualAccount', meaning: 'Runs commands as a temporary virtual account rather than the caller\'s own admin rights.' },
-            { part: '-RoleDefinitions @{ "LAB\\HelpDesk" = @{ ... } }', meaning: 'Maps a group to a role capability.' },
-            { part: 'Register-PSSessionConfiguration -WhatIf', meaning: 'Previews creating the endpoint. Remove -WhatIf in the lab to really register it.' },
+            { part: '-RunAsVirtualAccount', meaning: 'Runs commands as a temporary virtual account rather than the caller\'s own rights. That account is a local administrator (domain-admin context on a DC), so keep the allow-list tiny. Narrow it with -RunAsVirtualAccountGroups.' },
+            { part: '-RoleDefinitions @{ "CORP\\GRP_Helpdesk" = @{ ... } }', meaning: 'Maps a group to a role capability. Without it nobody gets any commands.' },
+            { part: 'Register-PSSessionConfiguration -WhatIf', meaning: 'Previews creating the endpoint. Remove -WhatIf in the lab to really register it. Undo with Unregister-PSSessionConfiguration -Name LabJea.' },
           ],
           watchOut: 'Registering restarts the WinRM service, which drops existing remote sessions. Use a lab VM, and create the transcript folder first with strict permissions.',
         },
         {
           title: 'Prove what a user can really do',
-          code: 'Get-PSSessionCapability -ConfigurationName LabJea -Username "LAB\\alice" | Select-Object -First 15 Name, CommandType',
+          code: 'Get-PSSessionCapability -ConfigurationName LabJea -Username "CORP\\ihaider" | Select-Object -First 15 Name, CommandType',
           whatItDoes: 'Lists the commands available to a specific user in the JEA endpoint, so you can confirm they get just enough and no more.',
           parts: [
             { part: 'Get-PSSessionCapability', meaning: 'Reports the commands a user can run in a session configuration.' },
             { part: '-ConfigurationName LabJea', meaning: 'The endpoint to inspect.' },
-            { part: '-Username "LAB\\alice"', meaning: 'The user (domain\\name) whose access you want to check.' },
+            { part: '-Username "CORP\\ihaider"', meaning: 'The user (domain\\name) whose access you want to check. The user must be in the mapped group.' },
           ],
           sampleOutput: 'Name            CommandType\n----            -----------\nGet-Service           Cmdlet\nRestart-Service       Cmdlet',
         },
@@ -1352,9 +1369,9 @@ export const GUIDES_PART_5: Record<string, LessonGuide> = {
       ],
     },
     recap: [
-      'Remove PowerShell 2.0 (and verify with -Version 2) so attackers cannot downgrade past AMSI and logging.',
-      'Constrained Language Mode is truly enforced by application control such as WDAC or AppLocker, not by typing a variable.',
-      'JEA gives people just enough commands with a virtual account instead of full administrator rights.',
+      'Remove PowerShell 2.0 where it exists (and verify with -Version 2) so attackers cannot downgrade past AMSI and logging. Newer builds such as Windows Server 2025 no longer include it, so an empty audit is a pass.',
+      'Constrained Language Mode is truly enforced by application control such as WDAC or AppLocker, not by typing a variable, and it is not a boundary on its own.',
+      'JEA gives people just enough commands with a virtual account instead of full administrator rights, but that virtual account is itself an administrator, so keep the allow-list tiny.',
       'Design roles with the smallest command list, test with Get-PSSessionCapability, and review transcripts.',
     ],
   },

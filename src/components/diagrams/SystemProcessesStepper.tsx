@@ -40,7 +40,7 @@ export const SystemProcessesStepper: React.FC = () => {
           <span className="font-bold text-blue-600 dark:text-blue-400 text-sm">
             {current.name}
           </span>
-          <div className="flex flex-wrap gap-3 text-[11px] text-stone-600 dark:text-stone-400">
+          <div className="flex flex-wrap gap-3 text-[0.75rem] text-stone-600 dark:text-stone-400">
             <span>
               PID: <strong>{current.pid}</strong>
             </span>

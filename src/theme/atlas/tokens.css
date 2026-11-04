@@ -1,0 +1,108 @@
+/* ============================================================================
+   ATLAS: design tokens (light "Paper" and dark "Ink")
+   A monochrome, editorial system with a single blue signal.
+   Scoped to html[data-theme="atlas"]; Claymorphism is untouched.
+   ============================================================================ */
+
+@property --spot {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+html[data-theme="atlas"] {
+  color-scheme: light;
+
+  --atlas-sans: "Geist", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --atlas-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: var(--atlas-sans);
+  --font-display: var(--atlas-sans);
+  --font-mono: var(--atlas-mono);
+  --dp-typography-face: var(--atlas-sans);
+  --dp-typography-emphasis: 600;
+  --dp-typography-reading-leading: 1.7;
+  --dp-typography-body: 1.0625rem;
+
+  /* Light "Paper": cool white, ink text, hairlines, one blue */
+  --dp-color-ground: #fbfbfc;
+  --dp-color-ink: #0b0c0f;
+  --dp-color-ink-secondary: #555d6b;
+  --dp-color-accent: #1b55ff;
+  --dp-color-accent-bright: #3b73ff;
+  --dp-color-accent-cushion: #eaf0ff;
+  --dp-color-surface-support: #f1f8f4;
+  --dp-color-surface-compare: #f3f4f6;
+  --dp-color-surface-warm: #fbf6ea;
+  --dp-color-surface-cool: #eef5fb;
+  --dp-color-surface: #ffffff;
+
+  --a-panel: #ffffff;
+  --a-panel-2: #f5f6f8;
+  --a-line: #e4e7ec;
+  --a-line-strong: #c3c9d4;
+  --a-ink-3: #5f6773;
+  --a-accent: #1b55ff;
+  --a-accent-rgb: 27, 85, 255;
+  --a-good: #12a150;
+  --a-warn: #c77700;
+  --a-bad: #d92d20;
+  --a-hover: rgba(11, 12, 15, 0.045);
+  --a-grid: rgba(11, 12, 15, 0.06);
+  --a-grid-hot: rgba(27, 85, 255, 0.22);
+
+  /* Geometry: tight and architectural */
+  --dp-radius-surface: 0.625rem;
+  --dp-radius-tray: 0.75rem;
+  --dp-radius-control: 0.5rem;
+  --dp-radius-disclosure: 0.625rem;
+  --dp-border-focus-width: 2px;
+  --dp-motion-interaction: 180ms;
+
+  /* Depth is a hairline, never a shadow */
+  --clay-shadow-tray: inset 0 0 0 1px var(--a-line);
+  --clay-shadow-cushion: inset 0 0 0 1px var(--a-line);
+  --clay-shadow-blue-cushion: inset 0 0 0 1px var(--a-line-strong);
+  --clay-shadow-pill: inset 0 0 0 1px var(--a-line);
+  --clay-shadow-blue-btn: none;
+  --clay-shadow-pill-pressed: inset 0 0 0 1px var(--a-line-strong);
+  --clay-shadow-well: inset 0 0 0 1px var(--a-line);
+
+  /* Shared home widget tokens */
+  --hx-line: var(--a-line);
+  --hx-chip: rgba(var(--a-accent-rgb), 0.08);
+  --hx-accent2: #0ea5e9;
+}
+
+html[data-theme="atlas"].dark {
+  color-scheme: dark;
+
+  /* Dark "Ink": true-dark ground, soft white text, hairline edges */
+  --dp-color-ground: #09090b;
+  --dp-color-ink: #f4f5f7;
+  --dp-color-ink-secondary: #9aa1ae;
+  --dp-color-accent: #6f9bff;
+  --dp-color-accent-bright: #9ab8ff;
+  --dp-color-accent-cushion: rgba(111, 155, 255, 0.14);
+  --dp-color-surface-support: rgba(61, 220, 151, 0.08);
+  --dp-color-surface-compare: rgba(255, 255, 255, 0.05);
+  --dp-color-surface-warm: rgba(255, 181, 71, 0.08);
+  --dp-color-surface-cool: rgba(56, 189, 248, 0.08);
+  --dp-color-surface: #0e1013;
+
+  --a-panel: #0e1013;
+  --a-panel-2: #14171b;
+  --a-line: #22262c;
+  --a-line-strong: #3a404a;
+  --a-ink-3: #8a93a3;
+  --a-accent: #6f9bff;
+  --a-accent-rgb: 111, 155, 255;
+  --a-good: #3ddc97;
+  --a-warn: #ffb547;
+  --a-bad: #ff6b7d;
+  --a-hover: rgba(255, 255, 255, 0.05);
+  --a-grid: rgba(255, 255, 255, 0.05);
+  --a-grid-hot: rgba(111, 155, 255, 0.28);
+
+  --hx-chip: rgba(var(--a-accent-rgb), 0.14);
+  --hx-accent2: #38bdf8;
+}

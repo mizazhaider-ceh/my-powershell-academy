@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
+import { flushSync } from 'react-dom';
+import { useTheme } from './theme/useTheme';
+import { AtlasShell } from './components/atlas/AtlasShell';
 import { Header } from './components/common/Header';
 import { Footer } from './components/common/Footer';
 import { SearchModal } from './components/common/SearchModal';
 import { HomeView } from './views/HomeView';
-import { RoadmapView } from './views/RoadmapView';
-import { LearnOverviewView } from './views/LearnOverviewView';
-import { ChapterView } from './views/ChapterView';
-import { LessonView } from './views/LessonView';
-import { CommandsView } from './views/CommandsView';
-import { KnowledgeView } from './views/KnowledgeView';
-import { GlossaryView } from './views/GlossaryView';
-import { AboutView } from './views/AboutView';
+import { AtlasHomeView } from './views/AtlasHomeView';
+import { RouteView } from './components/common/RouteView';
+import { useRouteAnnouncer } from './utils/routeMeta';
 
 export default function App() {
   const [currentPath, setCurrentPath] = useState<string>(() => {
@@ -18,21 +16,7 @@ export default function App() {
   });
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isDark, setIsDark] = useState<boolean>(() => {
-    const saved = localStorage.getItem('powershell_academy_theme');
-    if (saved) return saved === 'dark';
-    return false; // Default to the luminous Royal Periwinkle Claymorphism light theme matching reference
-  });
-
-  useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('powershell_academy_theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('powershell_academy_theme', 'light');
-    }
-  }, [isDark]);
+  const { theme, setTheme, isDark, toggleMode } = useTheme();
 
   useEffect(() => {
     const handlePopState = () => {
@@ -54,97 +38,93 @@ export default function App() {
   }, []);
 
   const navigate = (path: string) => {
-    if (path !== currentPath) {
+    if (path === currentPath) return;
+
+    const go = (behavior: ScrollBehavior) => {
       window.history.pushState(null, '', path);
       setCurrentPath(path);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
+      window.scrollTo({ top: 0, behavior });
+    };
 
-  const toggleTheme = () => {
-    setIsDark(!isDark);
+    // Atlas crossfades between routes with the View Transitions API when available.
+    const doc = document as Document & {
+      startViewTransition?: (update: () => void) => { finished: Promise<void> };
+    };
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (theme === 'atlas' && doc.startViewTransition && !reduceMotion) {
+      const root = document.documentElement;
+      root.dataset.routeTransition = '';
+      doc
+        .startViewTransition(() => flushSync(() => go('instant')))
+        .finished.finally(() => delete root.dataset.routeTransition);
+      return;
+    }
+
+    go('smooth');
   };
 
   // Strip query string and hash before route matching; keep the query for views that use it.
   const cleanPath = currentPath.split(/[?#]/)[0].replace(/\/+$/, '') || '/';
   const queryParams = new URLSearchParams((currentPath.split('?')[1] || '').split('#')[0]);
 
-  const renderRoute = () => {
+  useRouteAnnouncer(cleanPath);
 
-    if (cleanPath === '/' || cleanPath === '') {
-      return <HomeView onNavigate={navigate} />;
-    }
+  const renderHome = () =>
+    theme === 'atlas' ? <AtlasHomeView onNavigate={navigate} /> : <HomeView onNavigate={navigate} />;
 
-    if (cleanPath === '/roadmap') {
-      return <RoadmapView onNavigate={navigate} />;
-    }
+  const renderRoute = () => (
+    <div id="main-content" tabIndex={-1} className="outline-none">
+      <RouteView cleanPath={cleanPath} queryParams={queryParams} onNavigate={navigate} home={renderHome()} />
+    </div>
+  );
 
-    if (cleanPath === '/learn') {
-      return <LearnOverviewView onNavigate={navigate} />;
-    }
+  const searchModal = (
+    <SearchModal
+      isOpen={isSearchOpen}
+      onClose={() => setIsSearchOpen(false)}
+      onNavigate={navigate}
+    />
+  );
 
-    if (cleanPath.startsWith('/learn/')) {
-      const parts = cleanPath.replace('/learn/', '').split('/');
-      const chapterId = parts[0];
-      const lessonSlug = parts[1];
-
-      if (lessonSlug) {
-        return (
-          <LessonView
-            chapterId={chapterId}
-            lessonSlug={lessonSlug}
-            onNavigate={navigate}
-          />
-        );
-      }
-
-      return <ChapterView chapterId={chapterId} onNavigate={navigate} />;
-    }
-
-    if (cleanPath === '/commands') {
-      return <CommandsView onNavigate={navigate} />;
-    }
-
-    if (cleanPath.startsWith('/commands/')) {
-      const cmdletName = decodeURIComponent(cleanPath.replace('/commands/', ''));
-      return <CommandsView key={cmdletName} initialCmdlet={cmdletName} onNavigate={navigate} />;
-    }
-
-    if (cleanPath === '/knowledge') {
-      return <KnowledgeView onNavigate={navigate} />;
-    }
-
-    if (cleanPath === '/glossary') {
-      const glossaryQuery = queryParams.get('q') || '';
-      return <GlossaryView key={glossaryQuery} initialQuery={glossaryQuery} onNavigate={navigate} />;
-    }
-
-    if (cleanPath === '/about') {
-      return <AboutView onNavigate={navigate} />;
-    }
-
-    return <HomeView onNavigate={navigate} />;
-  };
+  if (theme === 'atlas') {
+    return (
+      <div className="font-sans antialiased">
+        <a href="#main-content" className="skip-link">Skip to content</a>
+        <AtlasShell
+          currentPath={cleanPath}
+          onNavigate={navigate}
+          onOpenSearch={() => setIsSearchOpen(true)}
+          isDark={isDark}
+          onToggleTheme={toggleMode}
+          theme={theme}
+          onSelectTheme={setTheme}
+        >
+          {renderRoute()}
+        </AtlasShell>
+        {searchModal}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col font-sans antialiased">
+      <a href="#main-content" className="skip-link">Skip to content</a>
       <Header
         currentPath={cleanPath}
         onNavigate={navigate}
         onOpenSearch={() => setIsSearchOpen(true)}
         isDark={isDark}
-        onToggleTheme={toggleTheme}
+        onToggleTheme={toggleMode}
+        theme={theme}
+        onSelectTheme={setTheme}
       />
 
       <main className="flex-1">{renderRoute()}</main>
 
       <Footer onNavigate={navigate} />
 
-      <SearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onNavigate={navigate}
-      />
+      {searchModal}
     </div>
   );
 }

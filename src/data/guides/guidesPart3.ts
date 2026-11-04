@@ -2,13 +2,15 @@ import { LessonGuide } from '../../types';
 
 export const GUIDES_PART_3: Record<string, LessonGuide> = {
   '6-2': {
+    oneSentence:
+      'Double quotes expand variables, single quotes do not, Write-Host only talks to the screen, and passwords should use Read-Host -AsSecureString or Get-Credential.',
     analogy:
-      'Double quotes are like a mail-merge letter: PowerShell opens the envelope and swaps "Dear $name" for "Dear Izaz". Single quotes are like a letter sealed in a glass case: you see exactly what is written, and nothing inside is ever swapped. Write-Output puts a parcel on the conveyor belt so the next machine can pick it up; Write-Host is someone shouting across the room: people hear it, but no machine can catch it. SecureString is a PIN pad that shows dots instead of numbers.',
+      'Double quotes are like a mail-merge letter: PowerShell opens the envelope and swaps "Dear $name" for "Dear Izaz". Single quotes are like a letter sealed in a glass case: you see exactly what is written, and nothing inside is ever swapped. Write-Output puts a parcel on the conveyor belt so the next machine can pick it up; Write-Host is someone shouting across the room: people hear it, but the next machine on the conveyor belt never receives it. SecureString is a PIN pad that shows dots instead of numbers.',
     plainEnglish: [
       'Inside "double quotes" PowerShell replaces `$variables` with their values. Inside single quotes it prints every character as-is. Same text, very different result.',
       'To print a property inside double quotes you need the `$()` wrapper: `"$($proc.Id)"`. Without it PowerShell only expands `$proc` and leaves `.Id` as plain text.',
-      '`Write-Output` sends data down the pipeline so you can save it or pass it on. `Write-Host` only paints text on the screen, so piping it into a file gives you an empty file.',
-      'Never type passwords as plain text. `Read-Host -AsSecureString` hides what you type and keeps the password encrypted in memory.',
+      '`Write-Output` sends data down the pipeline so you can save it or pass it on. `Write-Host` shows text on the screen through the Information stream, not the pipeline, so piping it into a file gives you an empty file.',
+      'Never type passwords as plain text. `Read-Host -AsSecureString` hides what you type and keeps the password in a protected SecureString (better than plain text, but not strong encryption).',
     ],
     beforeYouStart: [
       'PowerShell 5.1 or 7 on any Windows machine, running in a normal (non-elevated) window.',
@@ -29,7 +31,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
         detail: 'Run `$proc = Get-Process -Id $PID` and then `"ID: $($proc.Id)"`. Try it again without the `$()` and see the odd result, so you recognise it when it happens by accident.',
       },
       {
-        title: 'Step 4: Prove Write-Host cannot be piped',
+        title: 'Step 4: Prove Write-Host output skips the pipeline',
         detail: 'Pipe `Write-Output` and `Write-Host` into `Out-File` in turn and look at the file sizes. Only Write-Output puts text in the file.',
       },
       {
@@ -46,7 +48,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       { word: 'Literal string', meaning: 'A string in single quotes that is printed exactly as typed.' },
       { word: 'Subexpression $()', meaning: 'A wrapper that tells PowerShell to evaluate the code inside first, then insert the result into the string.' },
       { word: 'Output stream', meaning: 'A numbered channel for messages. The Success stream feeds the pipeline; Write-Host uses the Information stream.' },
-      { word: 'SecureString', meaning: 'A password type that is hidden on screen and kept encrypted in memory.' },
+      { word: 'SecureString', meaning: 'A password type that is hidden on screen and protected in memory (not strong encryption).' },
       { word: 'PSCredential', meaning: 'A package holding a user name plus a SecureString password, used by -Credential parameters.' },
     ],
     beginner: {
@@ -84,7 +86,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
           whatItDoes: 'Prints the same words two ways. They look alike on screen, but only the first one travels down the pipeline.',
           parts: [
             { part: 'Write-Output', meaning: 'Puts the text on the pipeline (Success stream). If nothing catches it, PowerShell shows it on screen.' },
-            { part: 'Write-Host', meaning: 'Paints text straight onto the console window and skips the pipeline.' },
+            { part: 'Write-Host', meaning: 'Shows text on screen through the Information stream, so it does not travel down the pipeline.' },
             { part: '-ForegroundColor Green', meaning: 'Colours the Write-Host text. Handy for human-friendly status messages.' },
           ],
           sampleOutput: 'Server Ready\nServer Ready',
@@ -96,7 +98,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
         'Now we use these ideas to build real output: files, typed input and formatted report lines. File examples write only to your TEMP folder.',
       commands: [
         {
-          title: 'Prove Write-Host cannot be piped to a file',
+          title: 'Prove Write-Host output does not reach a file',
           code: '$f = Join-Path $env:TEMP "status.txt"\nWrite-Host "Server Ready" | Out-File $f\n(Get-Item $f).Length\nWrite-Output "Server Ready" | Out-File $f\n(Get-Item $f).Length',
           whatItDoes: 'Writes to a test file twice. The first length is 0 because Write-Host sent nothing down the pipe; the second length is greater than 0.',
           parts: [
@@ -142,7 +144,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
           code: '$securePwd = Read-Host "Enter lab password" -AsSecureString\n$securePwd.GetType().FullName\n$securePwd.Length',
           whatItDoes: 'Hides your typing, stores the answer as a SecureString and shows the type and the length of the password you entered.',
           parts: [
-            { part: 'Read-Host -AsSecureString', meaning: 'Masks the keystrokes and returns an encrypted SecureString instead of text.' },
+            { part: 'Read-Host -AsSecureString', meaning: 'Masks the keystrokes and returns a protected SecureString instead of text.' },
             { part: '$securePwd', meaning: 'Variable holding the SecureString. Printing it only shows its type name, never the password.' },
             { part: '.GetType().FullName', meaning: 'Confirms the object really is System.Security.SecureString.' },
           ],
@@ -190,15 +192,17 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     recap: [
       'Double quotes expand variables; single quotes keep text literal.',
       'Use `"$($obj.Property)"` whenever you put a property or expression inside double quotes.',
-      'Write-Output feeds the pipeline; Write-Host only paints the screen, so never use it to return data.',
+      'Write-Output feeds the pipeline; Write-Host shows text on screen (Information stream) without feeding the pipeline, so never use it to return data.',
       'Read-Host returns text, so cast numbers with `[int]` and always use `-AsSecureString` for passwords.',
     ],
   },
   '7-1': {
+    oneSentence:
+      'Filter as early as you can, because -Filter works inside the cmdlet at the source while Where-Object tests each object after it has already arrived.',
     analogy:
       'Imagine a warehouse that ships parcels to your house. "Filter Left" is telling the warehouse "only send me the blue boxes" so only blue boxes ever travel. Where-Object is the opposite: the warehouse sends you every box on a truck and you stand in the driveway checking each label yourself. Both give you blue boxes, but one wastes a lot of fuel. Where-Object is still essential when the warehouse cannot sort by the thing you care about.',
     plainEnglish: [
-      'Many cmdlets have their own `-Filter` (or `-Name`) parameter. It filters at the source, before data is created or sent over the network. That is the fastest option, so try it first.',
+      'Many cmdlets have a parameter that filters at the source, before the data is created or sent over the network (`-Filter` on `Get-ChildItem`, `Get-CimInstance` and `Get-ADUser`; `-FilterHashtable` on `Get-WinEvent`). The syntax differs by cmdlet. That is usually the fastest option, so try it first.',
       '`Where-Object` is the flexible backup. It looks at each object going by, stored for a moment in `$_`, and keeps the object only if your condition is true.',
       'PowerShell uses `-eq`, `-gt`, `-lt` instead of `=`, `>`, `<` because `>` already means "redirect to a file" in command shells.',
       'Combine tests with `-and`, `-or` and `-not`, and match text with `-like` (wildcards) or `-match` (regular expressions).',
@@ -369,20 +373,22 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       ],
     },
     recap: [
-      'Filter Left: use the cmdlet own -Filter or -Name first; it is much faster, especially over a network.',
+      'Filter Left: use the cmdlet own filter parameter (`-Filter`, `-FilterHashtable` and so on) first; it is usually much faster, especially over a network. Measure it with Measure-Command.',
       'Where-Object checks each object in turn through `$_`; keep it for properties the source cannot filter.',
       'PowerShell uses -eq, -ne, -gt, -ge, -lt, -le, -like, -match, -in because > and = already have other jobs.',
       'Combine tests with -and, -or and -not, and remember -like needs a * wildcard.',
     ],
   },
   '7-2': {
+    oneSentence:
+      'Sort before you Select -First N, and preview anything destructive with -WhatIf or -Confirm so a mistake stays on paper.',
     analogy:
       'Think of a talent show. If you pick the first three contestants who walk in and THEN ask which is the best singer, you will never meet the real winner. You must let everybody perform and rank them first, then pick the top three. And -WhatIf is the rehearsal before the live show: the stagehands walk through every move, but the curtain never opens.',
     plainEnglish: [
       'The order of pipeline stages matters. Sort first, then take the top few with `Select-Object -First`. If you slice first, you only sort a random handful.',
       'A good default order is: Get, Filter, Sort, Select, Output.',
       '`Select-Object -Property` keeps columns inside an object. `-ExpandProperty` pulls out the raw value itself, which is what you want when feeding plain text to another command.',
-      '`-WhatIf` is a dry run for any command that changes something. `-Confirm` asks you to approve each change. `-Verbose` explains what the command is doing.',
+      '`-WhatIf` is a dry run for commands that support it (check `Get-Help` for `[-WhatIf]`). `-Confirm` asks you to approve each change. `-Verbose` explains what the command is doing.',
     ],
     beforeYouStart: [
       'PowerShell 5.1 or 7 on Windows.',
@@ -544,6 +550,8 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     ],
   },
   '8-1': {
+    oneSentence:
+      'PowerShell treats the registry, environment variables, and even Active Directory like drives, so cd and Get-ChildItem work inside HKLM:, Env:, and AD:.',
     analogy:
       'Think of a universal TV remote. Whether you are controlling a TV, a speaker or a lamp, the same buttons (up, down, select) work. A PSProvider is the little adapter that teaches the remote how to talk to a device, and a PSDrive is the labelled button on the remote (C:, HKLM:, Env:). Once you know the file buttons (`cd`, `dir`), you can browse the Registry, environment variables and certificates too.',
     plainEnglish: [
@@ -576,7 +584,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 5: Read registry values',
-        detail: 'Use `Get-ItemProperty` on a key such as the `Run` key to see which programs start with Windows. Security teams check this key for suspicious startup entries.',
+        detail: 'Use `Get-ItemProperty` on a key such as the `Run` key to see some of the programs that start with Windows (it is only one of several startup locations, along with RunOnce, Startup folders, scheduled tasks and services). Security teams check these keys for suspicious startup entries.',
       },
       {
         title: 'Step 6: Build a shortcut drive',
@@ -638,7 +646,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
         {
           title: 'Review startup programs',
           code: 'Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\nGet-ItemProperty HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run',
-          whatItDoes: 'Prints programs set to launch at logon for all users and for you. Defenders review these keys when checking for unwanted persistence.',
+          whatItDoes: 'Prints programs set to launch at logon for all users and for you (two common startup locations, not the complete list). Defenders review these keys when checking for unwanted persistence.',
           parts: [
             { part: 'Get-ItemProperty', meaning: 'Reads the values (properties) stored in a key.' },
             { part: 'HKLM:\\...\\Run', meaning: 'Run key for every user on this computer.' },
@@ -717,6 +725,8 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     ],
   },
   '8-2': {
+    oneSentence:
+      'Get-ChildItem -Filter narrows at the source and -Recurse reaches subfolders, New-Item creates files in bulk, and Select-String searches inside them.',
     analogy:
       'Imagine a huge library. Get-ChildItem is the librarian who finds books by title on the shelf. Adding -Filter makes the librarian use the catalogue instead of walking every aisle; adding -Recurse makes them check every floor, not just the front desk. New-Item is the person who prints blank labelled folders in bulk. Select-String is a highlighter that reads inside every book for one phrase and tells you the book, the page and the exact line.',
     plainEnglish: [
@@ -899,6 +909,8 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     ],
   },
   '9-1': {
+    oneSentence:
+      'Building a Core server is always the same three moves: rename it, give it a static IP and gateway on your LAN, and point DNS at pfSense, checking after every step.',
     analogy:
       'Setting up a new server is like moving into a new house. First you read the street map (the network diagram), then you put your name on the door (hostname), claim a permanent street address (static IP), and write down the phone number of the directory service (DNS). Finally you test the doorbell and keep a checklist (your script) so the next 50 houses take two minutes each.',
     plainEnglish: [
@@ -908,6 +920,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       'A new computer name only takes effect after a restart. After every change, verify it with a matching Get- command.',
     ],
     beforeYouStart: [
+      'LAB VM ONLY: these commands rename the computer and change its IP address. Never paste them on your own PC or on a production server.',
       'A Windows Server Core virtual machine in a lab network. Never practice on a production server.',
       'The lab plan: server IP `192.168.153.210`, prefix `/24`, gateway and DNS `192.168.153.1`. Adjust the numbers to match your own lab.',
       'An elevated PowerShell session on the server. On Server Core, type `powershell` at the prompt.',
@@ -915,7 +928,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     atoZSteps: [
       {
         title: 'Step 1: Start PowerShell',
-        detail: 'At the Server Core command prompt type `powershell` (or choose option 15 in `sconfig`). While the VM still has internet, run `Update-Help -Force` once to get offline help.',
+        detail: 'At the Server Core command prompt type `powershell` (or choose option 15 in `sconfig`). Optional: while the VM still has internet, run `Update-Help -Force` once to get offline help (Windows PowerShell 5.1 needs the elevated window for this).',
       },
       {
         title: 'Step 2: Check the current name',
@@ -923,7 +936,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 3: Find your network card',
-        detail: 'Run `Get-NetAdapter` and note the `ifIndex` of the adapter whose Status is Up.',
+        detail: 'Run `Get-NetAdapter` and note the `ifIndex` and Name of the adapter on your lab network (Status Up). A VM can have several adapters (for example NAT plus host-only), so choose by Name or ifIndex instead of just taking the first one.',
       },
       {
         title: 'Step 4: Plan before you type',
@@ -931,7 +944,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 5: Dry-run, then apply',
-        detail: 'Run `Rename-Computer`, `New-NetIPAddress` and `Set-DnsClientServerAddress` first with `-WhatIf`. When the preview looks right, remove `-WhatIf` and run them for real in the lab.',
+        detail: 'Run `Rename-Computer`, `Set-NetIPInterface`, `New-NetIPAddress` and `Set-DnsClientServerAddress` first with `-WhatIf`. Lab VM NICs usually start on DHCP, so DHCP must be switched off on the adapter before a static address is added. When the preview looks right, remove `-WhatIf` and run them for real in the lab.',
       },
       {
         title: 'Step 6: Verify everything',
@@ -939,7 +952,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 7: Restart and save the script',
-        detail: 'Run `Restart-Computer` to finish the rename, then save all the commands as `configureCoreServerBasic.ps1` so you can repeat the build.',
+        detail: 'In the lab VM only, run `Restart-Computer` to finish the rename, then save all the commands as `configureCoreServerBasic.ps1` so you can repeat the build.',
       },
     ],
     wordsYouWillMeet: [
@@ -987,15 +1000,15 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       intro: 'The real build steps, each one previewed with -WhatIf first. Use a lab VM only: removing -WhatIf changes the name and network settings for real.',
       commands: [
         {
-          title: 'Store the active adapter in a variable',
-          code: '$nic = Get-NetAdapter | Where-Object Status -eq "Up" | Select-Object -First 1\n$nic.Name\n$nic.ifIndex',
-          whatItDoes: 'Finds the first connected adapter and remembers it so later commands do not need the number typed by hand.',
+          title: 'Store the lab adapter in a variable',
+          code: '$nic = Get-NetAdapter -Name "Ethernet"\n$nic.Name\n$nic.ifIndex',
+          whatItDoes: 'Selects your lab network adapter by name and remembers it so later commands do not need the number typed by hand. Run `Get-NetAdapter` first to see the real adapter names.',
           parts: [
-            { part: 'Where-Object Status -eq "Up"', meaning: 'Keeps only connected adapters.' },
-            { part: 'Select-Object -First 1', meaning: 'Takes just one adapter.' },
+            { part: 'Get-NetAdapter -Name "Ethernet"', meaning: 'Picks one adapter by its name. Replace "Ethernet" with the name shown on your lab network.' },
+            { part: '$nic =', meaning: 'Stores the adapter in a variable.' },
             { part: '$nic.ifIndex', meaning: 'Reads the ifIndex property from the variable.' },
           ],
-          watchOut: 'If the server has several adapters, check that the first one is the right network.',
+          watchOut: 'Do not just take the first adapter that is Up: a VM with NAT plus host-only adapters has several. Check that $nic.Name is the adapter on the lab network.',
         },
         {
           title: 'Dry-run renaming the server',
@@ -1010,16 +1023,17 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
           watchOut: 'Without -WhatIf this changes the real name after the next restart. Never rename a domain controller or production server casually.',
         },
         {
-          title: 'Dry-run the static IP and DNS',
-          code: 'New-NetIPAddress -InterfaceIndex $nic.ifIndex -IPAddress 192.168.153.210 -PrefixLength 24 -DefaultGateway 192.168.153.1 -WhatIf\nSet-DnsClientServerAddress -InterfaceIndex $nic.ifIndex -ServerAddresses 192.168.153.1 -WhatIf',
-          whatItDoes: 'Previews assigning the static address, subnet, gateway and DNS server to the chosen adapter.',
+          title: 'Dry-run switching off DHCP, then the static IP and DNS',
+          code: 'Set-NetIPInterface -InterfaceIndex $nic.ifIndex -Dhcp Disabled -WhatIf\nNew-NetIPAddress -InterfaceIndex $nic.ifIndex -IPAddress 192.168.153.210 -PrefixLength 24 -DefaultGateway 192.168.153.1 -WhatIf\nSet-DnsClientServerAddress -InterfaceIndex $nic.ifIndex -ServerAddresses 192.168.153.1 -WhatIf',
+          whatItDoes: 'Previews turning DHCP off, then assigning the static address, subnet, gateway and DNS server to the chosen adapter.',
           parts: [
+            { part: 'Set-NetIPInterface -Dhcp Disabled', meaning: 'Stops the adapter from taking an address from DHCP. Without this step, New-NetIPAddress can fail on an adapter that is still on DHCP.' },
             { part: '-InterfaceIndex $nic.ifIndex', meaning: 'Selects the adapter by its number.' },
             { part: '-IPAddress / -PrefixLength 24', meaning: 'The address and the /24 subnet (255.255.255.0).' },
             { part: '-DefaultGateway', meaning: 'The router the server uses to leave its network.' },
             { part: 'Set-DnsClientServerAddress -ServerAddresses', meaning: 'Sets which DNS server(s) the adapter asks.' },
           ],
-          watchOut: 'A wrong IP can lock you out of a remote server. If the adapter already has a DHCP address, remove it first with Remove-NetIPAddress. Always do this from the lab VM console.',
+          watchOut: 'A wrong IP can lock you out of a remote server. If the adapter already has an IPv4 address from DHCP, the DHCP step above removes the lease, and an old static address can be removed with Remove-NetIPAddress. Always do this from the lab VM console, never over the network connection you are changing.',
         },
       ],
     },
@@ -1028,11 +1042,12 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
       commands: [
         {
           title: 'Wrap the build in a reusable function',
-          code: 'function Set-CoreServerBasic {\n  [CmdletBinding(SupportsShouldProcess)]\n  param(\n    [Parameter(Mandatory)][string]$NewName,\n    [Parameter(Mandatory)][string]$IPAddress,\n    [int]$PrefixLength = 24,\n    [Parameter(Mandatory)][string]$Gateway,\n    [Parameter(Mandatory)][string[]]$Dns\n  )\n  $nic = Get-NetAdapter | Where-Object Status -eq "Up" | Select-Object -First 1\n  Rename-Computer -NewName $NewName\n  New-NetIPAddress -InterfaceIndex $nic.ifIndex -IPAddress $IPAddress -PrefixLength $PrefixLength -DefaultGateway $Gateway\n  Set-DnsClientServerAddress -InterfaceIndex $nic.ifIndex -ServerAddresses $Dns\n}\nSet-CoreServerBasic -NewName SRV-CORE01 -IPAddress 192.168.153.210 -Gateway 192.168.153.1 -Dns 192.168.153.1 -WhatIf',
-          whatItDoes: 'Packages rename, IP and DNS into one function. Because it supports -WhatIf, you can preview the whole build before applying it.',
+          code: 'function Set-CoreServerBasic {\n  [CmdletBinding(SupportsShouldProcess)]\n  param(\n    [Parameter(Mandatory)][string]$NewName,\n    [Parameter(Mandatory)][string]$IPAddress,\n    [int]$PrefixLength = 24,\n    [Parameter(Mandatory)][string]$Gateway,\n    [Parameter(Mandatory)][string[]]$Dns,\n    [string]$AdapterName = "Ethernet"\n  )\n  $nic = Get-NetAdapter -Name $AdapterName\n  Rename-Computer -NewName $NewName\n  Set-NetIPInterface -InterfaceIndex $nic.ifIndex -Dhcp Disabled\n  New-NetIPAddress -InterfaceIndex $nic.ifIndex -IPAddress $IPAddress -PrefixLength $PrefixLength -DefaultGateway $Gateway\n  Set-DnsClientServerAddress -InterfaceIndex $nic.ifIndex -ServerAddresses $Dns\n}\nSet-CoreServerBasic -NewName SRV-CORE01 -IPAddress 192.168.153.210 -Gateway 192.168.153.1 -Dns 192.168.153.1 -WhatIf',
+          whatItDoes: 'Packages rename, DHCP-off, IP and DNS into one function for a named adapter. Because it supports -WhatIf, you can preview the whole build before applying it. LAB VM ONLY.',
           parts: [
             { part: '[CmdletBinding(SupportsShouldProcess)]', meaning: 'Adds -WhatIf and -Confirm, passed on to the cmdlets inside.' },
             { part: '[Parameter(Mandatory)]', meaning: 'PowerShell insists on a value instead of guessing.' },
+            { part: '[string]$AdapterName = "Ethernet"', meaning: 'Names the adapter to configure, so the function never guesses which of several adapters you meant.' },
             { part: '[string[]]$Dns', meaning: 'Allows more than one DNS server.' },
             { part: 'Set-CoreServerBasic ... -WhatIf', meaning: 'Calls the function in preview mode.' },
           ],
@@ -1040,7 +1055,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
         },
         {
           title: 'Verify the build with pass/fail checks',
-          code: '$ifIndex = (Get-NetAdapter | Where-Object Status -eq "Up" | Select-Object -First 1).ifIndex\n$ip = Get-NetIPAddress -InterfaceIndex $ifIndex -AddressFamily IPv4\nif ($ip.IPAddress -eq "192.168.153.210" -and $ip.PrefixLength -eq 24) { "IP OK" } else { "IP MISMATCH" }\nTest-Connection 192.168.153.1 -Count 2 -Quiet',
+          code: '$ifIndex = (Get-NetAdapter -Name "Ethernet").ifIndex\n$ip = Get-NetIPAddress -InterfaceIndex $ifIndex -AddressFamily IPv4\nif ($ip.IPAddress -eq "192.168.153.210" -and $ip.PrefixLength -eq 24) { "IP OK" } else { "IP MISMATCH" }\nTest-Connection 192.168.153.1 -Count 2 -Quiet',
           whatItDoes: 'Checks that the IP and prefix match the plan, then tests whether the gateway answers. Read-only.',
           parts: [
             { part: 'Get-NetIPAddress -AddressFamily IPv4', meaning: 'Reads the IPv4 settings of the adapter.' },
@@ -1071,6 +1086,8 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     ],
   },
   '9-2': {
+    oneSentence:
+      'A real admin workout means creating users from a custom object, reading disks and dates, and exporting reports to TXT, CSV, and HTML.',
     analogy:
       'Think of this lesson as a day shift in a small office. You hand out visitor badges (local users), check which machines are busy (processes), look at how full the filing cabinets are (disks), stamp every report with the correct date, and print summaries as a plain note, a spreadsheet or a web page. Each task is small, but together they are what every admin does daily.',
     plainEnglish: [
@@ -1082,7 +1099,7 @@ export const GUIDES_PART_3: Record<string, LessonGuide> = {
     beforeYouStart: [
       'A lab Windows machine or Server Core VM. Creating users needs an elevated window, so use the lab only.',
       'PowerShell 5.1 or 7. The LocalAccounts module comes with Windows PowerShell 5.1; in PowerShell 7 it works on current Windows.',
-      'Fake passwords only. Reports in this guide are written to your TEMP folder.',
+      'Fake passwords only. Prompt for them with `Read-Host -AsSecureString` (never type a password inside the script). A SecureString hides the typing and protects the value in memory, but it is not strong encryption. Reports in this guide are written to your TEMP folder.',
     ],
     atoZSteps: [
       {

@@ -7,6 +7,8 @@ import { lessons } from '../../src/data/lessons';
 import { commands } from '../../src/data/commands';
 import { glossary } from '../../src/data/glossary';
 import { quizzes } from '../../src/data/quizzes';
+import { TEACHING, countConceptDiagrams } from '../../src/data/teaching';
+import { THEMES, readStoredTheme } from '../../src/theme/themes';
 import {
   buildLessonFlowchartData,
   extractPlainEnglishKeyTerms,
@@ -71,8 +73,9 @@ test('Curriculum coverage: all 16 modules across 4 specialized engineering track
 test('Every lesson has a complete A-to-Z guide with beginner, intermediate and pro tiers', () => {
   lessons.forEach((lesson) => {
     const g = lesson.guide;
-    assert.ok(g, `Lesson ${lesson.id} must have a guide`);
-    assert.ok(g.analogy.length > 40, `Lesson ${lesson.id} guide needs an analogy`);
+  assert.ok(g, `Lesson ${lesson.id} must have a guide`);
+  assert.ok(g.oneSentence.length > 20, `Lesson ${lesson.id} guide needs a one-sentence version`);
+  assert.ok(g.analogy.length > 40, `Lesson ${lesson.id} guide needs an analogy`);
     assert.ok(g.atoZSteps.length >= 5, `Lesson ${lesson.id} guide needs at least 5 A-to-Z steps`);
     assert.ok(g.wordsYouWillMeet.length >= 4, `Lesson ${lesson.id} guide needs vocabulary`);
     assert.ok(g.recap.length >= 3, `Lesson ${lesson.id} guide needs a recap`);
@@ -159,8 +162,8 @@ test('Glossary: contains comprehensive definitions across all 7 categories', () 
   assert.ok(categories.has('Security & Ethical Hacking'));
 });
 
-test('Quiz integrity: all 30 questions have valid correctAnswer and explanation', () => {
-  assert.ok(quizzes.length >= 30, 'Expected at least 30 quiz questions');
+test('Quiz integrity: all 72 questions have valid correctAnswer and explanation', () => {
+  assert.ok(quizzes.length >= 72, 'Expected at least 72 quiz questions');
   quizzes.forEach((q) => {
     assert.ok(q.options.length >= 2, `Question ${q.id} has at least 2 options`);
     assert.ok(q.options.includes(q.correctAnswer), `Question ${q.id} correctAnswer must match one of its options`);
@@ -204,4 +207,63 @@ test('Chapter lesson refs match real lesson ids and slugs', () => {
       assert.equal(real!.chapterId, c.id, `Lesson ${ref.id} chapter mismatch`);
     })
   );
+});
+
+test('Teaching layer: every lesson has complete expert-teacher scaffolding', () => {
+  for (const lesson of lessons) {
+    const t = TEACHING[lesson.id];
+    assert.ok(t, `Lesson ${lesson.id} must have teaching content`);
+    assert.ok(t.hook.length > 20, `${lesson.id} needs a curiosity hook`);
+    assert.ok(t.mentalModel.length > 40, `${lesson.id} needs a mental model`);
+    assert.ok(t.misconceptions.length >= 3, `${lesson.id} needs 3 misconceptions`);
+    assert.ok(t.workedExample.steps.length >= 4, `${lesson.id} needs a worked example of 4+ steps`);
+    assert.ok(t.checkpoints.length >= 3, `${lesson.id} needs 3 checkpoints`);
+    assert.ok(t.challenge.hints.length >= 3 && t.challenge.solution.length > 5, `${lesson.id} needs a hinted challenge`);
+    assert.ok(t.teachBack.length > 20, `${lesson.id} needs a teach-back prompt`);
+    assert.ok(t.diagrams.length >= 1, `${lesson.id} needs at least one concept diagram`);
+    for (const m of t.misconceptions) assert.ok(m.myth && m.truth && m.test, `${lesson.id} misconception is incomplete`);
+    for (const s of t.workedExample.steps) assert.ok(s.think && s.action, `${lesson.id} worked example step is incomplete`);
+  }
+  assert.equal(Object.keys(TEACHING).length, lessons.length, 'No teaching entries for unknown lessons');
+  assert.ok(countConceptDiagrams() >= lessons.length, 'Expected at least one diagram per lesson');
+});
+
+test('Concept diagrams are structurally valid so the renderers never break', () => {
+  for (const [id, t] of Object.entries(TEACHING)) {
+    for (const d of t.diagrams) {
+      const where = `${id} "${d.title}"`;
+      assert.ok(d.title && d.caption, `${where} needs a title and caption`);
+      if (d.kind === 'layers') {
+        assert.ok(d.layers.length >= 3, `${where} needs 3+ layers`);
+        assert.ok(d.traceLabel.length > 0, `${where} needs a trace label`);
+        for (const i of d.tracePath ?? []) assert.ok(i >= 0 && i < d.layers.length, `${where} tracePath index ${i} out of range`);
+      } else if (d.kind === 'sequence') {
+        assert.ok(d.actors.length >= 2 && d.messages.length >= 3, `${where} needs 2+ actors and 3+ messages`);
+        for (const m of d.messages) {
+          assert.ok(m.from >= 0 && m.from < d.actors.length, `${where} message from index out of range`);
+          assert.ok(m.to >= 0 && m.to < d.actors.length, `${where} message to index out of range`);
+        }
+      } else if (d.kind === 'compare') {
+        assert.ok(d.left.rows.length >= 2 && d.right.rows.length >= 2, `${where} needs 2+ rows per side`);
+        assert.ok(d.verdict.length > 10, `${where} needs a verdict`);
+      } else {
+        const countNodes = (n: { children?: unknown[] }): number =>
+          1 + (n.children ?? []).reduce<number>((sum, c) => sum + countNodes(c as { children?: unknown[] }), 0);
+        assert.ok(countNodes(d.root) >= 3, `${where} needs 3+ nodes`);
+      }
+    }
+  }
+});
+
+test('Teaching content has no em dashes or forbidden terms', () => {
+  const json = JSON.stringify(TEACHING).toLowerCase();
+  for (const term of ['howest', 'pascal', '2627', '—']) {
+    assert.equal(json.includes(term), false, `Teaching data must not contain: "${term}"`);
+  }
+});
+
+test('Theme registry offers Claymorphism and Atlas with distinct fonts', () => {
+  assert.deepEqual(THEMES.map((t) => t.id), ['clay', 'atlas']);
+  assert.notEqual(THEMES[0].fonts, THEMES[1].fonts);
+  assert.equal(readStoredTheme(), 'clay', 'Claymorphism stays the default theme');
 });

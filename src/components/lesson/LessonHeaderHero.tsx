@@ -3,17 +3,20 @@ import { Clock, Lightbulb, BookOpen } from 'lucide-react';
 import { Chapter, Lesson as LessonType } from '../../types';
 import { PlainEnglishTermExplanation } from '../../utils/lessonPedagogy';
 import { formatInlineRichText } from './formatInlineRichText';
+import type { LessonTimeEstimate } from '../../utils/lessonTime';
 
 interface LessonHeaderHeroProps {
   currentLesson: LessonType;
   parentChapter?: Chapter;
   plainEnglishTerms: PlainEnglishTermExplanation[];
+  time?: LessonTimeEstimate;
 }
 
 export const LessonHeaderHero: React.FC<LessonHeaderHeroProps> = ({
   currentLesson,
   parentChapter,
   plainEnglishTerms,
+  time,
 }) => {
   return (
     <>
@@ -27,10 +30,11 @@ export const LessonHeaderHero: React.FC<LessonHeaderHeroProps> = ({
           </span>
           <span className="px-3 py-1 rounded-full clay-pill flex items-center gap-1">
             <Clock className="w-3.5 h-3.5" />
-            <span>{currentLesson.estimatedMinutes} min study</span>
-          </span>
-          <span className="px-3 py-1 rounded-full clay-pill">
-            Created by Muhammad Izaz Haider
+            <span>
+              {time
+                ? `${time.core} min core, ${time.full} min full${time.sittings > 1 ? ` (${time.sittings} sittings)` : ''}`
+                : `${currentLesson.estimatedMinutes} min study`}
+            </span>
           </span>
         </div>
 
@@ -49,7 +53,7 @@ export const LessonHeaderHero: React.FC<LessonHeaderHeroProps> = ({
           <div className="clay-cushion-warm p-5 sm:p-6 space-y-1.5">
             <span className="text-[0.8125rem] font-mono uppercase tracking-wider font-extrabold flex items-center gap-1.5">
               <Lightbulb className="w-4 h-4 shrink-0" />
-              <span>💡 The One-Sentence Version</span>
+              <span>The one-sentence version</span>
             </span>
             <p className="text-[1.0625rem] font-semibold leading-relaxed">
               {formatInlineRichText(currentLesson.oneSentenceSummary)}
@@ -80,7 +84,7 @@ export const LessonHeaderHero: React.FC<LessonHeaderHeroProps> = ({
 
           <div className="clay-cushion-cool p-5 sm:p-6 space-y-2">
             <span className="text-[0.75rem] font-mono uppercase tracking-wider font-extrabold block">
-              🎯 Real-World Engineering Context
+              Real-world context
             </span>
             <p className="text-[1rem] leading-relaxed">
               {formatInlineRichText(currentLesson.whyItMatters)}

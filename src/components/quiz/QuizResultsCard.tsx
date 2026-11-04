@@ -41,6 +41,7 @@ export const QuizResultsCard: React.FC<QuizResultsCardProps> = ({
       </div>
 
       <button
+        type="button"
         onClick={onRestart}
         className="clay-btn-primary inline-flex items-center gap-2 px-6 py-3.5 text-[0.9375rem] cursor-pointer"
       >

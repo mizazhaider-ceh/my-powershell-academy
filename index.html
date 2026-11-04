@@ -5,6 +5,21 @@
     <script>
       (function () {
         try {
+          var theme = localStorage.getItem('powershell_academy_visual_theme');
+          var dark = localStorage.getItem('powershell_academy_theme') === 'dark';
+          var root = document.documentElement;
+          if (theme === 'atlas') {
+            root.setAttribute('data-theme', 'atlas');
+          } else {
+            root.setAttribute('data-theme', 'clay');
+          }
+          if (dark) root.classList.add('dark');
+        } catch (_e) {}
+      })();
+    </script>
+    <script>
+      (function () {
+        try {
           var currentFetch = window.fetch ? window.fetch.bind(window) : undefined;
           var makeWritableFetch = function (target) {
             if (!target) return;
@@ -58,7 +73,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:ital,wght@0,400..800;1,400..800&family=Plus+Jakarta+Sans:ital,wght@0,400..800;1,400..800&display=swap" rel="stylesheet">
   </head>
   <body>
     <div id="root"></div>

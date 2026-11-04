@@ -79,14 +79,14 @@ export const ProcessTreeNodeInspector: React.FC<ProcessTreeNodeInspectorProps> =
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 pt-1">
         <div className="clay-cushion-cool p-4 rounded-[1.25rem] text-[0.85rem] space-y-1">
-          <span className="font-mono text-[0.72rem] font-extrabold uppercase tracking-wider block">
+          <span className="font-mono text-[0.75rem] font-extrabold uppercase tracking-wider block">
             🔍 Blue Team Forensic Verification Rule
           </span>
           <p className="leading-relaxed">{activeProcessNode.forensicNote}</p>
         </div>
 
         <div className="p-4 rounded-[1.25rem] bg-[#0f172a] text-[#e2e8f0] font-mono text-[0.78rem] space-y-1.5 flex flex-col justify-center">
-          <span className="text-[0.6875rem] uppercase tracking-wider text-blue-300 font-bold flex items-center gap-1.5">
+          <span className="text-[0.75rem] uppercase tracking-wider text-blue-300 font-bold flex items-center gap-1.5">
             <Terminal className="w-3.5 h-3.5" />
             <span>Inspect in PowerShell:</span>
           </span>

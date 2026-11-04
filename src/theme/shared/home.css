@@ -1,0 +1,264 @@
+/* ============================================================================
+   SHARED: home page widgets
+   Theme-agnostic. Colours come from CSS variables so Claymorphism and Prism both work.
+   ============================================================================ */
+
+:root {
+  --hx-line: rgba(29, 78, 216, 0.18);
+  --hx-chip: rgba(29, 78, 216, 0.09);
+  --hx-accent2: #0ea5e9;
+  --hx-good: #059669;
+  --hx-bad: #dc2626;
+  --hx-warm: #d97706;
+  --hx-row-h: 2.5rem;
+}
+
+.dark {
+  --hx-line: rgba(148, 163, 255, 0.22);
+  --hx-chip: rgba(96, 165, 250, 0.16);
+  --hx-accent2: #38bdf8;
+  --hx-good: #34d399;
+  --hx-bad: #fb7185;
+  --hx-warm: #fbbf24;
+}
+
+/* ---------- Live pipeline demo: always a dark console window ---------- */
+.hx-window {
+  background: linear-gradient(180deg, #0b1328, #070d1d);
+  color: #e6eeff;
+  border-radius: 1.1rem;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 0 1px rgba(120, 150, 255, 0.24), 0 34px 60px -30px rgba(8, 14, 40, 0.85);
+}
+
+.hx-window-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid rgba(120, 150, 255, 0.16);
+  font-size: 0.75rem;
+  color: #8fa3cf;
+}
+
+.hx-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+}
+
+.hx-cmd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.85rem 0.9rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.hx-seg {
+  padding: 0.28rem 0.5rem;
+  border-radius: 0.5rem;
+  color: #8fa3cf;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hx-seg[data-done="true"] {
+  color: #d3e2ff;
+}
+
+.hx-seg[data-active="true"] {
+  color: #ffffff;
+  background: rgba(91, 140, 255, 0.24);
+  box-shadow: inset 0 0 0 1px rgba(130, 170, 255, 0.55), 0 0 22px -8px rgba(91, 140, 255, 0.8);
+}
+
+.hx-seg:hover {
+  color: #ffffff;
+}
+
+.hx-pipe-char {
+  color: #5b8cff;
+}
+
+.hx-table-head,
+.hx-row {
+  display: grid;
+  grid-template-columns: 1fr 4.4rem 4.4rem;
+  align-items: center;
+  padding: 0 0.75rem;
+  font-size: 0.75rem;
+}
+
+.hx-table-head {
+  margin: 0 0.9rem;
+  height: 1.7rem;
+  color: #6f84b3;
+  border-bottom: 1px solid rgba(120, 150, 255, 0.14);
+}
+
+.hx-table {
+  position: relative;
+  margin: 0.45rem 0.9rem 0;
+  height: calc(var(--hx-row-h) * 8);
+}
+
+.hx-row {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: calc(var(--hx-row-h) - 0.35rem);
+  border-radius: 0.6rem;
+  background: rgba(120, 150, 255, 0.07);
+  transform: translateY(calc(var(--y) * var(--hx-row-h)));
+  transition:
+    transform 0.85s cubic-bezier(0.2, 0.9, 0.2, 1),
+    opacity 0.5s ease,
+    background 0.45s ease,
+    box-shadow 0.45s ease,
+    filter 0.5s ease;
+}
+
+.hx-row[data-state="dim"] {
+  opacity: 0.3;
+  filter: grayscale(1);
+  transform: translateY(calc(var(--y) * var(--hx-row-h))) translateX(-8px);
+}
+
+.hx-row[data-state="gone"] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(calc(var(--y) * var(--hx-row-h))) scale(0.97);
+}
+
+.hx-row[data-state="hit"] {
+  background: linear-gradient(90deg, rgba(91, 140, 255, 0.36), rgba(34, 211, 238, 0.18));
+  box-shadow: inset 0 0 0 1px rgba(140, 180, 255, 0.6), 0 0 30px -8px rgba(91, 140, 255, 0.75);
+}
+
+.hx-row-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #f2f6ff;
+}
+
+.hx-row-name::before {
+  content: "";
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 2px;
+  background: #5b8cff;
+}
+
+.hx-row span:nth-child(n + 2) {
+  color: #a9bce6;
+  text-align: right;
+}
+
+.hx-caption {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+  padding: 0.9rem;
+  border-top: 1px solid rgba(120, 150, 255, 0.16);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #c9d8f7;
+}
+
+.hx-count {
+  flex-shrink: 0;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: #04101f;
+  background: linear-gradient(120deg, #7aa2ff, #4fd8ee);
+  animation: hx-pop 0.45s cubic-bezier(0.2, 0.9, 0.2, 1);
+}
+
+/* ---------- Cmdlet marquee ---------- */
+.hx-marquee {
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.hx-marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 0.7rem;
+  padding: 0.35rem 0;
+  animation: hx-marquee 52s linear infinite;
+}
+
+.hx-marquee[data-dir="reverse"] .hx-marquee-track {
+  animation-direction: reverse;
+}
+
+.hx-marquee:hover .hx-marquee-track,
+.hx-marquee:focus-within .hx-marquee-track {
+  animation-play-state: paused;
+}
+
+/* ---------- Progress meter ---------- */
+.hx-meter {
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--hx-chip);
+}
+
+.hx-meter > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--dp-color-accent-bright), var(--hx-accent2));
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.hx-stat {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Scroll reveal: opt-in, where the browser supports view timelines ---------- */
+@supports (animation-timeline: view()) {
+  .hx-reveal {
+    animation: hx-reveal linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 38%;
+  }
+}
+
+@keyframes hx-reveal {
+  from { opacity: 0; translate: 0 26px; }
+}
+
+@keyframes hx-marquee {
+  to { transform: translateX(-50%); }
+}
+
+@keyframes hx-pop {
+  from { transform: scale(0.7); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-marquee-track {
+    animation: none;
+    width: auto;
+    flex-wrap: wrap;
+  }
+
+  .hx-marquee-track > [aria-hidden="true"] {
+    display: none;
+  }
+
+  .hx-row {
+    transition-duration: 0.01ms;
+  }
+}

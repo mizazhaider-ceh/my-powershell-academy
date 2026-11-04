@@ -85,10 +85,10 @@ export const PipelineVisualizer: React.FC = () => {
             <div key={proc.id} className={`p-3.5 rounded-xl border transition-all duration-300 font-mono text-xs ${cardStateClass}`}>
               <div className="flex items-center justify-between pb-2 border-b border-stone-200/60 dark:border-stone-800/60 mb-2">
                 <span className="font-bold text-stone-900 dark:text-stone-100 truncate">{proc.name}</span>
-                <span className="text-[10px] text-stone-600 dark:text-stone-400">PID {proc.id}</span>
+                <span className="text-[0.75rem] text-stone-600 dark:text-stone-400">PID {proc.id}</span>
               </div>
 
-              <div className="space-y-1 text-[11px]">
+              <div className="space-y-1 text-[0.75rem]">
                 <div className="flex justify-between">
                   <span className="text-stone-500">Handles:</span>
                   <span className={`font-semibold ${stage >= 1 && passesFilter ? 'text-emerald-600 dark:text-emerald-400' : ''}`}>
@@ -103,7 +103,7 @@ export const PipelineVisualizer: React.FC = () => {
                 )}
               </div>
 
-              <div className="mt-2.5 pt-2 border-t border-stone-200/40 dark:border-stone-800/40 flex items-center justify-between text-[10px]">
+              <div className="mt-2.5 pt-2 border-t border-stone-200/40 dark:border-stone-800/40 flex items-center justify-between text-[0.75rem]">
                 {stage === 0 && (
                   <span className="text-blue-500 flex items-center gap-1">
                     <Sparkles className="w-2.5 h-2.5" /> Emitted by Get-Process

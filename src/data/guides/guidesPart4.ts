@@ -2,12 +2,14 @@ import { LessonGuide } from '../../types';
 
 export const GUIDES_PART_4: Record<string, LessonGuide> = {
   '10-1': {
+    oneSentence:
+      'A script is just saved commands in a .ps1 file, and Execution Policy is a seatbelt (RemoteSigned) that stops unknown scripts, not a firewall.',
     analogy:
       'A script is a recipe card. Instead of cooking from memory every night, you write the steps once and reuse the card forever. The Execution Policy is the kitchen rule that says "only cook from cards I trust". It is a seatbelt that stops accidents, not a locked door that stops a determined burglar. And typing `.\\` in front of a script name is like pointing at the exact card on your own counter instead of shouting a name and hoping the right one shows up.',
     plainEnglish: [
       'A `.ps1` file is just a plain text file full of PowerShell commands. Anything you can type at the prompt can be saved in a file and replayed a thousand times.',
-      'PowerShell refuses to run a script from the current folder unless you write `.\\script.ps1`. The `.\\` means "this folder". It stops an attacker from dropping a fake `dir.ps1` in a folder and tricking you into running it.',
-      'Execution Policy is a safety setting that decides which scripts may run (for example only signed ones or only ones from your own machine). It is not a security boundary, so never rely on it alone.',
+      'PowerShell does not look in the current folder when you type a bare name like `script.ps1`; it only searches the folders in your PATH. To run a script that sits in the current folder you write `.\\script.ps1`, where `.\\` means "this folder". It is a small safety habit that stops a lookalike file in your working folder from being run by accident.',
+      'Execution Policy is a safety setting that decides which scripts may run (for example only signed ones or only ones from your own machine). It is not a security boundary (anyone can bypass it from the command line), so never rely on it alone.',
     ],
     beforeYouStart: [
       'Windows PowerShell 5.1 or PowerShell 7 (a lab virtual machine is perfect for practice).',
@@ -33,12 +35,12 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       {
         title: 'Step 4: Try to run it and read the error',
         detail:
-          'Type `hello.ps1` and press Enter. PowerShell refuses and suggests `.\\hello.ps1`. This is the security rule at work, not a bug.',
+          'Type `hello.ps1` and press Enter. PowerShell says the term is "not recognized" and hints at `.\\hello.ps1`, because it does not search the current folder. Now type `.\\hello.ps1`. On a Windows client you will probably see a different error: "running scripts is disabled on this system". That is the Execution Policy (`Restricted`) doing its job, and Step 5 fixes it.',
       },
       {
         title: 'Step 5: Loosen the seatbelt for yourself only',
         detail:
-          'Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`. `RemoteSigned` allows your own scripts but demands a signature on downloaded ones. `-Scope CurrentUser` changes nothing for other people.',
+          'Run `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`. `RemoteSigned` allows your own scripts but demands a signature on downloaded ones. `-Scope CurrentUser` changes nothing for other people. To undo it later, run `Set-ExecutionPolicy Undefined -Scope CurrentUser`. If `Get-ExecutionPolicy -List` shows a value in `MachinePolicy` or `UserPolicy`, Group Policy controls it and your change will not win.',
       },
       {
         title: 'Step 6: Run it properly',
@@ -189,13 +191,15 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
     },
     recap: [
       'A `.ps1` file is just saved commands. Read it with Get-Content before you run it.',
-      'Run scripts in the current folder with `.\\name.ps1`; the `.\\` is a deliberate safety rule.',
+      'Run scripts in the current folder with `.\\name.ps1`; a bare name is only searched in PATH, so `.\\` makes the location explicit.',
       'Execution Policy is a seatbelt against accidents. Use `RemoteSigned` with `-Scope CurrentUser` and never rely on it as security.',
       'Pros add `param`, validation, StrictMode, try/catch and signatures to every script.',
     ],
   },
 
   '10-2': {
+    oneSentence:
+      'Every program is three building blocks: sequence (top to bottom), selection (if and else), and iteration (for, while, foreach) to repeat work.',
     analogy:
       'Control structures are like the rules of a board game turn. Sequence means "do the steps in order". Selection (`if`) is "if you land on a red square, draw a card, otherwise move on". Loops are "do this for each player at the table". Every script ever written is just these three ideas stacked together.',
     plainEnglish: [
@@ -305,7 +309,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
           code: '$ok = Test-Connection -ComputerName localhost -Count 1 -Quiet\nif ($ok) { "Reachable" } elseif ((Get-Date).Hour -lt 6) { "Down at night - log it" } else { "Down - raise an alert" }',
           whatItDoes: 'Pings the local machine once and prints a message depending on the true/false result.',
           parts: [
-            { part: 'Test-Connection', meaning: 'PowerShell\'s ping.' },
+            { part: 'Test-Connection', meaning: 'PowerShell\'s ping-style cmdlet. (`ping` itself is a separate program, ping.exe, not an alias of this cmdlet.) The target parameter is `-ComputerName` on Windows PowerShell 5.1; PowerShell 7 calls it `-TargetName` but still accepts `-ComputerName`.' },
             { part: '-Count 1', meaning: 'Send only one ping.' },
             { part: '-Quiet', meaning: 'Return only True or False instead of a full report.' },
             { part: 'if / elseif / else', meaning: 'Checks conditions in order and runs the first block that is true.' },
@@ -378,6 +382,8 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
   },
 
   '11-1': {
+    oneSentence:
+      'A module is a pack of cmdlets you must first find, install, and import, and installed is not the same as imported.',
     analogy:
       'A module is a toolbox you add to your workshop. The PowerShell Gallery is the hardware store. To use a new tool you find it in the catalogue, buy and carry it home (install), then take it out of the cupboard and put it on the workbench (import). Having a toolbox in the garage does not mean it is open on your bench.',
     plainEnglish: [
@@ -556,15 +562,17 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
   },
 
   '11-2': {
+    oneSentence:
+      'WinRM lets you run commands on other machines, Invoke-Command for one command and Enter-PSSession for an interactive session, over ports 5985 and 5986.',
     analogy:
-      'Remote Desktop is like flying to a faraway office, sitting at a desk and doing the work in person. PowerShell Remoting is like phoning the office and giving a precise instruction. It is faster and lighter. `Enter-PSSession` is a private phone call to one office. `Invoke-Command` is a conference call that gives the same instruction to a hundred offices at once.',
+      'Remote Desktop is like flying to a faraway office, sitting at a desk and doing the work in person. PowerShell Remoting is like phoning the office and giving a precise instruction. It is faster and lighter. `Enter-PSSession` is a private phone call to one office. `Invoke-Command` is a conference call that gives the same instruction to many offices (32 lines open at a time by default).',
     plainEnglish: [
-      'PowerShell Remoting uses a service called WinRM (Windows Remote Management). It listens on TCP port 5985 (HTTP) and 5986 (HTTPS). The traffic is encrypted by the protocol even on 5985, but HTTPS adds certificate-based server identity.',
+      'PowerShell Remoting uses a service called WinRM (Windows Remote Management). It listens on TCP port 5985 (HTTP) and 5986 (HTTPS). With the normal domain sign-in (Kerberos) the messages are encrypted even on 5985. `Enable-PSRemoting` only creates the 5985 listener: HTTPS (5986) needs a certificate and a listener that you set up yourself, and adds certificate-based server identity.',
       '`Enter-PSSession` opens an interactive prompt on one computer. `Invoke-Command` sends a script block to one or many computers and returns the results as objects.',
-      'The "double-hop" problem: your credentials can travel from your PC to server A but not onward from A to server B. This is a deliberate security design of Kerberos.',
+      'The "double-hop" problem: your credentials can travel from your PC to server A but not onward from A to server B. This is a deliberate security design of Kerberos. CredSSP can bypass it, but it hands your real password to the remote server, so avoid it.',
     ],
     beforeYouStart: [
-      'Two lab machines (or one) on the same network, ideally in a domain. Domain-joined machines work with no extra setup.',
+      'The lab: `CLIENT01` (192.168.56.30) managing `SRV-CORE01` (192.168.56.20) and `DC01` (192.168.56.10) on the `LabNet` switch, all joined to `corp.example.com`. Lab setup: see the Lab Setup page.',
       'An elevated PowerShell window on the target machine to enable remoting.',
       'Port 5985 reachable between them (firewall rules for WinRM).',
     ],
@@ -575,15 +583,15 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 2: Enable remoting (lab only)',
-        detail: 'In an elevated window on the target run `Enable-PSRemoting`. It starts WinRM and opens the firewall for private/domain networks.',
+        detail: 'In an elevated window on the target run `Enable-PSRemoting`. It starts WinRM and opens the firewall for private/domain networks. On a Windows client whose network is `Public` it stops with an error: switch the network to Private with `Set-NetConnectionProfile -NetworkCategory Private` (or, in the lab only, add `-SkipNetworkProfileCheck`).',
       },
       {
         title: 'Step 3: Test the connection',
-        detail: 'From your workstation run `Test-NetConnection SERVER01 -Port 5985`. `TcpTestSucceeded : True` means the door is open.',
+        detail: 'From your workstation run `Test-NetConnection SRV-CORE01 -Port 5985`. `TcpTestSucceeded : True` means the door is open.',
       },
       {
         title: 'Step 4: Have a 1-to-1 conversation',
-        detail: 'Run `Enter-PSSession -ComputerName SERVER01`. The prompt changes to `[SERVER01]: PS>`. Everything you type now runs there.',
+        detail: 'Run `Enter-PSSession -ComputerName SRV-CORE01`. The prompt changes to `[SRV-CORE01]: PS>`. Everything you type now runs there.',
       },
       {
         title: 'Step 5: Leave cleanly',
@@ -591,11 +599,11 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 6: Go 1-to-many',
-        detail: 'Use `Invoke-Command -ComputerName SERVER01,SERVER02 -ScriptBlock { ... }` to run the same task on several servers in parallel.',
+        detail: 'Use `Invoke-Command -ComputerName SRV-CORE01,DC01 -ScriptBlock { ... }` to run the same task on several servers in parallel (32 at a time by default; change it with `-ThrottleLimit`).',
       },
       {
         title: 'Step 7: Understand the double hop',
-        detail: 'Your credentials do not forward from SERVER01 to a third computer. Fix it with delegated trust (such as Kerberos constrained delegation) rather than opening up broad credential forwarding.',
+        detail: 'Your credentials do not forward from SRV-CORE01 to a third computer. Fix it with delegated trust (such as Kerberos constrained delegation) rather than opening up broad credential forwarding. CredSSP works but hands your real password to the middle server, so avoid it.',
       },
     ],
     wordsYouWillMeet: [
@@ -607,7 +615,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       { word: 'Double-hop', meaning: 'Credentials cannot be passed on from the first remote machine to a second one.' },
     ],
     beginner: {
-      intro: 'These commands only check and look. They connect to nothing dangerous. Replace SERVER01 with a lab computer name.',
+      intro: 'These commands only check and look. They connect to nothing dangerous. Run them from CLIENT01 against the lab server SRV-CORE01.',
       commands: [
         {
           title: 'Is the WinRM service running here?',
@@ -621,14 +629,14 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Is the remoting door open on a server?',
-          code: 'Test-NetConnection -ComputerName SERVER01 -Port 5985',
+          code: 'Test-NetConnection -ComputerName SRV-CORE01 -Port 5985',
           whatItDoes: 'Tries to reach the WinRM HTTP port and reports whether it answered.',
           parts: [
             { part: 'Test-NetConnection', meaning: 'A connectivity tester that does more than ping.' },
-            { part: '-ComputerName SERVER01', meaning: 'The target. Use your own lab server name.' },
-            { part: '-Port 5985', meaning: 'The WinRM HTTP port to test. Use 5986 for HTTPS.' },
+            { part: '-ComputerName SRV-CORE01', meaning: 'The target lab server.' },
+            { part: '-Port 5985', meaning: 'The WinRM HTTP port to test. Port 5986 is HTTPS and only answers if you set up a certificate and listener.' },
           ],
-          sampleOutput: 'ComputerName     : SERVER01\nRemotePort       : 5985\nTcpTestSucceeded : True',
+          sampleOutput: 'ComputerName     : SRV-CORE01\nRemotePort       : 5985\nTcpTestSucceeded : True',
           watchOut: 'False usually means a firewall, a stopped WinRM service or a wrong name.',
         },
         {
@@ -658,27 +666,27 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Open an interactive remote shell',
-          code: 'Enter-PSSession -ComputerName SERVER01\nHostname\nExit-PSSession',
-          whatItDoes: 'Connects to SERVER01, shows its host name to prove you are there, then leaves.',
+          code: 'Enter-PSSession -ComputerName SRV-CORE01\nHostname\nExit-PSSession',
+          whatItDoes: 'Connects to SRV-CORE01, shows its host name to prove you are there, then leaves.',
           parts: [
             { part: 'Enter-PSSession', meaning: 'Starts a one-to-one interactive remote session.' },
-            { part: '-ComputerName SERVER01', meaning: 'Which computer to connect to.' },
+            { part: '-ComputerName SRV-CORE01', meaning: 'Which computer to connect to.' },
             { part: 'Hostname', meaning: 'Runs on the remote computer and prints its name.' },
             { part: 'Exit-PSSession', meaning: 'Returns you to your own computer.' },
           ],
-          sampleOutput: '[SERVER01]: PS C:\\Users\\sam\\Documents> hostname\nSERVER01',
-          watchOut: 'Look at the prompt. If it shows [SERVER01] your commands are running there.',
+          sampleOutput: '[SRV-CORE01]: PS C:\\Users\\Administrator\\Documents> hostname\nSRV-CORE01',
+          watchOut: 'Look at the prompt. If it shows [SRV-CORE01] your commands are running there.',
         },
         {
           title: 'Run one task on many servers',
-          code: 'Invoke-Command -ComputerName SERVER01,SERVER02 -ScriptBlock { Get-Service -Name WinRM | Select-Object Name, Status }',
+          code: 'Invoke-Command -ComputerName SRV-CORE01,DC01 -ScriptBlock { Get-Service -Name WinRM | Select-Object Name, Status }',
           whatItDoes: 'Runs the same read-only query on two servers at once and returns each result tagged with the server name.',
           parts: [
-            { part: 'Invoke-Command', meaning: 'Runs code on one or more remote computers.' },
-            { part: '-ComputerName SERVER01,SERVER02', meaning: 'A comma-separated list of targets.' },
+            { part: 'Invoke-Command', meaning: 'Runs code on one or more remote computers (32 at a time by default).' },
+            { part: '-ComputerName SRV-CORE01,DC01', meaning: 'A comma-separated list of targets.' },
             { part: '-ScriptBlock { ... }', meaning: 'The code that executes remotely.' },
           ],
-          sampleOutput: 'Name  Status PSComputerName\n----  ------ --------------\nWinRM Running SERVER01\nWinRM Running SERVER02',
+          sampleOutput: 'Name  Status PSComputerName\n----  ------ --------------\nWinRM Running SRV-CORE01\nWinRM Running DC01',
         },
       ],
     },
@@ -687,7 +695,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       commands: [
         {
           title: 'Reuse a persistent session',
-          code: '$s = New-PSSession -ComputerName SERVER01\nInvoke-Command -Session $s -ScriptBlock { $x = 5 }\nInvoke-Command -Session $s -ScriptBlock { $x }\nRemove-PSSession $s',
+          code: '$s = New-PSSession -ComputerName SRV-CORE01\nInvoke-Command -Session $s -ScriptBlock { $x = 5 }\nInvoke-Command -Session $s -ScriptBlock { $x }\nRemove-PSSession $s',
           whatItDoes: 'Keeps one connection open so remote variables survive between commands, then closes it.',
           parts: [
             { part: 'New-PSSession', meaning: 'Creates a reusable remote connection stored in $s.' },
@@ -699,11 +707,11 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Pass a local value with $using and limit parallelism',
-          code: '$min = 100MB\nInvoke-Command -ComputerName SERVER01,SERVER02 -ThrottleLimit 16 -ScriptBlock {\n    Get-Process | Where-Object WorkingSet -gt $using:min | Select-Object -First 3 Name, WorkingSet\n}',
+          code: '$min = 100MB\nInvoke-Command -ComputerName SRV-CORE01,DC01 -ThrottleLimit 16 -ScriptBlock {\n    Get-Process | Where-Object WorkingSet -gt $using:min | Select-Object -First 3 Name, WorkingSet\n}',
           whatItDoes: 'Sends a value from your computer into the remote script block and finds processes larger than 100 MB.',
           parts: [
             { part: '$min = 100MB', meaning: 'A local variable; MB is a built-in size multiplier.' },
-            { part: '-ThrottleLimit 16', meaning: 'At most 16 computers are contacted at the same time.' },
+            { part: '-ThrottleLimit 16', meaning: 'At most 16 computers are contacted at the same time (the default is 32).' },
             { part: '$using:min', meaning: 'Brings the local $min into the remote script block.' },
             { part: 'Where-Object WorkingSet -gt ...', meaning: 'Keeps processes using more memory than the limit.' },
           ],
@@ -711,14 +719,14 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Connect over HTTPS with explicit credentials',
-          code: '$cred = Get-Credential\nEnter-PSSession -ComputerName server01.lab.local -UseSSL -Credential $cred',
+          code: '$cred = Get-Credential\nEnter-PSSession -ComputerName SRV-CORE01.corp.example.com -UseSSL -Credential $cred',
           whatItDoes: 'Connects over port 5986 so the server proves its identity with a certificate.',
           parts: [
             { part: 'Get-Credential', meaning: 'Pops up a secure prompt; the password is stored encrypted in memory.' },
             { part: '-UseSSL', meaning: 'Use the HTTPS listener on port 5986.' },
             { part: '-Credential $cred', meaning: 'Sign in as that account.' },
           ],
-          watchOut: 'Needs an HTTPS listener and a valid certificate on the server. Never type passwords into a script in plain text.',
+          watchOut: 'Needs an HTTPS listener and a valid certificate whose name matches the host, which `Enable-PSRemoting` does not create. Never type passwords into a script in plain text.',
         },
         {
           title: 'Audit the TrustedHosts list',
@@ -728,19 +736,22 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: 'Get-Item', meaning: 'Reads one item from a provider (like a drive).' },
             { part: 'WSMan:\\localhost\\Client\\TrustedHosts', meaning: 'The WinRM setting listing trusted non-domain hosts.' },
           ],
-          watchOut: 'Needs an elevated window. Never set TrustedHosts to "*" on a real network.',
+          watchOut: 'Needs an elevated window. TrustedHosts means "talk to this host without proving who it is", so someone could impersonate it and collect your credentials. Add single named hosts only, never "*", and remove them afterwards.',
         },
       ],
     },
     recap: [
-      'Remoting uses WinRM on ports 5985 (HTTP) and 5986 (HTTPS).',
-      '`Enter-PSSession` is one server interactively; `Invoke-Command` is many servers in parallel.',
+      'Remoting uses WinRM on ports 5985 (HTTP, created by Enable-PSRemoting) and 5986 (HTTPS, needs a certificate and listener).',
+      '`Enter-PSSession` is one server interactively; `Invoke-Command` is many servers in parallel (32 at a time by default).',
       'Use `$using:` to pass local variables and `Remove-PSSession` to clean up.',
-      'The double-hop is a security feature. Solve it with delegation, not by weakening credentials.',
+      'The double-hop is a security feature. Solve it with delegation, not by weakening credentials (avoid CredSSP).',
+      'When you get stuck: check the network profile (Public blocks Enable-PSRemoting), run Test-NetConnection on 5985, use the host name (Kerberos fails by IP), and treat TrustedHosts and HTTPS as the fallback with a security cost.',
     ],
   },
 
   '12-1': {
+    oneSentence:
+      'Active Directory holds users, groups, and OUs, and Test-ComputerSecureChannel -Repair fixes a machine that lost its domain trust without a rebuild.',
     analogy:
       'Active Directory is the company phone book and ID-badge office in one. Each person (user) has a record, groups are mailing lists that decide who may enter which room, and Organizational Units (OUs) are the filing drawers that keep it all tidy and tell the helpdesk who may manage what. PowerShell lets you update the whole book in seconds instead of editing one card at a time.',
     plainEnglish: [
@@ -749,7 +760,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       'If a workstation says "the trust relationship between this workstation and the primary domain failed", `Test-ComputerSecureChannel -Repair` can often fix it in one line.',
     ],
     beforeYouStart: [
-      'A lab domain (a Windows Server domain controller VM) and a domain-joined admin machine. Never practise on a real company directory.',
+      'A lab domain (`corp.example.com`, domain controller `DC01`) and a domain-joined admin machine such as `CLIENT01`. Never practise on a real company directory. Lab setup: see the Lab Setup page.',
       'The `ActiveDirectory` module (installed with RSAT or on a domain controller).',
       'A domain account with the right to read the directory. Creating objects needs more rights.',
     ],
@@ -760,7 +771,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 2: Read the domain',
-        detail: 'Run `Get-ADDomain`. It tells you the domain name and its distinguished name (`DC=lab,DC=local`).',
+        detail: 'Run `Get-ADDomain`. It tells you the domain name and its distinguished name (`DC=corp,DC=example,DC=com`).',
       },
       {
         title: 'Step 3: Look at the OUs',
@@ -780,13 +791,13 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 7: Scale up with a CSV',
-        detail: 'Use `Import-Csv` and `ForEach-Object` to create many users from a spreadsheet, again with -WhatIf first.',
+        detail: 'Use `Import-Csv` and `ForEach-Object` to create many users from a spreadsheet. A safe script checks whether each user already exists, avoids name collisions, previews with -WhatIf, and writes one result row per input row (see the pro tier).',
       },
     ],
     wordsYouWillMeet: [
       { word: 'Active Directory (AD)', meaning: 'Microsoft\'s central directory of users, computers and groups.' },
       { word: 'OU', meaning: 'Organizational Unit, a folder in AD used to organise and delegate control.' },
-      { word: 'Distinguished Name', meaning: 'The full path of an object such as CN=Jane,OU=Sales,DC=lab,DC=local.' },
+      { word: 'Distinguished Name', meaning: 'The full path of an object such as CN=Jane,OU=Sales,DC=corp,DC=example,DC=com.' },
       { word: 'SamAccountName', meaning: 'The short logon name, for example jdoe.' },
       { word: 'Secure channel', meaning: 'The secret trust between a computer and the domain.' },
     ],
@@ -802,7 +813,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: '|', meaning: 'Passes the result on.' },
             { part: 'Select-Object Name, DNSRoot, DomainMode, PDCEmulator', meaning: 'Keeps only these four properties.' },
           ],
-          sampleOutput: 'Name       : LAB\nDNSRoot    : lab.local\nDomainMode : Windows2016Domain\nPDCEmulator: DC01.lab.local',
+          sampleOutput: 'Name       : CORP\nDNSRoot    : corp.example.com\nDomainMode : Windows2016Domain\nPDCEmulator: DC01.corp.example.com',
         },
         {
           title: 'List the OUs',
@@ -813,7 +824,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: '-Filter *', meaning: 'Required. The star means "all".' },
             { part: 'Select-Object ...', meaning: 'Chooses the columns.' },
           ],
-          sampleOutput: 'Name              DistinguishedName\n----              -----------------\nDomain Controllers OU=Domain Controllers,DC=lab,DC=local\nSales             OU=Sales,DC=lab,DC=local',
+          sampleOutput: 'Name              DistinguishedName\n----              -----------------\nDomain Controllers OU=Domain Controllers,DC=corp,DC=example,DC=com\nSales             OU=Sales,DC=corp,DC=example,DC=com',
         },
         {
           title: 'Look up one user',
@@ -833,18 +844,18 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       commands: [
         {
           title: 'Find users with a filter',
-          code: 'Get-ADUser -Filter "Department -eq \'Sales\'" -Properties Department | Select-Object Name, SamAccountName, Department',
+          code: 'Get-ADUser -Filter \'Department -eq "Sales"\' -Properties Department | Select-Object Name, SamAccountName, Department',
           whatItDoes: 'Asks the domain controller for only the Sales users instead of downloading everyone.',
           parts: [
-            { part: '-Filter "..."', meaning: 'Runs the search on the server, which is fast.' },
-            { part: 'Department -eq \'Sales\'', meaning: 'A comparison: Department equals Sales. Note the single quotes around Sales.' },
+            { part: '-Filter \'...\'', meaning: 'Runs the search on the server, which is fast. The whole filter is in single quotes so PowerShell does not expand variables like $true before AD sees them.' },
+            { part: 'Department -eq "Sales"', meaning: 'A comparison: Department equals Sales. The value sits in double quotes inside the single-quoted filter.' },
             { part: '-Properties Department', meaning: 'Include the Department attribute in the results.' },
           ],
-          watchOut: 'The Filter parameter uses its own syntax, not a script block. Prefer it over Where-Object.',
+          watchOut: 'The Filter parameter uses its own syntax, not a script block. Prefer it over Where-Object, and keep the filter in single quotes.',
         },
         {
           title: 'Preview creating a user',
-          code: 'New-ADUser -Name "Jane Doe" -SamAccountName jdoe -Path "OU=Sales,DC=lab,DC=local" -AccountPassword (Read-Host "Temp password" -AsSecureString) -Enabled $true -WhatIf',
+          code: 'New-ADUser -Name "Jane Doe" -SamAccountName jdoe -Path "OU=Sales,DC=corp,DC=example,DC=com" -AccountPassword (Read-Host "Temp password" -AsSecureString) -ChangePasswordAtLogon $true -Enabled $true -WhatIf',
           whatItDoes: 'Shows the user that would be created. Nothing is saved.',
           parts: [
             { part: 'New-ADUser', meaning: 'Creates a user account.' },
@@ -873,16 +884,18 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       intro: 'Pros bulk-provision from CSV, hunt stale accounts and repair domain trust. Lab domain only; keep -WhatIf until you are sure.',
       commands: [
         {
-          title: 'Bulk create users from a CSV (preview)',
-          code: 'Import-Csv -Path .\\newusers.csv | ForEach-Object {\n    New-ADUser -Name $_.Name -SamAccountName $_.Sam -Path $_.OU -Enabled $false -WhatIf\n}',
-          whatItDoes: 'Reads a spreadsheet and previews creating one disabled account per row.',
+          title: 'Bulk create users from a CSV (safe, repeatable, preview)',
+          code: '$initial = Read-Host "Initial password" -AsSecureString\n$results = foreach ($r in Import-Csv -Path .\\newusers.csv) {\n    $sam = $r.Sam\n    if ($sam -notmatch \'^[A-Za-z0-9._-]{1,20}$\') {\n        [pscustomobject]@{ Sam = $sam; Status = \'Failed\'; Detail = \'Bad SamAccountName\' }; continue\n    }\n    if (Get-ADUser -Filter "SamAccountName -eq \'$sam\'") {\n        [pscustomobject]@{ Sam = $sam; Status = \'Skipped\'; Detail = \'Already exists\' }; continue\n    }\n    try {\n        New-ADUser -Name $r.Name -SamAccountName $sam -Path $r.OU -AccountPassword $initial -ChangePasswordAtLogon $true -Enabled $true -WhatIf -ErrorAction Stop\n        [pscustomobject]@{ Sam = $sam; Status = \'WhatIf OK\'; Detail = \'\' }\n    } catch {\n        [pscustomobject]@{ Sam = $sam; Status = \'Failed\'; Detail = $_.Exception.Message }\n    }\n}\n$results | Export-Csv -Path .\\results.csv -NoTypeInformation\n$results',
+          whatItDoes: 'Reads a spreadsheet and, for each row, validates the logon name, skips anyone who already exists (so running it twice is safe), previews the creation with -WhatIf, and records one result row per input row in results.csv.',
           parts: [
             { part: 'Import-Csv', meaning: 'Turns each CSV row into an object with column names as properties.' },
-            { part: 'ForEach-Object { }', meaning: 'Runs the block once per row.' },
-            { part: '$_.Name, $_.Sam, $_.OU', meaning: 'Read the Name, Sam and OU columns of the current row.' },
-            { part: '-Enabled $false', meaning: 'Creates the account disabled until a password is set.' },
+            { part: '$sam -notmatch \'^[A-Za-z0-9._-]{1,20}$\'', meaning: 'Rejects odd characters and names longer than the 20-character SamAccountName limit. It also keeps the filter below safe to build.' },
+            { part: 'Get-ADUser -Filter "SamAccountName -eq \'$sam\'"', meaning: 'Checks for an existing account first. If one exists the row is skipped, so the script is idempotent.' },
+            { part: 'New-ADUser ... -ChangePasswordAtLogon $true -WhatIf', meaning: 'Creates an enabled account with a prompt-supplied password that must be changed at first logon. -WhatIf makes this a preview.' },
+            { part: 'try { } catch { }', meaning: 'A failure on one row is recorded and the loop continues.' },
+            { part: 'Export-Csv', meaning: 'Saves the per-row results so you can audit what happened.' },
           ],
-          watchOut: 'Check that your CSV has headers named Name, Sam and OU. A typo silently gives empty values.',
+          watchOut: 'Needs columns Name, Sam and OU. Remove -WhatIf only in the lab after the results look right. If two people would get the same Sam, the second is skipped; the lesson shows how to generate jsmith2.',
         },
         {
           title: 'Find stale accounts',
@@ -907,32 +920,35 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Repair a broken trust (preview)',
-          code: 'Test-ComputerSecureChannel -Repair -Credential (Get-Credential LAB\\Administrator) -WhatIf',
+          code: 'Test-ComputerSecureChannel -Repair -Credential (Get-Credential CORP\\Administrator) -WhatIf',
           whatItDoes: 'Previews resetting the computer\'s machine password with the domain so trust is restored.',
           parts: [
             { part: '-Repair', meaning: 'Tries to fix the secure channel instead of only testing it.' },
             { part: '-Credential (Get-Credential ...)', meaning: 'Prompts for a domain account with the right to reset the computer account.' },
             { part: '-WhatIf', meaning: 'Preview only.' },
           ],
-          watchOut: 'Run it on the affected workstation, ideally logged on locally. Remove -WhatIf only in your lab.',
+          watchOut: 'Run it on the affected workstation, so you need a way to log on first (a local administrator account, or a cached domain logon). Typical causes are a snapshot rollback, or a reset or deleted computer object, not simply being switched off for a while. Remove -WhatIf only in your lab.',
         },
       ],
     },
     recap: [
       'The `ActiveDirectory` module manages users, groups and OUs with the `*-AD*` cmdlets.',
-      'Use `-Filter` and `-Properties` to search on the server and ask only for what you need.',
+      'Use `-Filter` (in single quotes) and `-Properties` to search on the server and ask only for what you need.',
       'Always preview with `-WhatIf` and keep OU protection on.',
-      'A broken domain trust can often be fixed with `Test-ComputerSecureChannel -Repair`.',
+      'A broken domain trust can often be fixed with `Test-ComputerSecureChannel -Repair`, run on the affected computer.',
+      'When you get stuck: check DNS first. The client\'s only DNS server should be 192.168.56.10 (DC01), and `Resolve-DnsName corp.example.com` should answer.',
     ],
   },
 
   '12-2': {
+    oneSentence:
+      'Promote a domain controller with Install-ADDSForest, manage its DNS zones and records, and apply Fine-Grained Password Policies to your admin groups.',
     analogy:
       'A forest is a small country, a domain is a city inside it, and Domain Controllers are the city halls that keep the official records. DNS is the postal system: without the correct address entries (SRV records), a laptop would never find the city hall. Fine-Grained Password Policies are special house rules for the most important buildings, such as stricter locks for the mayor\'s office.',
     plainEnglish: [
       'To build a new Active Directory you install the AD DS role and then promote the server to a Domain Controller. On a headless Server Core machine this is done entirely with PowerShell.',
-      'Clients find Domain Controllers using DNS `SRV` records such as `_ldap._tcp.dc._msdcs.lab.local`. If DNS is broken, domain logon is broken.',
-      'A Fine-Grained Password Policy (FGPP) lets you give admin groups a stricter policy (such as 16 characters) while normal users keep the default.',
+      'Clients find Domain Controllers using DNS `SRV` records such as `_ldap._tcp.dc._msdcs.corp.example.com`. If DNS is broken, domain logon is broken.',
+      'A Fine-Grained Password Policy (FGPP) lets you give admin groups a stricter policy (such as 20 characters) while normal users keep the default.',
     ],
     beforeYouStart: [
       'A lab Windows Server VM. Promoting a server to a Domain Controller is a big change; never do it on a production machine.',
@@ -942,15 +958,15 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
     atoZSteps: [
       {
         title: 'Step 1: Plan the names',
-        detail: 'Choose a lab domain name such as `lab.local` and a NetBIOS name such as `LAB`. Names are hard to change later.',
+        detail: 'Use the lab domain name `corp.example.com` and the NetBIOS name `CORP`. Avoid `.local` in real life because it clashes with multicast DNS. Names are hard to change later.',
       },
       {
         title: 'Step 2: Install the role',
-        detail: 'Run `Install-WindowsFeature AD-Domain-Services -IncludeManagementTools`. This only adds the files, it does not create a domain yet.',
+        detail: 'Run `Install-WindowsFeature AD-Domain-Services -IncludeManagementTools`. This only adds the files, it does not create a domain yet. First point the server\'s DNS client at itself (`Set-DnsClientServerAddress ... -ServerAddresses 192.168.56.10`), because the new DC will host the domain\'s DNS.',
       },
       {
         title: 'Step 3: Promote the server',
-        detail: 'Run `Install-ADDSForest` with your domain name. It asks for a DSRM (recovery) password and restarts the server.',
+        detail: 'Run `Install-ADDSForest -DomainName corp.example.com -DomainNetbiosName CORP -InstallDns -SafeModeAdministratorPassword (Read-Host "DSRM password" -AsSecureString)`. Preview with `-WhatIf` first. The DSRM password is your recovery login, and the server restarts by itself when it finishes.',
       },
       {
         title: 'Step 4: Check the forest and DCs',
@@ -958,7 +974,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 5: Prove DNS works',
-        detail: 'Run `Resolve-DnsName -Type SRV _ldap._tcp.dc._msdcs.lab.local`. It should name your Domain Controller.',
+        detail: 'Run `Resolve-DnsName -Type SRV _ldap._tcp.dc._msdcs.corp.example.com`. It should name your Domain Controller. If it does not, fix DNS before anything else: it is the most common cause of AD trouble.',
       },
       {
         title: 'Step 6: Manage DNS records',
@@ -987,7 +1003,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: 'Get-ADForest', meaning: 'Reads forest information from AD.' },
             { part: 'Select-Object Name, ForestMode, Domains, GlobalCatalogs', meaning: 'Keeps just the useful facts.' },
           ],
-          sampleOutput: 'Name           : lab.local\nForestMode     : Windows2016Forest\nDomains        : {lab.local}\nGlobalCatalogs : {DC01.lab.local}',
+          sampleOutput: 'Name           : corp.example.com\nForestMode     : Windows2016Forest\nDomains        : {corp.example.com}\nGlobalCatalogs : {DC01.corp.example.com}',
         },
         {
           title: 'List the Domain Controllers',
@@ -998,19 +1014,19 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: '-Filter *', meaning: 'Include all of them.' },
             { part: 'Select-Object ...', meaning: 'Chooses the columns.' },
           ],
-          sampleOutput: 'Name IPv4Address  Site                  IsGlobalCatalog\n---- -----------  ----                  ---------------\nDC01 192.168.1.10 Default-First-Site-Name True',
+          sampleOutput: 'Name IPv4Address   Site                  IsGlobalCatalog\n---- -----------   ----                  ---------------\nDC01 192.168.56.10 Default-First-Site-Name True',
         },
         {
           title: 'Find a DC through DNS',
-          code: 'Resolve-DnsName -Name _ldap._tcp.dc._msdcs.lab.local -Type SRV',
+          code: 'Resolve-DnsName -Name _ldap._tcp.dc._msdcs.corp.example.com -Type SRV',
           whatItDoes: 'Asks DNS the same question a client asks when it looks for a Domain Controller.',
           parts: [
             { part: 'Resolve-DnsName', meaning: 'PowerShell\'s DNS lookup tool.' },
-            { part: '-Name _ldap._tcp.dc._msdcs.lab.local', meaning: 'The special SRV record name for DCs in lab.local.' },
+            { part: '-Name _ldap._tcp.dc._msdcs.corp.example.com', meaning: 'The special SRV record name for DCs in corp.example.com.' },
             { part: '-Type SRV', meaning: 'Ask for a service record rather than an address.' },
           ],
-          sampleOutput: 'Name                         Type TTL Section NameTarget Priority Weight Port\n----                         ---- --- ------- ---------- -------- ------ ----\n_ldap._tcp.dc._msdcs.lab.local SRV 600 Answer  DC01.lab.local 0  100  389',
-          watchOut: 'Change lab.local to your own domain. No answer usually means a DNS problem, not an AD problem.',
+          sampleOutput: 'Name                                    Type TTL Section NameTarget                Priority Weight Port\n----                                    ---- --- ------- ----------                -------- ------ ----\n_ldap._tcp.dc._msdcs.corp.example.com   SRV  600 Answer  DC01.corp.example.com     0        100    389',
+          watchOut: 'No answer usually means a DNS problem, not an AD problem: check that the client\'s DNS server is 192.168.56.10.',
         },
       ],
     },
@@ -1025,26 +1041,26 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: 'Get-DnsServerZone', meaning: 'Reads zones from the DNS Server role.' },
             { part: 'Select-Object ZoneName, ZoneType, IsDsIntegrated', meaning: 'Show the name, type and whether it is stored in AD.' },
           ],
-          sampleOutput: 'ZoneName         ZoneType IsDsIntegrated\n--------         -------- --------------\nlab.local        Primary  True\n_msdcs.lab.local Primary  True',
+          sampleOutput: 'ZoneName                   ZoneType IsDsIntegrated\n--------                   -------- --------------\ncorp.example.com           Primary  True\n_msdcs.corp.example.com    Primary  True',
         },
         {
           title: 'Filter DNS records',
-          code: 'Get-DnsServerResourceRecord -ZoneName lab.local -RRType A | Select-Object HostName, @{n="IP";e={$_.RecordData.IPv4Address}}',
-          whatItDoes: 'Lists the host (A) records in lab.local with their IP addresses.',
+          code: 'Get-DnsServerResourceRecord -ZoneName corp.example.com -RRType A | Select-Object HostName, @{n="IP";e={$_.RecordData.IPv4Address}}',
+          whatItDoes: 'Lists the host (A) records in corp.example.com with their IP addresses.',
           parts: [
             { part: 'Get-DnsServerResourceRecord', meaning: 'Reads records from a zone.' },
-            { part: '-ZoneName lab.local -RRType A', meaning: 'The zone to read, limited to address records.' },
+            { part: '-ZoneName corp.example.com -RRType A', meaning: 'The zone to read, limited to address records.' },
             { part: '@{n="IP";e={...}}', meaning: 'A calculated column named IP, taken from inside RecordData.' },
           ],
         },
         {
           title: 'Preview adding a DNS record',
-          code: 'Add-DnsServerResourceRecordA -ZoneName lab.local -Name app01 -IPv4Address 192.168.1.50 -WhatIf',
-          whatItDoes: 'Shows the DNS record that would map app01.lab.local to 192.168.1.50.',
+          code: 'Add-DnsServerResourceRecordA -ZoneName corp.example.com -Name app01 -IPv4Address 192.168.56.50 -WhatIf',
+          whatItDoes: 'Shows the DNS record that would map app01.corp.example.com to 192.168.56.50.',
           parts: [
             { part: 'Add-DnsServerResourceRecordA', meaning: 'Creates an A (name to IPv4) record.' },
-            { part: '-ZoneName lab.local -Name app01', meaning: 'The zone and the host name to add.' },
-            { part: '-IPv4Address 192.168.1.50', meaning: 'The address the name points to.' },
+            { part: '-ZoneName corp.example.com -Name app01', meaning: 'The zone and the host name to add.' },
+            { part: '-IPv4Address 192.168.56.50', meaning: 'The address the name points to.' },
             { part: '-WhatIf', meaning: 'Preview only.' },
           ],
           watchOut: 'A wrong DNS record can send users to the wrong server. Remove -WhatIf only in the lab.',
@@ -1066,8 +1082,8 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       commands: [
         {
           title: 'Install the role and promote a lab DC',
-          code: 'Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools -WhatIf\nInstall-ADDSForest -DomainName lab.local -DomainNetbiosName LAB -InstallDns -SafeModeAdministratorPassword (Read-Host "DSRM password" -AsSecureString) -WhatIf',
-          whatItDoes: 'Previews the two big steps of building a new domain: adding the role and promoting the server to the first DC.',
+          code: 'Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools -WhatIf\nInstall-ADDSForest -DomainName corp.example.com -DomainNetbiosName CORP -InstallDns -SafeModeAdministratorPassword (Read-Host "DSRM password" -AsSecureString) -WhatIf',
+          whatItDoes: 'Previews the two big steps of building a new domain: adding the role and promoting the server to the first DC. Before the real run, the server\'s own DNS client must point at itself (192.168.56.10).',
           parts: [
             { part: 'Install-WindowsFeature -Name AD-Domain-Services', meaning: 'Adds the AD DS role files.' },
             { part: '-IncludeManagementTools', meaning: 'Also installs the management tools and the AD module.' },
@@ -1080,24 +1096,25 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Create a strict password policy',
-          code: 'New-ADFineGrainedPasswordPolicy -Name "Admins-16" -Precedence 10 -MinPasswordLength 16 -ComplexityEnabled $true -LockoutThreshold 5 -LockoutDuration 00:30:00 -LockoutObservationWindow 00:30:00 -MaxPasswordAge 60.00:00:00 -PasswordHistoryCount 24 -ReversibleEncryptionEnabled $false -WhatIf',
-          whatItDoes: 'Previews a policy that requires 16-character complex passwords for the people it is applied to.',
+          code: 'New-ADFineGrainedPasswordPolicy -Name "Admins-20" -Precedence 1 -MinPasswordLength 20 -ComplexityEnabled $true -LockoutThreshold 5 -LockoutDuration 00:30:00 -LockoutObservationWindow 00:30:00 -MinPasswordAge 1.00:00:00 -MaxPasswordAge 60.00:00:00 -PasswordHistoryCount 24 -ReversibleEncryptionEnabled $false -WhatIf',
+          whatItDoes: 'Previews a policy that requires 20-character complex passwords for the people it is applied to. All the lockout, age and history settings are given explicitly so the policy is predictable.',
           parts: [
-            { part: '-Name "Admins-16"', meaning: 'A friendly name for the policy.' },
-            { part: '-Precedence 10', meaning: 'Lower numbers win if several policies apply.' },
-            { part: '-MinPasswordLength 16', meaning: 'Passwords must have at least 16 characters.' },
-            { part: '-LockoutThreshold 5', meaning: 'Lock the account after 5 wrong attempts.' },
+            { part: '-Name "Admins-20"', meaning: 'A friendly name for the policy.' },
+            { part: '-Precedence 1', meaning: 'Lower numbers win if several policies apply.' },
+            { part: '-MinPasswordLength 20', meaning: 'Passwords must have at least 20 characters.' },
+            { part: '-LockoutThreshold 5 / -LockoutDuration / -LockoutObservationWindow', meaning: 'Lock the account after 5 wrong attempts, for 30 minutes, counted over a 30-minute window.' },
+            { part: '-MinPasswordAge / -MaxPasswordAge / -PasswordHistoryCount', meaning: 'How often a password may be changed, when it expires, and how many old ones are remembered.' },
             { part: '-ReversibleEncryptionEnabled $false', meaning: 'Never store passwords in a reversible way.' },
           ],
           watchOut: 'Test with a lab group first; a policy this strict can lock out accounts that are not ready for it.',
         },
         {
           title: 'Apply the policy to a group',
-          code: 'Add-ADFineGrainedPasswordPolicySubject -Identity "Admins-16" -Subjects "Domain Admins" -WhatIf',
+          code: 'Add-ADFineGrainedPasswordPolicySubject -Identity "Admins-20" -Subjects "Domain Admins" -WhatIf',
           whatItDoes: 'Previews attaching the strict policy to the Domain Admins group.',
           parts: [
             { part: 'Add-ADFineGrainedPasswordPolicySubject', meaning: 'Links a policy to users or groups.' },
-            { part: '-Identity "Admins-16"', meaning: 'The policy to attach.' },
+            { part: '-Identity "Admins-20"', meaning: 'The policy to attach.' },
             { part: '-Subjects "Domain Admins"', meaning: 'A group or user. Use a global security group, not an OU.' },
           ],
           watchOut: 'FGPP only works with users or global security groups, not with OUs.',
@@ -1115,19 +1132,21 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
       ],
     },
     recap: [
-      'Install the role with `Install-WindowsFeature`, then promote with `Install-ADDSForest` (lab only).',
-      'Clients find Domain Controllers through DNS SRV records; check them with `Resolve-DnsName -Type SRV`.',
+      'Install the role with `Install-WindowsFeature`, then promote with `Install-ADDSForest` (lab only, DNS client pointing at itself first).',
+      'Clients find Domain Controllers through DNS SRV records; check them with `Resolve-DnsName -Type SRV`. When stuck, check DNS first.',
       'Manage DNS with the `DnsServer` cmdlets and preview changes with `-WhatIf`.',
       'Use an FGPP on global security groups to give admins stricter passwords than everyone else.',
     ],
   },
 
   '13-1': {
+    oneSentence:
+      'The firewall has three profiles (Domain, Private, Public), and Enable-NetFirewallRule -DisplayGroup opens a whole function safely instead of guessing ports.',
     analogy:
       'The Windows Firewall is the security guard at a building. Network Location Awareness (NLA) tells the guard where the building is today: at the office (Domain), at home (Private) or in a coffee shop (Public), and each place has its own rule book. Instead of unlocking one random door after another, you tell the guard "let the cleaning team in", and a whole group of rules opens exactly the right doors.',
     plainEnglish: [
       'Every network adapter is placed in one of three profiles: `Domain`, `Private` or `Public`. Each profile has its own firewall settings, and the strictest is Public.',
-      'Rules are collected into `DisplayGroup`s such as "Windows Remote Management". Enabling a group opens all required ports in one step, which beats guessing port numbers.',
+      'Rules are collected into `DisplayGroup`s such as "Windows Remote Management". Enabling a group opens a defined bundle of rules in one step (not just one port), which beats guessing port numbers. Read what a group contains before you enable it.',
       'When something cannot connect, never turn the firewall off. Find the right rule, enable only that, scope it to the right profile and remote addresses.',
     ],
     beforeYouStart: [
@@ -1183,7 +1202,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: 'Get-NetConnectionProfile', meaning: 'Reads the Network Location Awareness result for each adapter.' },
             { part: 'Select-Object Name, InterfaceAlias, NetworkCategory', meaning: 'Keeps the network name, adapter name and profile.' },
           ],
-          sampleOutput: 'Name        InterfaceAlias NetworkCategory\n----        -------------- ---------------\nlab.local   Ethernet0     DomainAuthenticated',
+          sampleOutput: 'Name                 InterfaceAlias NetworkCategory\n----                 -------------- ---------------\ncorp.example.com     Ethernet       DomainAuthenticated',
         },
         {
           title: 'Is the firewall on for each profile?',
@@ -1205,7 +1224,7 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
             { part: 'Select-Object ...', meaning: 'Chooses the columns.' },
           ],
           sampleOutput: 'DisplayName                                   Enabled Profile Direction\n-----------                                   ------- ------- ---------\nWindows Remote Management (HTTP-In)            True    Domain  Inbound',
-          watchOut: 'Group names depend on the Windows display language. Use Get-NetFirewallRule | Select DisplayGroup -Unique to see yours.',
+          watchOut: 'Group names depend on the Windows display language. Use Get-NetFirewallRule | Select DisplayGroup, Group -Unique to see yours; the Group value (for example @FirewallAPI.dll,-30267 for Windows Remote Management) is language-neutral and works with `-Group`.',
         },
       ],
     },
@@ -1263,12 +1282,12 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
         },
         {
           title: 'Create a tightly scoped rule (preview)',
-          code: 'New-NetFirewallRule -DisplayName "Lab - RDP from admin subnet" -Direction Inbound -Protocol TCP -LocalPort 3389 -RemoteAddress 10.0.0.0/24 -Profile Domain -Action Allow -WhatIf',
-          whatItDoes: 'Previews a rule that allows Remote Desktop only from one admin subnet and only on the Domain profile.',
+          code: 'New-NetFirewallRule -DisplayName "Lab - RDP from admin subnet" -Direction Inbound -Protocol TCP -LocalPort 3389 -RemoteAddress 192.168.56.0/24 -Profile Domain -Action Allow -WhatIf',
+          whatItDoes: 'Previews a rule that allows Remote Desktop only from the lab subnet and only on the Domain profile.',
           parts: [
             { part: 'New-NetFirewallRule', meaning: 'Creates a brand-new firewall rule.' },
             { part: '-Protocol TCP -LocalPort 3389', meaning: 'The protocol and port to match.' },
-            { part: '-RemoteAddress 10.0.0.0/24', meaning: 'Only this range of computers may connect.' },
+            { part: '-RemoteAddress 192.168.56.0/24', meaning: 'Only this range of computers (the lab subnet) may connect.' },
             { part: '-Profile Domain', meaning: 'The rule applies only on the Domain profile.' },
             { part: '-Action Allow', meaning: 'Let matching traffic through.' },
           ],
@@ -1301,9 +1320,10 @@ export const GUIDES_PART_4: Record<string, LessonGuide> = {
     },
     recap: [
       'NLA assigns each adapter a Domain, Private or Public profile with separate rules.',
-      'Enable rules by `-DisplayGroup` instead of guessing port numbers.',
+      'Enable rules by group (`-DisplayGroup`, or the language-neutral `-Group`) instead of guessing port numbers, and check what the group contains first.',
       'Back up first, scope rules by remote address and profile, and preview with `-WhatIf`.',
       'Never switch the firewall off to fix a connection problem.',
+      'When you get stuck: the rule is enabled but the port is closed? Compare the NIC\'s profile (`Get-NetConnectionProfile`) with the rule\'s Profile. A rule for Domain,Private does nothing on a Public network.',
     ],
   },
 };

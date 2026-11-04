@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lightbulb, Sparkles } from 'lucide-react';
+import { TabList, tabPanelProps } from '../common/TabList';
 import { PipelineVisualizer } from '../diagrams/PipelineVisualizer';
 import { ObjectAnatomy } from '../diagrams/ObjectAnatomy';
 import {
@@ -66,30 +67,21 @@ export const PipelineWalkthroughSection: React.FC = () => {
           </p>
         </div>
 
-        <div
+        <TabList
+          idPrefix="pipeline-stages"
+          label="Pipeline stages"
           className="flex flex-wrap gap-2"
-          role="tablist"
-          aria-label="Pipeline stages"
-        >
-          {PIPELINE_STEPPER.map((st, idx) => (
-            <button
-              key={st.step}
-              type="button"
-              role="tab"
-              aria-selected={pipeStepIdx === idx}
-              onClick={() => setPipeStepIdx(idx)}
-              className={`px-3.5 py-2 rounded-full text-[0.8125rem] font-extrabold cursor-pointer transition-all ${
-                pipeStepIdx === idx
-                  ? 'clay-btn-pink text-white'
-                  : 'clay-btn-secondary'
-              }`}
-            >
-              {st.step}
-            </button>
-          ))}
-        </div>
+          tabs={PIPELINE_STEPPER.map((st, idx) => ({ id: String(idx), label: st.step }))}
+          activeId={String(pipeStepIdx)}
+          onChange={(id) => setPipeStepIdx(Number(id))}
+          tabClassName={(active) =>
+            `px-3.5 py-2 rounded-full text-[0.8125rem] font-extrabold cursor-pointer transition-all ${
+              active ? 'clay-btn-pink text-white' : 'clay-btn-secondary'
+            }`
+          }
+        />
 
-        <div className="clay-card p-5 space-y-3">
+        <div className="clay-card p-5 space-y-3" {...tabPanelProps('pipeline-stages', String(pipeStepIdx))}>
           <div className="p-3.5 rounded-[1rem] clay-terminal text-[#f9e7a8] font-mono font-bold text-[0.875rem] overflow-x-auto">
             <code>{PIPELINE_STEPPER[pipeStepIdx].command}</code>
           </div>
@@ -112,6 +104,7 @@ export const PipelineWalkthroughSection: React.FC = () => {
               <button
                 key={sb.id}
                 type="button"
+                aria-pressed={activeSandbox === sb.id}
                 onClick={() =>
                   setActiveSandbox(
                     activeSandbox === sb.id
@@ -119,7 +112,7 @@ export const PipelineWalkthroughSection: React.FC = () => {
                       : (sb.id as typeof activeSandbox)
                   )
                 }
-                className={`px-3 py-1.5 rounded-full text-[0.75rem] font-extrabold cursor-pointer ${
+                className={`tap-target px-3 py-1.5 rounded-full text-[0.75rem] font-extrabold cursor-pointer ${
                   activeSandbox === sb.id
                     ? 'clay-btn-primary'
                     : 'clay-btn-secondary'
@@ -147,7 +140,7 @@ export const PipelineWalkthroughSection: React.FC = () => {
           <div className="flex items-center gap-2.5">
             <Lightbulb className="w-5 h-5 shrink-0" />
             <h3 className="text-[1.125rem] font-extrabold">
-              💡 Golden Rule of Least Privilege
+              Golden Rule of Least Privilege
             </h3>
           </div>
           <p className="text-[0.9375rem] font-medium leading-relaxed">
@@ -161,7 +154,7 @@ export const PipelineWalkthroughSection: React.FC = () => {
           <div className="flex items-center gap-2.5">
             <Sparkles className="w-5 h-5 shrink-0" />
             <h3 className="text-[1.125rem] font-extrabold">
-              🧰 The Self-Reliance Pocketknife
+              The Self-Reliance Pocketknife
             </h3>
           </div>
           <p className="text-[0.9375rem] font-medium leading-relaxed">

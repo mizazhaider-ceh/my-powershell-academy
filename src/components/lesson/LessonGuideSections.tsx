@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, Rocket, Lightbulb } from 'lucide-react';
+import { Compass, Rocket, Lightbulb, Sparkles } from 'lucide-react';
 import { LessonGuide } from '../../types';
 import { formatInlineRichText } from './formatInlineRichText';
 
@@ -21,6 +21,13 @@ export const LessonStartHere: React.FC<{ guide: LessonGuide }> = ({ guide }) => 
           The Lesson from A to Z, in Plain English
         </h2>
       </div>
+    </div>
+
+    <div className="clay-cushion-mint p-5 sm:p-6 space-y-2">
+      <span className="text-[0.8125rem] font-mono font-extrabold uppercase tracking-wider flex items-center gap-2">
+        <Sparkles className="w-4 h-4" /> The idea in one sentence
+      </span>
+      <p className="text-[1.125rem] font-semibold leading-[1.6]">{guide.oneSentence}</p>
     </div>
 
     <div className="clay-cushion-warm p-5 sm:p-6 space-y-2">

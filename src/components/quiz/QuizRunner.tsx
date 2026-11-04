@@ -91,8 +91,10 @@ export const QuizRunner: React.FC<QuizRunnerProps> = ({
           {availableTypes.map((t) => (
             <button
               key={t}
+              type="button"
+              aria-pressed={selectedType === t}
               onClick={() => resetState(t)}
-              className={`px-3.5 py-2 rounded-full text-[0.8125rem] font-extrabold transition-all cursor-pointer ${
+              className={`px-3.5 py-2 min-h-11 rounded-full text-[0.8125rem] font-extrabold transition-all cursor-pointer ${
                 selectedType === t
                   ? 'clay-btn-pink text-[var(--dp-color-ink)]'
                   : 'clay-well text-[var(--dp-color-ink-secondary)] hover:text-[var(--dp-color-ink)]'

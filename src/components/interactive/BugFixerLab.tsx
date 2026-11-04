@@ -78,7 +78,7 @@ export const BugFixerLab: React.FC = () => {
         </div>
 
         <div className="p-4 rounded-[1.25rem] clay-terminal space-y-2 font-mono text-[0.82rem]">
-          <div className="flex items-center justify-between text-[#93c5fd] text-[0.72rem] uppercase tracking-wider font-extrabold">
+          <div className="flex items-center justify-between text-[#93c5fd] text-[0.75rem] uppercase tracking-wider font-extrabold">
             <span>❌ Broken Command</span>
             <span>Status: Bug Detected</span>
           </div>
@@ -156,7 +156,7 @@ export const BugFixerLab: React.FC = () => {
 
             {chosenOption.isCorrect && (
               <div className="p-4 rounded-[1rem] clay-terminal text-[#a7f3d0] font-mono text-[0.8125rem] overflow-x-auto space-y-1.5">
-                <div className="text-[0.7rem] uppercase tracking-wider text-[#93c5fd] font-bold">
+                <div className="text-[0.75rem] uppercase tracking-wider text-[#93c5fd] font-bold">
                   ✓ Verified Output After Fix:
                 </div>
                 <pre className="whitespace-pre">{currentBug.fixedOutput}</pre>

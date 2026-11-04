@@ -1,3 +1,6 @@
+﻿import { KEY_TERM_DEFINITIONS } from '../data/keyTermDefinitions';
+import { GLOSSARY } from '../data/glossary';
+import { COMMANDS } from '../data/commands';
 import {
   Lesson,
   Chapter,
@@ -22,7 +25,7 @@ const BEGINNER_TERM_LEXICON: Record<string, string> = {
   'kernel convergence':
     'The fact that desktop Windows (10/11) and datacenter Windows Server share the exact same core operating system brain (ntoskrnl.exe).',
   'active directory':
-    'Microsoft’s central database for an organization’s computers, user accounts, passwords, and security groups.',
+    'Microsoftâ€™s central database for an organizationâ€™s computers, user accounts, passwords, and security groups.',
   'least privilege':
     'The safety rule that every user or program should only have the minimum permissions needed to do its current job, never full Admin rights by default.',
   uac:
@@ -30,13 +33,13 @@ const BEGINNER_TERM_LEXICON: Record<string, string> = {
   wsl2:
     'Windows Subsystem for Linux 2: a lightweight virtual machine built into Windows that lets you run a real Linux kernel side-by-side with PowerShell.',
   process:
-    'A living container in memory created when you launch a program. It holds the program’s memory space, security badge (token), and open file handles.',
+    'A living container in memory created when you launch a program. It holds the programâ€™s memory space, security badge (token), and open file handles.',
   pid:
     'Process Identifier: a unique ID number (like a license plate) that Windows assigns to each running program while it is alive.',
   thread:
     'A worker inside a process that actually executes instructions on the CPU. One process can have many threads working in parallel.',
   handle:
-    'A numbered claim ticket in a process’s private table that points to a protected kernel resource like an open file, registry key, or another process.',
+    'A numbered claim ticket in a processâ€™s private table that points to a protected kernel resource like an open file, registry key, or another process.',
   token:
     'Access Token: a digital ID badge attached to a process that lists who started it, which groups they belong to, and what privileges they hold.',
   'virtual memory':
@@ -70,13 +73,13 @@ const BEGINNER_TERM_LEXICON: Record<string, string> = {
   cmdlet:
     'Pronounced "command-let": a native PowerShell command built on .NET that always follows the Verb-SingularNoun naming rule (like Get-Process or Stop-Service).',
   '.net':
-    'Microsoft’s software framework and runtime engine (CLR) that sits underneath PowerShell and provides live, structured objects instead of plain text.',
+    'Microsoftâ€™s software framework and runtime engine (CLR) that sits underneath PowerShell and provides live, structured objects instead of plain text.',
   'get-member':
-    'The X-ray vision cmdlet (alias gm) that reveals an object’s exact .NET class name, its data Properties, and its action Methods.',
+    'The X-ray vision cmdlet (alias gm) that reveals an objectâ€™s exact .NET class name, its data Properties, and its action Methods.',
   'get-help':
-    'PowerShell’s built-in manual system that shows syntax, parameter details, and copy-ready code examples (-Examples) right in your terminal.',
+    'PowerShellâ€™s built-in manual system that shows syntax, parameter details, and copy-ready code examples (-Examples) right in your terminal.',
   'get-command':
-    'PowerShell’s discovery search engine (alias gcm) that finds commands by wildcard name, Verb, Noun, or Module.',
+    'PowerShellâ€™s discovery search engine (alias gcm) that finds commands by wildcard name, Verb, Noun, or Module.',
   object:
     'A live package of structured data in memory that has Properties (facts about it, like Name or CPU) and Methods (actions it can perform, like .Kill()).',
   property:
@@ -104,7 +107,7 @@ const BEGINNER_TERM_LEXICON: Record<string, string> = {
   'execution policy':
     'A safety seatbelt (like RemoteSigned or Restricted) that prevents accidental launching of untrusted .ps1 scripts, not a security boundary against attackers.',
   winrm:
-    'Windows Remote Management: Microsoft’s WS-Management protocol (ports 5985 HTTP / 5986 HTTPS) that powers encrypted PowerShell remoting across servers.',
+    'Windows Remote Management: Microsoftâ€™s WS-Management protocol (ports 5985 HTTP / 5986 HTTPS) that powers encrypted PowerShell remoting across servers.',
   'double-hop':
     'The Kerberos authentication limit where credentials sent from Machine A to Remote Server B cannot automatically hop a second time to File Server C without delegation or CredSSP.',
   fgpp:
@@ -131,37 +134,31 @@ const BEGINNER_TERM_LEXICON: Record<string, string> = {
     'Just Enough Administration: a PowerShell Remoting security architecture that gives delegated operators access to specific approved commands without granting them full Admin rights.',
 };
 
+const normalise = (value: string) => value.toLowerCase().replace(/\(.*?\)/g, '').replace(/[^a-z0-9\- ]+/g, ' ').replace(/\s+/g, ' ').trim();
+
+const GLOSSARY_BY_TERM = new Map(GLOSSARY.map((g) => [normalise(g.term), g.definition]));
+const PURPOSE_BY_CMDLET = new Map(COMMANDS.map((c) => [c.name.toLowerCase(), c.purpose]));
+
+/**
+ * Plain-English meaning for each key term. Only real definitions are used (glossary, lexicon, cmdlet library).
+ * A term with no real definition is left out rather than padded with filler.
+ */
 export function extractPlainEnglishKeyTerms(lesson: Lesson): PlainEnglishTermExplanation[] {
   const results: PlainEnglishTermExplanation[] = [];
 
   for (const rawTerm of lesson.keyTerms) {
-    const lower = rawTerm.toLowerCase();
-    let matchedExplanation: string | undefined;
-
-    for (const [key, explanation] of Object.entries(BEGINNER_TERM_LEXICON)) {
-      if (lower.includes(key)) {
-        matchedExplanation = explanation;
-        break;
-      }
-    }
-
-    if (!matchedExplanation) {
-      if (rawTerm.includes('-')) {
-        matchedExplanation = `A built-in PowerShell Verb-Noun command used in this lesson (${rawTerm}) that outputs or acts on live .NET objects.`;
-      } else {
-        matchedExplanation = `A foundational concept in ${lesson.title} that we break down step-by-step with practical examples below.`;
-      }
-    }
-
-    results.push({
-      term: rawTerm,
-      plainEnglish: matchedExplanation,
-    });
+    const key = normalise(rawTerm);
+    const lexiconKey = Object.keys(BEGINNER_TERM_LEXICON).find((k) => key === k || key.split(' ').includes(k));
+    const meaning =
+      KEY_TERM_DEFINITIONS[rawTerm] ??
+      GLOSSARY_BY_TERM.get(key) ??
+      (lexiconKey ? BEGINNER_TERM_LEXICON[lexiconKey] : undefined) ??
+      PURPOSE_BY_CMDLET.get(rawTerm.toLowerCase());
+    if (meaning) results.push({ term: rawTerm, plainEnglish: meaning });
   }
 
   return results;
 }
-
 export function decodeSyntaxForBeginners(syntax: string): SyntaxRuleHelp[] {
   const rules: SyntaxRuleHelp[] = [];
   if (syntax.includes('[[-')) {
@@ -256,7 +253,7 @@ export function buildLessonFlowchartData(
             inputType: 'Parent Token',
             outputType: 'Process Security Context',
             plainEnglishSummary:
-              'The new process inherits a copy of its parent’s Access Token (defining what it is allowed to touch) and initializes its private Handle Table.',
+              'The new process inherits a copy of its parentâ€™s Access Token (defining what it is allowed to touch) and initializes its private Handle Table.',
             kind: 'security',
           },
           {
@@ -275,7 +272,7 @@ export function buildLessonFlowchartData(
         objectBlueprint: {
           typeName: 'System.Diagnostics.Process',
           friendlyTitle: 'Live Windows Process Object Blueprint',
-          layerOrNamespace: 'Kernel EPROCESS ↔ .NET Diagnostics Layer',
+          layerOrNamespace: 'Kernel EPROCESS â†” .NET Diagnostics Layer',
           plainEnglishOverview:
             'When you run Get-Process, PowerShell does not give you text, it wraps the live Windows kernel process into this structured .NET object.',
           members: [
@@ -305,7 +302,7 @@ export function buildLessonFlowchartData(
               kind: 'property',
               dataType: 'System.Int64',
               sampleValue: '94371840 (90 MB)',
-              plainEnglish: 'The exact amount of physical RAM (in bytes) currently mapped to this process’s 4 KB pages.',
+              plainEnglish: 'The exact amount of physical RAM (in bytes) currently mapped to this processâ€™s 4 KB pages.',
             },
             {
               name: 'Path',
@@ -353,7 +350,7 @@ export function buildLessonFlowchartData(
             inputType: 'Page Table Lookup',
             outputType: 'Valid / PageFault Bit',
             plainEnglishSummary:
-              'The CPU Memory Management Unit checks the process’s Page Table to see if that 4 KB page is currently sitting in fast physical RAM.',
+              'The CPU Memory Management Unit checks the processâ€™s Page Table to see if that 4 KB page is currently sitting in fast physical RAM.',
             kind: 'transform',
           },
           {
@@ -377,16 +374,16 @@ export function buildLessonFlowchartData(
             inputType: 'Physical Frame Mapped',
             outputType: 'Memory Diagnostics Object',
             plainEnglishSummary:
-              'You can inspect any process’s exact physical RAM footprint (WorkingSet64) and pagefile usage directly in PowerShell.',
+              'You can inspect any processâ€™s exact physical RAM footprint (WorkingSet64) and pagefile usage directly in PowerShell.',
             kind: 'output',
           },
         ],
         objectBlueprint: {
           typeName: 'Win32_OperatingSystem (CIM Memory Object)',
           friendlyTitle: 'Kernel Memory & Pagefile Telemetry Object',
-          layerOrNamespace: 'ROOT\\CIMV2 · Memory Manager',
+          layerOrNamespace: 'ROOT\\CIMV2 Â· Memory Manager',
           plainEnglishOverview:
-            'Querying Get-CimInstance Win32_OperatingSystem exposes the kernel’s real-time physical RAM and virtual memory counters.',
+            'Querying Get-CimInstance Win32_OperatingSystem exposes the kernelâ€™s real-time physical RAM and virtual memory counters.',
           members: [
             {
               name: 'TotalVisibleMemorySize',
@@ -444,7 +441,7 @@ export function buildLessonFlowchartData(
           stepNumber: 2,
           label: 'Subsystem & NTDLL.DLL',
           sublabel: 'The Border Checkpoint',
-          commandOrMechanism: 'ntdll.dll → syscall instruction',
+          commandOrMechanism: 'ntdll.dll â†’ syscall instruction',
           inputType: '.NET / Win32 API Call',
           outputType: 'Kernel Syscall Trap',
           plainEnglishSummary:
@@ -705,7 +702,7 @@ export function buildLessonFlowchartData(
         id: 'stage-2',
         stepNumber: 2,
         label: '2. Parameter Binding Gate',
-        sublabel: 'ByValue → ByPropertyName',
+        sublabel: 'ByValue â†’ ByPropertyName',
         commandOrMechanism: 'Pipeline Binder (|)',
         inputType: 'Live .NET Object Stream',
         outputType: 'Bound Pipeline Object ($_)',
@@ -746,7 +743,7 @@ export function buildLessonFlowchartData(
       friendlyTitle: `Live Object Structure in ${lesson.id} (${primaryCmdlet})`,
       layerOrNamespace: 'System.Management.Automation (.NET CLR)',
       plainEnglishOverview:
-        'Every item flowing through this lesson’s commands is a self-describing package containing Metadata (TypeName), Properties (facts you can read), and Methods (actions you can trigger).',
+        'Every item flowing through this lessonâ€™s commands is a self-describing package containing Metadata (TypeName), Properties (facts you can read), and Methods (actions you can trigger).',
       members: [
         {
           name: 'PSTypeNames[0]',

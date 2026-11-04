@@ -107,7 +107,7 @@ export const ParameterBindingLab: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
           <div className="clay-card p-4 space-y-2">
-            <span className="text-[0.72rem] font-mono font-extrabold uppercase text-[var(--dp-color-accent)]">
+            <span className="text-[0.75rem] font-mono font-extrabold uppercase text-[var(--dp-color-accent)]">
               Incoming Object in Pipe
             </span>
             <div className="font-mono text-[0.82rem] font-extrabold break-all">
@@ -125,7 +125,7 @@ export const ParameterBindingLab: React.FC = () => {
                 : 'clay-card opacity-85'
             }`}
           >
-            <div className="flex items-center justify-between text-[0.72rem] font-mono font-extrabold uppercase">
+            <div className="flex items-center justify-between text-[0.75rem] font-mono font-extrabold uppercase">
               <span>Attempt 1 · ByValue</span>
               {current.winner === 'ByValue' ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-700" />
@@ -147,7 +147,7 @@ export const ParameterBindingLab: React.FC = () => {
                   : 'clay-card opacity-85'
             }`}
           >
-            <div className="flex items-center justify-between text-[0.72rem] font-mono font-extrabold uppercase">
+            <div className="flex items-center justify-between text-[0.75rem] font-mono font-extrabold uppercase">
               <span>Attempt 2 · ByPropertyName</span>
               {current.winner === 'ByPropertyName' ? (
                 <CheckCircle2 className="w-4 h-4 text-emerald-700" />

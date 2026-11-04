@@ -6,6 +6,7 @@ import {
   Lesson as LessonType,
   LessonFlowchartData,
 } from '../../types';
+import { DepthGate } from './DepthGate';
 import { InteractivePipelineProcessFlowchart } from '../diagrams/InteractivePipelineProcessFlowchart';
 import { PipelineVisualizer } from '../diagrams/PipelineVisualizer';
 import { ObjectAnatomy } from '../diagrams/ObjectAnatomy';
@@ -98,6 +99,7 @@ export const LessonContent: React.FC<LessonContentProps> = ({
         </section>
       )}
 
+      <DepthGate when="full">
       <section
         id="sec-concepts"
         aria-label="Step-by-step concept explanations"
@@ -155,6 +157,7 @@ export const LessonContent: React.FC<LessonContentProps> = ({
             </div>
           )}
       </section>
+      </DepthGate>
     </>
   );
 };

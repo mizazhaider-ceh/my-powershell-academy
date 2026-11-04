@@ -68,7 +68,7 @@ export const SyscallAnimator: React.FC = () => {
                 : 'border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-950/60 text-stone-700 dark:text-stone-300 hover:border-blue-400'
             }`}
           >
-            <div className="text-[11px] font-mono truncate">{st.short}</div>
+            <div className="text-[0.75rem] font-mono truncate">{st.short}</div>
           </button>
         ))}
       </div>
@@ -95,7 +95,7 @@ export const SyscallAnimator: React.FC = () => {
                   />
                   <span className="text-xs font-bold">{st.title}</span>
                 </div>
-                <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/5">{st.badge}</span>
+                <span className="text-[0.75rem] font-mono px-2 py-0.5 rounded bg-black/5 dark:bg-white/5">{st.badge}</span>
               </div>
             );
           })}
@@ -104,10 +104,10 @@ export const SyscallAnimator: React.FC = () => {
         <div className="lg:col-span-6 space-y-4">
           <div className="p-4 rounded-xl bg-stone-50 dark:bg-stone-950 border border-stone-200 dark:border-stone-800 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-bold">
+              <span className="text-[0.75rem] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 font-bold">
                 Step {activeStep + 1} of 5
               </span>
-              <span className="text-[11px] font-mono text-stone-500">{current.badge}</span>
+              <span className="text-[0.75rem] font-mono text-stone-500">{current.badge}</span>
             </div>
             <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100">{current.title}</h4>
             <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">{current.desc}</p>

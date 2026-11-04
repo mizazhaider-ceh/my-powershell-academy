@@ -1,0 +1,332 @@
+/* ============================================================================
+   SHARED: concept diagrams
+   Theme-agnostic. Everything is driven by --tone plus the dp-* and hx-* tokens, so the
+   same diagrams look right in Claymorphism and Atlas, in light and in dark.
+   ============================================================================ */
+
+.cd-tone-blue { --tone: var(--dp-color-accent); }
+.cd-tone-cyan { --tone: #0ea5e9; }
+.cd-tone-green { --tone: var(--hx-good); }
+.cd-tone-amber { --tone: var(--hx-warm); }
+.cd-tone-violet { --tone: #8b5cf6; }
+.cd-tone-red { --tone: var(--hx-bad); }
+
+.cd-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.cd-controls {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+
+/* ---------- Layers ---------- */
+.cd-layers {
+  display: grid;
+  gap: 0;
+}
+
+.cd-layer {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.3rem minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  width: 100%;
+  padding: 0.8rem 0.95rem 0.8rem 0.5rem;
+  border-radius: 0.6rem;
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  transition: background-color 0.2s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cd-layer::before {
+  content: "";
+  align-self: stretch;
+  border-radius: 99px;
+  background: var(--tone);
+  opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.3s ease;
+}
+
+.cd-layer:hover,
+.cd-layer[data-selected="true"] {
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+}
+
+.cd-layer[data-selected="true"]::before,
+.cd-layer[data-lit="true"]::before {
+  opacity: 1;
+  transform: scaleX(1.6);
+}
+
+.cd-layer[data-lit="true"] {
+  background: color-mix(in srgb, var(--tone) 16%, transparent);
+  transform: translateX(6px);
+}
+
+.cd-connector {
+  height: 0.9rem;
+  margin-left: 0.62rem;
+  width: 2px;
+  background: linear-gradient(var(--hx-line), var(--hx-line));
+}
+
+.cd-connector[data-lit="true"] {
+  background: linear-gradient(180deg, var(--dp-color-accent), var(--hx-accent2));
+}
+
+/* ---------- Sequence ---------- */
+.cd-seq {
+  position: relative;
+  overflow-x: auto;
+}
+
+.cd-seq-inner {
+  position: relative;
+  min-width: 34rem;
+}
+
+.cd-actors,
+.cd-lifelines {
+  display: grid;
+  grid-template-columns: repeat(var(--n), 1fr);
+}
+
+.cd-actor {
+  margin: 0 0.35rem;
+  padding: 0.55rem 0.5rem;
+  border-radius: 0.55rem;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: color-mix(in srgb, var(--tone) 12%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 45%, transparent);
+}
+
+.cd-actor small {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+.cd-msgs {
+  position: relative;
+  margin-top: 0.4rem;
+}
+
+.cd-msgs::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(90deg, transparent 0 calc(100% / var(--n) / 2 - 0.5px), var(--hx-line) calc(100% / var(--n) / 2 - 0.5px) calc(100% / var(--n) / 2 + 0.5px), transparent calc(100% / var(--n) / 2 + 0.5px) calc(100% / var(--n)));
+  pointer-events: none;
+}
+
+.cd-msg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 3.6rem;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cd-msg[data-shown="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+.cd-msg-line {
+  position: absolute;
+  top: 2.15rem;
+  height: 2px;
+  background: var(--dp-color-accent);
+  transform-origin: left center;
+}
+
+.cd-msg[data-dir="left"] .cd-msg-line {
+  transform-origin: right center;
+}
+
+.cd-msg-line::after {
+  content: "";
+  position: absolute;
+  top: -4px;
+  right: -1px;
+  border: 5px solid transparent;
+  border-left: 8px solid var(--dp-color-accent);
+  border-right: 0;
+}
+
+.cd-msg[data-dir="left"] .cd-msg-line::after {
+  right: auto;
+  left: -1px;
+  border-left: 0;
+  border-right: 8px solid var(--dp-color-accent);
+}
+
+.cd-msg-label {
+  position: absolute;
+  top: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: center;
+  background: var(--dp-color-surface);
+}
+
+.cd-msg[data-selected="true"] .cd-msg-line {
+  height: 3px;
+  background: var(--hx-accent2);
+}
+
+.cd-msg[data-selected="true"] .cd-msg-label {
+  box-shadow: inset 0 0 0 1px var(--dp-color-accent);
+}
+
+/* ---------- Compare ---------- */
+.cd-compare {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0.75rem 0.9rem;
+  align-items: stretch;
+}
+
+.cd-col-head {
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.55rem;
+  font-weight: 700;
+  font-size: 0.92rem;
+  background: color-mix(in srgb, var(--tone) 14%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone) 45%, transparent);
+}
+
+.cd-cell {
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.55rem;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  background: var(--hx-chip);
+  animation: cd-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+.cd-cell b {
+  display: block;
+  margin-bottom: 0.15rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  opacity: 0.65;
+}
+
+.cd-vs {
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* ---------- Tree ---------- */
+.cd-tree-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.cd-tree,
+.cd-tree ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cd-tree ul {
+  margin-left: 0.85rem;
+  padding-left: 0.85rem;
+  border-left: 1px solid var(--hx-line);
+}
+
+.cd-node {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  text-align: left;
+  font-size: 0.86rem;
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.cd-node::before {
+  content: "";
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 2px;
+  background: var(--tone, var(--dp-color-accent));
+}
+
+.cd-node:hover,
+.cd-node[data-selected="true"] {
+  background: color-mix(in srgb, var(--tone, var(--dp-color-accent)) 13%, transparent);
+}
+
+.cd-node small {
+  margin-left: auto;
+  font-size: 0.75rem;
+  opacity: 0.65;
+}
+
+.cd-detail {
+  padding: 0.95rem 1.05rem;
+  border-radius: 0.7rem;
+  font-size: 0.9rem;
+  line-height: 1.55;
+  background: color-mix(in srgb, var(--tone, var(--dp-color-accent)) 9%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--tone, var(--dp-color-accent)) 35%, transparent);
+  animation: cd-rise 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+
+@keyframes cd-rise {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@media (max-width: 40rem) {
+  .cd-compare {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cd-vs {
+    display: none;
+  }
+
+  .cd-tree-wrap {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cd-cell,
+  .cd-detail,
+  .cd-msg {
+    animation: none;
+    transition: none;
+  }
+}

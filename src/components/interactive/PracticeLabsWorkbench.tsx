@@ -13,6 +13,7 @@ import { ParameterBindingLab } from './ParameterBindingLab';
 import { ServerCoreBuilderLab } from './ServerCoreBuilderLab';
 import { SplattingRefactorLab } from './SplattingRefactorLab';
 import { FlashcardSpeedDrills } from './FlashcardSpeedDrills';
+import { TabList, tabPanelProps } from '../common/TabList';
 
 type LabTabId =
   | 'bugs'
@@ -44,34 +45,33 @@ export const PracticeLabsWorkbench: React.FC = () => {
         <span className="text-[0.75rem] font-mono font-extrabold uppercase tracking-wider text-[var(--dp-color-accent)] block">
           6 Interactive Hands-On Workbenches · Select a Lab Mode Below
         </span>
-        <div
+        <TabList
+          idPrefix="practice-labs"
+          label="Interactive PowerShell Practice Labs"
           className="flex flex-wrap gap-2"
-          role="tablist"
-          aria-label="Interactive PowerShell Practice Labs"
-        >
-          {LAB_TABS.map((tab) => {
+          tabs={LAB_TABS.map((tab) => {
             const Icon = tab.icon;
-            const isSelected = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={isSelected}
-                onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2.5 rounded-full text-[0.8125rem] font-extrabold inline-flex items-center gap-2 cursor-pointer transition-all ${
-                  isSelected ? 'clay-btn-primary' : 'clay-btn-secondary'
-                }`}
-              >
-                <Icon className="w-4 h-4 shrink-0" />
-                <span>{tab.label}</span>
-              </button>
-            );
+            return {
+              id: tab.id,
+              label: (
+                <>
+                  <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
+                  <span>{tab.label}</span>
+                </>
+              ),
+            };
           })}
-        </div>
+          activeId={activeTab}
+          onChange={(id) => setActiveTab(id as LabTabId)}
+          tabClassName={(isSelected) =>
+            `px-4 py-2.5 rounded-full text-[0.8125rem] font-extrabold inline-flex items-center gap-2 cursor-pointer transition-all ${
+              isSelected ? 'clay-btn-primary' : 'clay-btn-secondary'
+            }`
+          }
+        />
       </div>
 
-      <div>
+      <div {...tabPanelProps('practice-labs', activeTab)}>
         {activeTab === 'bugs' && <BugFixerLab />}
         {activeTab === 'base64' && <Base64Event4104Lab />}
         {activeTab === 'binding' && <ParameterBindingLab />}

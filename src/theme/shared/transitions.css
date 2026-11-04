@@ -1,0 +1,35 @@
+/* ============================================================================
+   SHARED: view transitions
+   Theme and mode switches reveal in a circle (clip-path animated from script).
+   Route changes crossfade with a small rise when html[data-route-transition] is set.
+   ============================================================================ */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  z-index: 1;
+}
+
+::view-transition-new(root) {
+  z-index: 2;
+}
+
+html[data-route-transition] ::view-transition-old(root) {
+  animation: route-fade-out 0.22s ease both;
+}
+
+html[data-route-transition] ::view-transition-new(root) {
+  animation: route-fade-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes route-fade-out {
+  to { opacity: 0; }
+}
+
+@keyframes route-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+}

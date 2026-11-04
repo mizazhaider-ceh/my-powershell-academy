@@ -1,4 +1,13 @@
 @import "tailwindcss";
+@import "./theme/shared/home.css";
+@import "./theme/shared/diagrams.css";
+@import "./theme/shared/flowchart.css";
+@import "./theme/shared/teaching.css";
+@import "./theme/shared/journey.css";
+@import "./theme/shared/lesson.css";
+@import "./theme/shared/transitions.css";
+@import "./theme/switcher.css";
+@import "./theme/atlas/index.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -130,7 +139,6 @@
 
 @layer base {
   html {
-    scroll-behavior: smooth;
     font-family: var(--dp-typography-face);
     font-size: 100%;
     background-color: var(--dp-color-ground);
@@ -287,6 +295,14 @@
   transform: translateY(0.0625rem) scale(0.985);
 }
 
+.clay-btn-primary:disabled,
+.clay-btn-primary:disabled:hover {
+  background: var(--dp-color-surface-compare);
+  color: var(--dp-color-ink-secondary) !important;
+  box-shadow: var(--clay-shadow-well);
+  transform: none;
+}
+
 /* Secondary White/Cream Pill Button */
 .clay-btn-secondary,
 .clay-pill {
@@ -414,6 +430,80 @@
 
 .lesson-prose p + p {
   margin-top: var(--dp-spacing-paragraph-gap);
+}
+
+/* ============================================================================
+   ACCESSIBILITY LAYER: contrast, touch targets, overflow, header shell
+   ============================================================================ */
+
+/* Inset chip that stays readable in both modes (replaces white/80 which blinded dark mode) */
+.clay-chip-surface {
+  background-color: rgba(255, 255, 255, 0.82);
+}
+.dark .clay-chip-surface {
+  background-color: rgba(255, 255, 255, 0.09);
+}
+
+/* Header shell: solid ground behind the pill so scrolled text never bleeds around it */
+.clay-header {
+  background: linear-gradient(to bottom, var(--dp-color-ground) calc(100% - 0.5rem), transparent);
+}
+html[data-theme="atlas"] .clay-header {
+  background: none;
+}
+
+.clay-menu-item {
+  min-height: 2.75rem;
+}
+
+.clay-menu-panel {
+  border-radius: 1.75rem;
+}
+
+/* Long inline code must wrap instead of pushing the page sideways */
+:where(p, li, td, th, dd, h2, h3, h4, summary) code,
+.clay-code-inline {
+  overflow-wrap: anywhere;
+}
+
+/* Dark mode: white text needs a deeper blue fill, blue text needs the lighter blue */
+.dark .jr-tag,
+.dark .tc-step[data-current="true"] .tc-step-dot {
+  background: #2563eb;
+}
+.dark .tc-label,
+.dark .tc-step-dot,
+.dark .jr-stop[data-state="next"] .jr-node {
+  color: var(--dp-color-accent-bright);
+}
+.dark .tc-step[data-current="true"] .tc-step-dot {
+  color: #ffffff;
+}
+.tc-label,
+.jr-tag,
+.jr-label small {
+  font-size: 0.75rem;
+}
+
+/* Shared code blocks: line numbers and labels need 4.5:1 on the near-black code surface */
+.bg-stone-900 .text-stone-600 {
+  color: #8b949e;
+}
+.bg-stone-900 .text-stone-500 {
+  color: #a1a8b3;
+}
+.bg-stone-900 :is(.text-\[11px\], .text-\[10px\]) {
+  font-size: 0.75rem;
+}
+
+/* Touch devices and narrow screens: every control reaches 44x44 CSS px */
+@media (max-width: 47.5rem), (pointer: coarse) {
+  .tap-target,
+  .search-icon-btn,
+  .search-chip {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+  }
 }
 
 /* Responsive Breakpoints & Reduced Motion Compliance */

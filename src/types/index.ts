@@ -165,6 +165,8 @@ export interface GuideWord {
 }
 
 export interface LessonGuide {
+  /** The single idea to hold in your head, in one beginner-friendly sentence. */
+  oneSentence: string;
   analogy: string;
   plainEnglish: string[];
   beforeYouStart: string[];
@@ -263,3 +265,6 @@ export interface QuizQuestion {
   explanation: string;
   relatedLessonPath?: string;
 }
+
+export * from './teaching';
+export * from './storyboard';

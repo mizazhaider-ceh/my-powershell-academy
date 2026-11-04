@@ -2,6 +2,8 @@ import { LessonGuide } from '../../types';
 
 export const GUIDES_PART_1: Record<string, LessonGuide> = {
   '1-1': {
+    oneSentence:
+      'Windows 11 and Windows Server share one engine (the NT kernel), and the account you use every day should be the weakest one that still does the job.',
     analogy:
       'Think of Windows like a big office building. The NT kernel is the building itself (walls, locks, electricity). Windows 11 is the building set up as a comfortable apartment for one person. Windows Server is the same building set up as a busy office for hundreds of people. Same structure, different furniture. And your Administrator account is the master key: you only take it out of your pocket when you really need to open a locked door, then you put it right back.',
     plainEnglish: [
@@ -18,7 +20,7 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
       {
         title: 'Step 1: Open PowerShell the normal way',
         detail:
-          'Click Start, type PowerShell, and press Enter (do NOT right-click and choose Run as administrator). This is your safe, everyday window.',
+          'Click Start, type PowerShell, and press Enter (do NOT right-click and choose Run as administrator). Pick plain "Windows PowerShell", not "ISE". A window opens (usually blue) with a line ending in `>`, such as `PS C:\\Users\\you>`. That line is called the prompt: `PS` means PowerShell, the path is the folder you are in, and `>` means it is waiting for you. You type commands in this window (on a laptop or PC, not in the lesson page), and you do not type the prompt itself. This is your safe, everyday window.',
       },
       {
         title: 'Step 2: Ask "who am I?"',
@@ -174,6 +176,8 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '1-2': {
+    oneSentence:
+      'A process is a program that is actually running, with its own memory, an ID number called the PID, handles to files, and a security badge copied from the user who started it.',
     analogy:
       'A program (.exe) is a recipe book sitting on a shelf. A process is a real kitchen that opens when someone starts cooking: it has its own counters (memory), a ring of keys to the pantry (handles), an ID badge that says what the cook may touch (access token), and one or more cooks (threads). The CPU never "runs a kitchen". It only ever watches individual cooks.',
     plainEnglish: [
@@ -232,7 +236,7 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
             { part: '-Id', meaning: 'Parameter that picks a process by its PID number.' },
             { part: '$PID', meaning: 'Automatic variable that holds the PID of the current PowerShell session.' },
           ],
-          sampleOutput: 'Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName\n-------  ------    -----      -----     ------     --  -- -----------\n    712      42   118320     131084       2.31  14872   1 pwsh',
+          sampleOutput: 'Handles  NPM(K)    PM(K)      WS(K)     CPU(s)     Id  SI ProcessName\n-------  ------    -----      -----     ------     --  -- -----------\n    712      42   118320     131084       2.31  14872   1 powershell',
         },
         {
           title: 'Count the threads inside it',
@@ -350,6 +354,8 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '1-3': {
+    oneSentence:
+      'Every process gets its own private pretend-memory (virtual memory) split into 4 KB pages, and Windows quietly moves inactive pages to disk when RAM runs low.',
     analogy:
       'Imagine every tenant in an apartment building believes they own the whole building and numbers their rooms from 1. The building manager (the Memory Manager) secretly maps each tenant\'s room numbers to real rooms and moves rarely used boxes to a storage unit (the page file) when space gets tight. Tenants never see each other\'s rooms and never know the boxes moved.',
     plainEnglish: [
@@ -525,12 +531,14 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '2-1': {
+    oneSentence:
+      'Your apps run in a safe outer ring (user mode), the operating system core runs in an inner ring (kernel mode), and a system call is the single controlled door between them.',
     analogy:
-      'Think of a bank. Customers (your apps) stay in the lobby (user mode). The vault (kernel mode) can reach everything, so customers never walk in. They fill out a request slip and a teller (NTDLL.DLL) carries it to the vault staff (the Executive managers), who do the job and hand back a receipt (a handle). If a customer faints in the lobby, the bank stays open. If the vault staff faint, the whole bank closes (a blue screen).',
+      'Think of a bank. Customers (your apps) stay in the lobby (user mode). The vault (kernel mode) can reach everything, so customers never walk in. They fill out a request slip and a teller (NTDLL.DLL) carries it to the vault staff (the Executive managers), who do the job and hand back a keycard (a handle). If a customer faints in the lobby, the bank stays open. If the vault staff faint, the whole bank closes (a blue screen).',
     plainEnglish: [
       'Your programs run in user mode, which is fenced off. If one crashes, only that program dies. The core of Windows runs in kernel mode with full hardware access, so a kernel bug can crash the entire computer.',
       'Apps never call the kernel directly. They go through `ntdll.dll`, which switches the CPU into kernel mode, asks for the service and switches back.',
-      'The kernel hands back handles instead of real pointers. A handle is a safe ticket number that only makes sense inside your process.',
+      'The kernel hands back handles instead of real pointers. A handle is a safe keycard number that only makes sense inside your process.',
     ],
     beforeYouStart: [
       'A standard PowerShell window works for everything except where marked.',
@@ -692,11 +700,13 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '2-2': {
+    oneSentence:
+      'Seven special system processes are born during every boot, and a fake process usually betrays itself by its wrong name, path, or parent.',
     analogy:
       'Picture a school with a strict roll call. Every morning the same seven staff members must arrive in the same order and sit in the same seats, each hired by a specific person. If you see a stranger in the principal\'s chair, wearing a name tag spelled a little wrong, you know straight away something is off. Knowing the normal roll call is how you spot an imposter.',
     plainEnglish: [
-      'A healthy Windows machine always starts the same core processes: System (PID 4), smss.exe, wininit.exe, services.exe, lsass.exe, winlogon.exe and many svchost.exe helpers.',
-      'Malware loves hiding by borrowing these names. You catch it with three checks: spelling, file path (real ones live in `C:\\Windows\\System32`) and parent process (for example, svchost.exe must be started by services.exe).',
+      'A healthy Windows machine always starts the same core processes: System (PID 4), smss.exe, csrss.exe, wininit.exe, services.exe, lsass.exe, winlogon.exe and many svchost.exe helpers.',
+      'Malware loves hiding by borrowing these names. You catch it with three checks: spelling, file path (real ones live in `C:\\Windows\\System32`) and parent process (for example, svchost.exe must be started by services.exe). Note that smss.exe, csrss.exe, wininit.exe and winlogon.exe legitimately show no parent, because the short-lived process that created them has already exited.',
       'Services also run under accounts. LocalSystem is all-powerful, LocalService and NetworkService have less. Choose the least powerful one that works.',
     ],
     beforeYouStart: [
@@ -715,11 +725,11 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 3: Check the path rule',
-        detail: 'Use Get-CimInstance to read the ExecutablePath. Real core processes run from `C:\\Windows\\System32`.',
+        detail: 'Use Get-CimInstance to read the ExecutablePath (open an elevated window first: without elevation, protected processes such as lsass.exe show a blank path). Real core processes run from `C:\\Windows\\System32`.',
       },
       {
         title: 'Step 4: Check the parent rule',
-        detail: 'Compare each svchost ParentProcessId with the PID of services.exe. They should all match.',
+        detail: 'Compare each svchost ParentProcessId with the PID of services.exe. They should all match. (Only apply the parent rule to svchost, services and lsass: wininit, winlogon and csrss show no parent on a healthy machine.)',
       },
       {
         title: 'Step 5: Check the count rule',
@@ -871,6 +881,8 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '2-3': {
+    oneSentence:
+      'Turning on a PC is a four-stage chain of trust, and Secure Boot plus Trusted Boot refuse to run anything that is not signed.',
     analogy:
       'Starting a computer is like opening a bank each morning. First a guard checks the building (firmware), then the manager confirms every key and ID is genuine before letting staff in (Secure Boot, Trusted Boot), a security scanner arrives before anyone else (ELAM), and a camera records the whole opening procedure (Measured Boot). Only then do the doors open to customers (the logon screen).',
     plainEnglish: [
@@ -898,7 +910,7 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 4: Check Secure Boot (elevated)',
-        detail: 'Open an elevated window and run `Confirm-SecureBootUEFI`. True means firmware is verifying boot files.',
+        detail: 'Open an elevated window and run `Confirm-SecureBootUEFI`. True means firmware is verifying boot files. On a legacy BIOS machine (or some VMs) it throws an error saying the cmdlet is not supported, which just means Secure Boot does not exist there.',
       },
       {
         title: 'Step 5: Check the TPM (elevated)',
@@ -1051,6 +1063,8 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
     ],
   },
   '3-1': {
+    oneSentence:
+      'PowerShell is a command-line shell and a .NET automation language in one, and the DRY rule says never type the same thing twice when a script can do it.',
     analogy:
       'Old command lines are like faxing a printed spreadsheet and making someone re-type it. PowerShell is like emailing the spreadsheet itself: the next command gets real rows and columns it can sort and filter, not a picture of text. And DRY ("Don\'t Repeat Yourself") is the rule that if you do the same chore three times, you write it down once and let the computer do it from then on.',
     plainEnglish: [
@@ -1059,7 +1073,7 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
       'Two versions coexist: Windows PowerShell 5.1 (built into Windows, `powershell.exe`) and PowerShell 7 (`pwsh.exe`, cross-platform and updated). You often need to know which one you are in.',
     ],
     beforeYouStart: [
-      'Open PowerShell from the Start menu. Both versions can be installed side by side.',
+      'Open PowerShell from the Start menu. Windows PowerShell 5.1 (already on your PC) is perfectly fine for this course. Both versions can be installed side by side.',
       'Optional: install PowerShell 7 with `winget install Microsoft.PowerShell` and Visual Studio Code.',
       'No scripting experience needed, you will only type single lines.',
     ],
@@ -1074,15 +1088,15 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 3: See that output is objects',
-        detail: 'Run `Get-Service -Name Spooler | Get-Member -MemberType Property` to list the properties you can filter on.',
+        detail: 'Run `Get-Service -Name Spooler | Get-Member -MemberType Property` to list the properties you can filter on. (Get-Member is covered properly in lesson 4-1. For now just read the list: each name is a fact about the service.)',
       },
       {
         title: 'Step 4: Filter by property',
-        detail: 'Run `Get-Service | Where-Object Status -eq \'Running\'`. No text chopping, you simply name the property.',
+        detail: 'Run `Get-Service | Where-Object Status -eq \'Running\'`. No text chopping, you simply name the property. (Where-Object has its own lesson later, 7-1. Just type it as shown.)',
       },
       {
         title: 'Step 5: Apply DRY',
-        detail: 'Turn a repeated task into a loop with `ForEach-Object`, then save it as a `.ps1` script.',
+        detail: 'Read the loop in the Intermediate tier: `ForEach-Object` runs the same job once per item, which is the DRY idea in action. Saving commands as a `.ps1` script comes later in the course, so for now just type the loop.',
       },
       {
         title: 'Step 6: Pick your workspace',
@@ -1107,7 +1121,7 @@ export const GUIDES_PART_1: Record<string, LessonGuide> = {
           parts: [
             { part: '$PSVersionTable', meaning: 'Built-in variable (the $ marks a variable) holding version details.' },
           ],
-          sampleOutput: 'Name                      Value\n----                      -----\nPSVersion                 7.5.0\nPSEdition                 Core\nOS                        Microsoft Windows 10.0.26100',
+          sampleOutput: 'Name                      Value\n----                      -----\nPSVersion                 7.4.6\nPSEdition                 Core\nOS                        Microsoft Windows 10.0.26100',
         },
         {
           title: 'Desktop or Core?',

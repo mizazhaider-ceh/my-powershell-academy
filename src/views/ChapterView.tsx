@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Clock, Download, Printer } from 'lucide-react';
 import { chapters } from '../data/chapters';
 import { lessons } from '../data/lessons';
-import { ModuleIllustration } from '../components/diagrams/ModuleIllustration';
 import { ChapterLessonsList } from '../components/lesson/ChapterLessonsList';
+import { ChapterJourney } from '../components/lesson/ChapterJourney';
+import { ChapterKeyArt } from '../components/lesson/ChapterKeyArt';
+import { getCompletedLessons } from '../utils/progress';
 
 interface ChapterViewProps {
   chapterId: string;
@@ -14,6 +16,15 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
   chapterId,
   onNavigate,
 }) => {
+  const [completedIds, setCompletedIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    const sync = () => setCompletedIds(getCompletedLessons());
+    sync();
+    window.addEventListener('ps-progress-updated', sync);
+    return () => window.removeEventListener('ps-progress-updated', sync);
+  }, []);
+
   const currentChapter = chapters.find(
     (c) => c.slug === chapterId || c.id === chapterId
   );
@@ -161,11 +172,11 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
         </div>
 
         <div className="lg:col-span-5">
-          <div className="clay-card p-3 rounded-[1.75rem]">
-            <ModuleIllustration moduleNumber={currentChapter.number} />
-          </div>
+          <ChapterKeyArt chapter={currentChapter} />
         </div>
       </header>
+
+      <ChapterJourney chapter={currentChapter} completedIds={completedIds} onNavigate={onNavigate} />
 
       <ChapterLessonsList
         currentChapter={currentChapter}

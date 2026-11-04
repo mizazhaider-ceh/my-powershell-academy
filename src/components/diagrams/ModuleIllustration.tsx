@@ -37,8 +37,7 @@ export const ModuleIllustration: React.FC<ModuleIllustrationProps> = ({
       <svg
         viewBox="0 0 440 168"
         className="w-full h-auto block"
-        role="img"
-        aria-label={`Module ${moduleNumber} 3D visual illustration`}
+        focusable="false"
       >
         <defs>
           <linearGradient

@@ -1,0 +1,64 @@
+/* Theme picker styles. These are shared by every theme and lean on design tokens. */
+.theme-popover.clay-tray {
+  border-radius: 1.75rem;
+  animation: theme-popover-in 0.28s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  transform-origin: top right;
+}
+
+.theme-option {
+  background-color: var(--dp-color-ground);
+  box-shadow: var(--clay-shadow-well);
+  transition: transform 0.2s ease, box-shadow 0.25s ease;
+}
+
+.theme-option:hover {
+  transform: translateY(-1px);
+}
+
+.theme-option-active {
+  box-shadow: 0 0 0 2px var(--dp-color-accent);
+}
+
+.theme-option-preview {
+  position: relative;
+  width: 4.4rem;
+  height: 3.2rem;
+  overflow: hidden;
+  border-radius: 0.8rem;
+  box-shadow: inset 0 0 0 1px rgba(128, 128, 170, 0.3);
+}
+
+.theme-option-preview-card {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  right: 0.4rem;
+  height: 1.15rem;
+  border-radius: 0.4rem;
+  box-shadow: 0 0 0 1px rgba(128, 128, 170, 0.22);
+}
+
+.theme-option-preview-pill {
+  position: absolute;
+  left: 0.4rem;
+  bottom: 0.4rem;
+  width: 1.7rem;
+  height: 0.6rem;
+  border-radius: 99px;
+}
+
+.theme-switcher-trigger {
+  transition: transform 0.3s ease;
+}
+
+.theme-switcher-trigger:hover svg {
+  animation: theme-trigger-spin 0.7s ease;
+}
+
+@keyframes theme-popover-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.96); }
+}
+
+@keyframes theme-trigger-spin {
+  to { transform: rotate(180deg); }
+}

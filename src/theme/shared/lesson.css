@@ -1,0 +1,236 @@
+/* ============================================================================
+   SHARED: lesson page chrome (sticky jump bar, depth toggle) and storyboards
+   Theme-agnostic; uses dp-* and hx-* tokens only.
+   ============================================================================ */
+
+:root {
+  --lesson-top: 5.4rem;
+}
+
+html[data-theme="atlas"] {
+  --lesson-top: 3.5rem;
+}
+
+.lj-bar {
+  position: sticky;
+  top: var(--lesson-top);
+  z-index: 30;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1rem;
+  padding: 0.55rem 0.75rem 0.7rem;
+  border-radius: 1rem;
+  background: color-mix(in srgb, var(--dp-color-surface) 88%, transparent);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: inset 0 0 0 1px var(--hx-line);
+}
+
+.lj-links {
+  display: flex;
+  flex: 1 1 18rem;
+  gap: 0.3rem;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 92%, transparent);
+  mask-image: linear-gradient(90deg, #000 92%, transparent);
+}
+
+.lj-links::-webkit-scrollbar {
+  display: none;
+}
+
+.lj-link {
+  flex-shrink: 0;
+  padding: 0.4rem 0.75rem;
+  min-height: 2rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  color: var(--dp-color-ink-secondary);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.lj-link:hover {
+  color: var(--dp-color-ink);
+  background: var(--hx-chip);
+}
+
+.lj-link[aria-current="true"] {
+  color: var(--dp-color-accent);
+  background: var(--hx-chip);
+  box-shadow: inset 0 0 0 1px var(--dp-color-accent);
+}
+
+.lj-depth {
+  display: inline-flex;
+  flex-shrink: 0;
+  padding: 0.2rem;
+  border-radius: 999px;
+  background: var(--hx-chip);
+}
+
+.lj-depth button {
+  padding: 0.35rem 0.8rem;
+  min-height: 1.9rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--dp-color-ink-secondary);
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.lj-depth button[aria-pressed="true"] {
+  color: #ffffff;
+  background: var(--dp-color-accent);
+}
+
+.dark .lj-depth button[aria-pressed="true"] {
+  color: #04101f;
+}
+
+.lj-progress {
+  flex-basis: 100%;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--hx-line);
+}
+
+.lj-progress i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--dp-color-accent-bright), var(--hx-accent2));
+  transition: width 0.15s linear;
+}
+
+.lt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  color: var(--dp-color-ink-secondary);
+}
+
+.lt-meta b {
+  color: var(--dp-color-ink);
+}
+
+/* ---------- Storyboard ---------- */
+.sb-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.sb-panel {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.7rem;
+  padding: 1.1rem 0.6rem 0.9rem;
+  border-radius: 1rem;
+  text-align: center;
+  background: var(--hx-chip);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+}
+
+.sb-panel:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 2.3rem;
+  right: -0.55rem;
+  z-index: 1;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-top: 2px solid var(--dp-color-accent);
+  border-right: 2px solid var(--dp-color-accent);
+  transform: rotate(45deg);
+  opacity: 0.55;
+}
+
+.sb-panel[data-active="true"] {
+  background: color-mix(in srgb, var(--dp-color-accent) 14%, transparent);
+  box-shadow: inset 0 0 0 2px var(--dp-color-accent);
+  transform: translateY(-3px);
+}
+
+.sb-icon {
+  display: grid;
+  place-items: center;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 50%;
+  color: var(--dp-color-accent);
+  background: var(--dp-color-surface);
+  box-shadow: inset 0 0 0 2px var(--hx-line);
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease, background-color 0.3s ease;
+}
+
+.sb-panel[data-active="true"] .sb-icon {
+  color: #ffffff;
+  background: var(--dp-color-accent);
+  transform: scale(1.1);
+}
+
+.dark .sb-panel[data-active="true"] .sb-icon {
+  color: #04101f;
+}
+
+.sb-caption {
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sb-step {
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  color: var(--dp-color-ink-secondary);
+}
+
+@media (max-width: 40rem) {
+  .sb-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sb-panel:not(:last-child)::after {
+    display: none;
+  }
+
+  .lj-bar {
+    top: var(--lesson-top);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sb-panel,
+  .sb-icon,
+  .lj-progress i {
+    transition: none;
+  }
+}
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 200;
+  padding: 0.6rem 1rem;
+  border-radius: 0.6rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #1d4ed8;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}

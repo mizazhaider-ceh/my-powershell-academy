@@ -39,7 +39,7 @@ export const CommandBuilderLab: React.FC = () => {
   ];
 
   return (
-    <div className="clay-well p-5 sm:p-6">
+    <div className="clay-well p-4 sm:p-6 min-w-0 max-w-full">
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-5 mb-5 border-b border-[rgba(15,23,42,0.08)]">
         <div>
           <div className="inline-flex items-center gap-2 text-[0.75rem] font-extrabold uppercase tracking-wider text-[var(--dp-color-accent)] mb-1">
@@ -51,15 +51,17 @@ export const CommandBuilderLab: React.FC = () => {
           </h3>
         </div>
 
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 min-w-0">
           {COMMAND_BUILDER_SCENARIOS.map((s) => (
             <button
               key={s.id}
+              type="button"
+              aria-pressed={selectedId === s.id}
               onClick={() => setSelectedId(s.id)}
-              className={`px-3.5 py-2 rounded-full text-[0.8125rem] font-extrabold transition-all cursor-pointer ${
+              className={`tap-target px-3.5 py-2 rounded-full text-[0.8125rem] font-extrabold transition-all cursor-pointer ${
                 selectedId === s.id
                   ? 'clay-btn-pink'
-                  : 'bg-white/85 text-[var(--dp-color-ink-secondary)] hover:text-[var(--dp-color-ink)] shadow-sm'
+                  : 'clay-chip-surface text-[var(--dp-color-ink-secondary)] hover:text-[var(--dp-color-ink)] shadow-sm'
               }`}
             >
               {s.label}
@@ -74,13 +76,15 @@ export const CommandBuilderLab: React.FC = () => {
           return (
             <button
               key={st.label}
+              type="button"
+              aria-pressed={st.active}
               onClick={st.onClick}
               className={`p-3.5 rounded-[1.15rem] text-left transition-all cursor-pointer flex items-start justify-between gap-2 ${
-                st.active ? st.cushion : 'bg-white/75 opacity-75'
+                st.active ? st.cushion : 'clay-chip-surface text-[var(--dp-color-ink)]'
               }`}
             >
               <div>
-                <div className="text-[0.72rem] font-extrabold uppercase tracking-wider text-[var(--dp-color-ink-secondary)]">{st.label}</div>
+                <div className="text-[0.75rem] font-extrabold uppercase tracking-wider text-[var(--dp-color-ink-secondary)]">{st.label}</div>
                 <div className="text-[0.875rem] font-extrabold font-mono text-[var(--dp-color-ink)] mt-0.5">{st.status}</div>
               </div>
               <Icon className="w-4 h-4 text-[var(--dp-color-ink)] shrink-0 mt-0.5" />
@@ -90,21 +94,21 @@ export const CommandBuilderLab: React.FC = () => {
       </div>
 
       <div className="clay-terminal p-4 sm:p-5 mb-4">
-        <div className="flex items-center justify-between gap-2 pb-3 mb-3 border-b border-white/10">
-          <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 mb-3 border-b border-white/10">
+          <div className="flex flex-wrap items-center gap-x-2 min-w-0">
             <span className="text-[0.75rem] font-mono font-bold text-[#93c5fd]">PS C:\Users\Izaz&gt;</span>
-            <span className="text-[0.72rem] font-mono text-white/60">Emits: [{scenario.dotnetType}]</span>
+            <span className="text-[0.75rem] font-mono text-white/60">Emits: [{scenario.dotnetType}]</span>
           </div>
           <button
             onClick={handleCopy}
-            className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-[0.75rem] font-extrabold inline-flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="tap-target self-start px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-[0.75rem] font-extrabold inline-flex items-center justify-center gap-1.5 cursor-pointer transition-colors"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#a7f3d0]" /> : <Copy className="w-3.5 h-3.5" />}
             {copied ? 'Copied' : 'Copy One-Liner'}
           </button>
         </div>
 
-        <code className="block font-mono text-[0.9rem] sm:text-[1rem] text-[#f9e7a8] font-bold break-words leading-[1.55]">
+        <code className="block font-mono text-[0.9rem] sm:text-[1rem] text-[#f9e7a8] font-bold [overflow-wrap:anywhere] leading-[1.55]">
           {builtCommand}
         </code>
 

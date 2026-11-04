@@ -145,13 +145,13 @@ export const BUG_CHALLENGES: BugChallenge[] = [
   {
     id: 'bug-ad-filter-left',
     moduleRef: 'Module 12 · Active Directory & Filter Left',
-    title: 'Bug #4: Pulling 50,000 AD Users Over the Network Before Filtering',
+    title: 'Bug #4: Pulling Every AD User Over the Network Before Filtering',
     scenario:
-      'An administrator wrote a script to find all users in the Finance department. In production with 50,000 users it saturates the Domain Controller and takes 45 seconds.',
+      'An administrator wrote a script to find all users in the Finance department. In a large domain (think tens of thousands of users) it is slow and puts needless load on the Domain Controller, because every user object is sent to the workstation before most are thrown away. The numbers in this scenario are illustrative.',
     brokenCode:
       'Get-ADUser -Filter * -Properties Department | Where-Object { $_.Department -eq "Finance" }',
     brokenOutput:
-      '[Warning: Streamed all 50,000 AD user objects over the network to client RAM before discarding 49,850 of them]',
+      '[Illustrative: the Domain Controller sent all 50,000 user objects over the network to client RAM, and Where-Object then discarded 49,850 of them]',
     options: [
       {
         id: 'opt-a',
@@ -160,7 +160,7 @@ export const BUG_CHALLENGES: BugChallenge[] = [
         code: 'Get-ADUser -Filter "Department -eq \'Finance\'" -Properties Department',
         isCorrect: true,
         explanation:
-          'Correct! Passing the condition to -Filter executes the query on the Domain Controller LDAP database index and only sends the matching 150 Finance objects across the wire.',
+          'Correct! Passing the condition to -Filter makes the Domain Controller evaluate the query server-side and send only the matching objects across the wire. Department is not an indexed attribute by default, so the DC still has to scan, but it scans next to the data and returns far fewer objects than the broken version.',
       },
       {
         id: 'opt-b',
@@ -179,12 +179,12 @@ export const BUG_CHALLENGES: BugChallenge[] = [
           'This still downloads all 50,000 objects from the Domain Controller before filtering locally.',
       },
     ],
-    fixedOutput: `DistinguishedName : CN=Sarah Chen,OU=Finance,DC=corp,DC=internal
+    fixedOutput: `DistinguishedName : CN=Sarah Chen,OU=Finance,DC=corp,DC=example,DC=com
 Department        : Finance
 Enabled           : True
 SamAccountName    : schen`,
     takeaway:
-      'Always check if the source cmdlet supports -Filter (Get-ADUser, Get-CimInstance, Get-ChildItem) before falling back to Where-Object.',
+      'Always check whether the source cmdlet supports -Filter (Get-ADUser, Get-CimInstance, Get-ChildItem) before falling back to Where-Object. Each cmdlet has its own filter syntax, so read its help.',
   },
   {
     id: 'bug-try-catch-erroraction',
@@ -226,6 +226,203 @@ SamAccountName    : schen`,
     fixedOutput: 'WARNING: Service missing!',
     takeaway:
       'Always append -ErrorAction Stop to cmdlets inside a try {} block if you want catch {} to intercept failures.',
+  },
+  {
+    id: 'bug-winrm-port-5985',
+    moduleRef: 'Module 11 · WinRM & Remoting',
+    title: 'Bug #6: Ping Works but WinRM Port 5985 Is Closed',
+    scenario:
+      'From CLIENT01 an admin runs Invoke-Command against the new lab VM SRV-CORE01 (192.168.56.20) and gets a WinRM connection error. Ping to the same address replies normally. A port test shows what is really wrong.',
+    brokenCode: 'Test-NetConnection -ComputerName SRV-CORE01 -Port 5985',
+    brokenOutput: `ComputerName     : SRV-CORE01
+RemoteAddress    : 192.168.56.20
+RemotePort       : 5985
+PingSucceeded    : True
+TcpTestSucceeded : False
+WARNING: TCP connect to (192.168.56.20 : 5985) failed
+[abridged output]`,
+    options: [
+      {
+        id: 'opt-a',
+        label:
+          'On the SRV-CORE01 console, enable PowerShell Remoting so WinRM listens on 5985',
+        code: 'Enable-PSRemoting -Force',
+        isCorrect: true,
+        explanation:
+          'Correct! Ping uses ICMP, which is a different door from TCP 5985. Enable-PSRemoting starts the WinRM service, creates the HTTP listener on 5985 and enables the matching firewall exception. Run it on the VM itself, because remoting cannot be used to switch on remoting. It creates only the HTTP listener: HTTPS on 5986 needs a certificate and a separate listener. On a client edition of Windows it also refuses on a Public network profile unless you add -SkipNetworkProfileCheck.',
+      },
+      {
+        id: 'opt-b',
+        label: 'Allow ICMP echo requests in the firewall',
+        code: "Enable-NetFirewallRule -DisplayName 'File and Printer Sharing (Echo Request - ICMPv4-In)'",
+        isCorrect: false,
+        explanation:
+          'Ping already succeeds, so ICMP is not blocked. Opening a protocol that already works does nothing for TCP 5985, which has no listener or no firewall exception.',
+      },
+      {
+        id: 'opt-c',
+        label: 'Add SRV-CORE01 to TrustedHosts on CLIENT01',
+        code: "Set-Item WSMan:\\localhost\\Client\\TrustedHosts -Value 'SRV-CORE01' -Force",
+        isCorrect: false,
+        explanation:
+          'TrustedHosts only relaxes how the client authenticates, for example when connecting by IP address or to a workgroup machine. It does not start a listener or open a port, so TcpTestSucceeded stays False. It also weakens mutual authentication, so use it sparingly.',
+      },
+    ],
+    fixedOutput: `ComputerName     : SRV-CORE01
+RemoteAddress    : 192.168.56.20
+RemotePort       : 5985
+PingSucceeded    : True
+TcpTestSucceeded : True
+[abridged output]`,
+    takeaway:
+      'Test the real port, not just ping. Debug remoting from the outside in: name, port 5985, WinRM service, then PowerShell.',
+  },
+  {
+    id: 'bug-firewall-profile-mismatch',
+    moduleRef: 'Module 13 · Firewall Profiles & Rules',
+    title: 'Bug #7: The Rule Says Enabled but the Port Stays Blocked',
+    scenario:
+      'On the standalone lab VM SRV-CORE01 an admin created an inbound rule for a test web app on TCP 8080 and confirmed it shows Enabled = True. From CLIENT01 the connection still times out.',
+    brokenCode: `New-NetFirewallRule -DisplayName 'Lab Web 8080' -Direction Inbound -Protocol TCP -LocalPort 8080 -Action Allow -Profile Domain
+Get-NetConnectionProfile | Select-Object InterfaceAlias, NetworkCategory`,
+    brokenOutput: `[Rule created: Enabled = True, Profile = Domain]
+
+InterfaceAlias NetworkCategory
+-------------- ---------------
+Ethernet                Public
+
+[From CLIENT01: TcpTestSucceeded : False]`,
+    options: [
+      {
+        id: 'opt-a',
+        label:
+          'Check the active profile, then make the rule apply to the profile the adapter is really on',
+        code: `Set-NetConnectionProfile -InterfaceAlias 'Ethernet' -NetworkCategory Private
+Set-NetFirewallRule -DisplayName 'Lab Web 8080' -Profile Private`,
+        isCorrect: true,
+        explanation:
+          'Correct! A rule is only evaluated when the connection profile is in its Profile list. The adapter is classed as Public, so a Domain-only rule never applies. On this standalone lab VM, mark the lab network Private and scope the rule to Private. On a domain-joined server you would fix the cause instead (for example DNS pointing at DC01) so that Network Location Awareness detects the domain.',
+      },
+      {
+        id: 'opt-b',
+        label: 'Turn off the Public firewall profile',
+        code: 'Set-NetFirewallProfile -Profile Public -Enabled False',
+        isCorrect: false,
+        explanation:
+          'The port would open only because all inbound filtering on that profile is removed. That hides the real mistake and leaves the machine exposed on every untrusted network it joins.',
+      },
+      {
+        id: 'opt-c',
+        label: 'Enable the rule again',
+        code: "Enable-NetFirewallRule -DisplayName 'Lab Web 8080'",
+        isCorrect: false,
+        explanation:
+          'The rule is already Enabled. Enabled and active are different things: an enabled rule still does nothing while the connection profile is outside its Profile list.',
+      },
+    ],
+    fixedOutput: `DisplayName  Enabled Profile
+-----------  ------- -------
+Lab Web 8080    True Private
+
+InterfaceAlias NetworkCategory
+-------------- ---------------
+Ethernet                Private
+
+[From CLIENT01: TcpTestSucceeded : True]`,
+    takeaway:
+      'When an enabled rule does not work, compare the rule Profile with Get-NetConnectionProfile before touching anything else.',
+  },
+  {
+    id: 'bug-gpo-block-inheritance',
+    moduleRef: 'Module 13 · GPO, LSDOU & Enforced',
+    title: 'Bug #8: The Domain GPO Never Reaches the Server',
+    scenario:
+      'A GPO called Lab Baseline is linked at the domain root, corp.example.com. SRV-CORE01 sits in OU=Servers, where Block Inheritance was switched on long ago. The setting never arrives, and gpupdate /force changes nothing.',
+    brokenCode: 'gpresult /r /scope computer',
+    brokenOutput: `Applied Group Policy Objects
+-----------------------------
+    Servers Local Overrides
+
+[abridged: Lab Baseline is missing. The domain link is not Enforced and OU=Servers blocks inheritance]`,
+    options: [
+      {
+        id: 'opt-a',
+        label:
+          'Enforce the domain link so it overrides Block Inheritance on the OU',
+        code: "Set-GPLink -Name 'Lab Baseline' -Target 'DC=corp,DC=example,DC=com' -Enforced Yes",
+        isCorrect: true,
+        explanation:
+          'Correct! GPOs apply in the order Local, Site, Domain, OU, and the last one applied wins a conflict. Block Inheritance stops normal links from higher containers, but an Enforced link ignores it and also wins over lower GPOs. Use Enforced sparingly, because it removes the OU admin\'s ability to override the setting.',
+      },
+      {
+        id: 'opt-b',
+        label: 'Force a faster policy refresh',
+        code: "Invoke-GPUpdate -Computer 'SRV-CORE01' -RandomDelayInMinutes 0 -Force",
+        isCorrect: false,
+        explanation:
+          'A refresh only re-reads the GPOs that are in scope. It cannot add a GPO that inheritance rules have filtered out, so the result is the same, just sooner.',
+      },
+      {
+        id: 'opt-c',
+        label: 'Move the domain link to order 1',
+        code: "Set-GPLink -Name 'Lab Baseline' -Target 'DC=corp,DC=example,DC=com' -Order 1",
+        isCorrect: false,
+        explanation:
+          'Link order only ranks GPOs that are linked to the same container. It does not decide whether a blocked link is inherited into a child OU.',
+      },
+    ],
+    fixedOutput: `Applied Group Policy Objects
+-----------------------------
+    Lab Baseline
+    Servers Local Overrides
+
+[abridged output after the next policy refresh]`,
+    takeaway:
+      'Inheritance shows what could apply and gpresult shows what did apply. Check Block Inheritance and Enforced before blaming the refresh.',
+  },
+  {
+    id: 'bug-4104-wrong-log',
+    moduleRef: 'Module 16 · Logging, AMSI & Threat Hunting',
+    title: 'Bug #9: "No 4104 Events, So Nothing Suspicious Ran"',
+    scenario:
+      'An analyst hunts for a suspicious encoded PowerShell command on DC01. The query returns nothing, so the ticket says: AMSI would have blocked it and nothing is logged, case closed. Script Block Logging was enabled by policy last month.',
+    brokenCode:
+      "Get-WinEvent -FilterHashtable @{ LogName = 'Security'; Id = 4104 }",
+    brokenOutput:
+      'Get-WinEvent : No events were found that match the specified selection criteria.',
+    options: [
+      {
+        id: 'opt-a',
+        label:
+          'Query the PowerShell Operational log, which is where event 4104 is written',
+        code: "Get-WinEvent -FilterHashtable @{ LogName = 'Microsoft-Windows-PowerShell/Operational'; Id = 4104 } -MaxEvents 20",
+        isCorrect: true,
+        explanation:
+          'Correct! Script block text (4104) is written to Microsoft-Windows-PowerShell/Operational. The Security log holds events such as 4688 and 4769. Also fix the conclusion: an empty result is not proof of safety. AMSI is a scanning interface rather than a log, it can miss or be bypassed, and logging only records activity that happened after the policy took effect.',
+      },
+      {
+        id: 'opt-b',
+        label: 'Turn AMSI on so the events get recorded',
+        code: 'Set-MpPreference -DisableScriptScanning $false',
+        isCorrect: false,
+        explanation:
+          'AMSI is not a log setting. Script scanning is normally already on, and AMSI verdicts are not what fills the 4104 log. Changing it does not recover past events, and a quiet AMSI never proves that nothing ran.',
+      },
+      {
+        id: 'opt-c',
+        label: 'Query the classic Windows PowerShell log instead',
+        code: "Get-WinEvent -FilterHashtable @{ LogName = 'Windows PowerShell'; Id = 4104 }",
+        isCorrect: false,
+        explanation:
+          'The classic Windows PowerShell log records engine lifecycle events such as 400 (engine started) and 403 (engine stopped). Script block text is not written there, so 4104 is absent.',
+      },
+    ],
+    fixedOutput: `TimeCreated           Id LevelDisplayName Message
+-----------           -- ---------------- -------
+11/03/2026 22:14:09 4104 Warning          Creating Scriptblock text (1 of 1): IEX ([Text.Encoding]...
+[illustrative output]`,
+    takeaway:
+      'Know which log holds which event ID, and treat "no events found" as a question about your query and your logging policy, not as proof that nothing happened.',
   },
 ];
 
@@ -355,9 +552,31 @@ export const COMMAND_BUILDER_SCENARIOS: PresetScenario[] = [
       },
     ],
     explanation:
-      'Filter Left Rule in action: -FilterHashtable queries the Windows Event Log engine at the source before crossing the pipeline, running 10× faster than pulling all logs into Where-Object.',
+      'Filter Left Rule in action: -FilterHashtable asks the Windows Event Log service for matching events only, so far fewer events are turned into objects than when you pull the whole log into Where-Object. Measure both with Measure-Command on your own machine.',
   },
 ];
+
+export const LAB_UNIVERSE = {
+  domain: 'corp.example.com',
+  netbios: 'CORP',
+  subnet: '192.168.56.0/24',
+  switchName: 'LabNet',
+  dnsServer: '192.168.56.10',
+  hosts: {
+    dc: { name: 'DC01', ip: '192.168.56.10' },
+    core: { name: 'SRV-CORE01', ip: '192.168.56.20' },
+    client: { name: 'CLIENT01', ip: '192.168.56.30' },
+  },
+} as const;
+
+// Doubles every single-quote character (including the typographic ones that
+// PowerShell also treats as quotes) and strips line breaks, so user input can
+// never break out of a single-quoted PowerShell string.
+const psQuote = (value: string): string =>
+  value
+    .replace(/[\r\n]+/g, ' ')
+    .trim()
+    .replace(/(['\u2018\u2019\u201A\u201B])/g, '$1$1');
 
 export function generateServerCorePlaybookScript(params: {
   hostname: string;
@@ -368,44 +587,94 @@ export function generateServerCorePlaybookScript(params: {
   interfaceAlias: string;
   adminUser: string;
 }): string {
-  const {
-    hostname,
-    ipAddress,
-    prefixLength,
-    gateway,
-    dnsServer,
-    interfaceAlias,
-    adminUser,
-  } = params;
+  const host = psQuote(params.hostname) || LAB_UNIVERSE.hosts.core.name;
+  const ip = psQuote(params.ipAddress) || LAB_UNIVERSE.hosts.core.ip;
+  const dns = psQuote(params.dnsServer) || LAB_UNIVERSE.dnsServer;
+  const alias = psQuote(params.interfaceAlias) || 'Ethernet';
+  const admin = psQuote(params.adminUser) || 'LabAdmin';
+  const gateway = psQuote(params.gateway);
+  const parsedPrefix = Number.parseInt(params.prefixLength, 10);
+  const prefix =
+    Number.isInteger(parsedPrefix) && parsedPrefix >= 1 && parsedPrefix <= 32
+      ? parsedPrefix
+      : 24;
+  const gatewayLine = gateway ? `\n        DefaultGateway = '${gateway}'` : '';
+
   return `#Requires -RunAsAdministrator
 <#
   .SYNOPSIS
-    Headless Windows Server Core Baseline Provisioning Script
-    Generated via PowerShell Academy (Created by Muhammad Izaz Haider)
+    Server Core baseline for a LAB VIRTUAL MACHINE ONLY.
+  .DESCRIPTION
+    Lab universe: domain ${LAB_UNIVERSE.domain} (${LAB_UNIVERSE.netbios}), virtual switch ${LAB_UNIVERSE.switchName},
+    subnet ${LAB_UNIVERSE.subnet}, DC01 192.168.56.10, SRV-CORE01 192.168.56.20, CLIENT01 192.168.56.30.
+    This script replaces the IP configuration, creates a local administrator and
+    renames the computer. Never run it on a work, school or production machine.
+    Run it from the VM console (not over remoting): changing the IP address drops
+    a remote session.
+  .EXAMPLE
+    .\\configure-srv-core01.ps1 -WhatIf    # rehearse first: nothing is changed
 #>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
 param()
 
 $ErrorActionPreference = 'Stop'
+Write-Warning 'LAB VM ONLY. Rehearse with -WhatIf first. Do not run this on a real machine.'
 
-# 1. Configure Static IPv4 Address & Default Gateway
-New-NetIPAddress -InterfaceAlias '${interfaceAlias}' \`
-                 -IPAddress '${ipAddress}' \`
-                 -PrefixLength ${prefixLength} \`
-                 -DefaultGateway '${gateway}'
+# 0. Validate the host name before touching anything (NetBIOS limit: 15 characters)
+if ('${host}' -notmatch '^[A-Za-z0-9-]{1,15}$') {
+    throw 'The host name must be 1 to 15 letters, digits or hyphens.'
+}
 
-# 2. Point DNS Client to Domain Controller / Internal Resolver
-Set-DnsClientServerAddress -InterfaceAlias '${interfaceAlias}' \`
-                           -ServerAddresses ('${dnsServer}')
+# 1. Choose the network adapter explicitly instead of taking "the first one"
+$nic = Get-NetAdapter -Name '${alias}'
+if ($nic.Status -ne 'Up') {
+    throw "Adapter '$($nic.Name)' is $($nic.Status). Expected Up."
+}
+$ifIndex = $nic.ifIndex
 
-# 3. Create Dedicated Local Administrator Account Safely
-$Password = Read-Host -Prompt 'Enter password for ${adminUser}' -AsSecureString
-New-LocalUser -Name '${adminUser}' -Password $Password -FullName '${adminUser}'
-Add-LocalGroupMember -Group 'Administrators' -Member '${adminUser}'
+# 2. Static IPv4 address. DHCP must be disabled first, otherwise New-NetIPAddress
+#    can fail or leave the old DHCP address and gateway in place.
+if ($PSCmdlet.ShouldProcess("$($nic.Name) (ifIndex $ifIndex)", 'Disable DHCP and set a static IPv4 address')) {
+    Set-NetIPInterface -InterfaceIndex $ifIndex -Dhcp Disabled
+    Get-NetIPAddress -InterfaceIndex $ifIndex -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+        Remove-NetIPAddress -Confirm:$false
+    Get-NetRoute -InterfaceIndex $ifIndex -DestinationPrefix '0.0.0.0/0' -ErrorAction SilentlyContinue |
+        Remove-NetRoute -Confirm:$false
 
-# 4. Enable PowerShell Remoting (WinRM Ports 5985/5986)
-Enable-PSRemoting -Force
+    $ipSettings = @{
+        InterfaceIndex = $ifIndex
+        IPAddress      = '${ip}'
+        PrefixLength   = ${prefix}${gatewayLine}
+    }
+    New-NetIPAddress @ipSettings | Out-Null
 
-# 5. Rename Server Core Host & Reboot
-Rename-Computer -NewName '${hostname}' -Force -Restart`;
+    # 3. DNS is a separate setting on the same interface
+    Set-DnsClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses '${dns}'
+}
+
+# 4. Dedicated local administrator. The password is typed at the prompt and
+#    never stored in the script.
+if (-not (Get-LocalUser -Name '${admin}' -ErrorAction SilentlyContinue)) {
+    if ($PSCmdlet.ShouldProcess('${admin}', 'Create a local administrator')) {
+        $Password = Read-Host -Prompt 'Enter password for the new administrator' -AsSecureString
+        New-LocalUser -Name '${admin}' -Password $Password -FullName '${admin}' | Out-Null
+        Add-LocalGroupMember -Group 'Administrators' -Member '${admin}'
+    }
+} else {
+    Write-Verbose 'The local administrator already exists. Skipping.'
+}
+
+# 5. PowerShell Remoting. This creates the HTTP listener on 5985 only.
+#    HTTPS on 5986 needs a certificate and a separate listener.
+if ($PSCmdlet.ShouldProcess('WinRM', 'Enable-PSRemoting')) {
+    Enable-PSRemoting -Force
+}
+
+# 6. Rename the computer. The new name is applied after a restart.
+if ($env:COMPUTERNAME -ne '${host}') {
+    if ($PSCmdlet.ShouldProcess($env:COMPUTERNAME, 'Rename the computer')) {
+        Rename-Computer -NewName '${host}'
+        Write-Warning 'Run Restart-Computer when you are ready. The new name applies after the restart.'
+    }
+}`;
 }

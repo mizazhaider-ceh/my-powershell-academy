@@ -3,6 +3,7 @@ import { AlertTriangle } from 'lucide-react';
 import { Lesson as LessonType } from '../../types';
 import { CodeBlock } from '../common/CodeBlock';
 import { formatInlineRichText } from './formatInlineRichText';
+import { DepthGate } from './DepthGate';
 import { LessonSyntaxSection } from './LessonSyntaxSection';
 
 interface LessonCodeAndTrapsSectionProps {
@@ -17,10 +18,13 @@ export const LessonCodeAndTrapsSection: React.FC<
   return (
     <>
       {commandBreakdowns && (
-        <LessonSyntaxSection commandBreakdowns={commandBreakdowns} />
+        <DepthGate when="full">
+          <LessonSyntaxSection commandBreakdowns={commandBreakdowns} />
+        </DepthGate>
       )}
 
       {codeExamples && codeExamples.length > 0 && (
+        <DepthGate when="full">
         <section
           id="sec-examples"
           aria-labelledby="lesson-examples-heading"
@@ -66,6 +70,7 @@ export const LessonCodeAndTrapsSection: React.FC<
             ))}
           </div>
         </section>
+        </DepthGate>
       )}
 
       {mistakesAndTraps && mistakesAndTraps.length > 0 && (

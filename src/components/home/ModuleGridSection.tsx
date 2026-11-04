@@ -105,7 +105,7 @@ export const ModuleGridSection: React.FC<ModuleGridSectionProps> = ({
                   {ch.relatedCmdlets.slice(0, 4).map((cmd) => (
                     <span
                       key={cmd}
-                      className="px-2.5 py-0.5 rounded-full clay-card font-mono text-[0.72rem] font-extrabold text-[var(--dp-color-accent)] inline-flex items-center gap-1"
+                      className="px-2.5 py-0.5 rounded-full clay-card font-mono text-[0.75rem] font-extrabold text-[var(--dp-color-accent)] inline-flex items-center gap-1"
                     >
                       <Code2 className="w-3 h-3" />
                       {cmd}
@@ -121,7 +121,7 @@ export const ModuleGridSection: React.FC<ModuleGridSectionProps> = ({
                     {ch.lessons.length} Lessons · {ch.estimatedMinutes} min
                   </span>
                   {doneInCh > 0 && (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full clay-cushion-mint text-[0.7rem]">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full clay-cushion-mint text-[0.75rem]">
                       <CheckCircle2 className="w-3 h-3" />
                       {doneInCh}/{ch.lessons.length}
                     </span>

@@ -7,6 +7,9 @@ coverage/
 .env*
 !.env.example
 .playwright-cli/
+.playwright-mcp/
+.verify-tmp/
+_scratch_quiz.ts
 .aistudio/
 
 # Private course source material (local reference only, never published)

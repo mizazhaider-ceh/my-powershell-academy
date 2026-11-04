@@ -10,6 +10,9 @@ import { PipelineStageInspector } from './flowchart/PipelineStageInspector';
 import { ProcessTreeSvgCanvas } from './flowchart/ProcessTreeSvgCanvas';
 import { ProcessTreeNodeInspector } from './flowchart/ProcessTreeNodeInspector';
 import { ObjectXRayPanel } from './flowchart/ObjectXRayPanel';
+import { TabList, tabPanelProps } from '../common/TabList';
+
+type FlowchartMode = 'pipeline' | 'processtree' | 'object';
 
 interface InteractivePipelineProcessFlowchartProps {
   data: LessonFlowchartData;
@@ -18,16 +21,14 @@ interface InteractivePipelineProcessFlowchartProps {
 }
 
 const FLOWCHART_TABS = [
-  { id: 'pipeline' as const, label: 'Object Pipeline SVG', Icon: GitCommit },
-  { id: 'processtree' as const, label: 'Process Tree SVG', Icon: Network },
-  { id: 'object' as const, label: '.NET Object X-Ray', Icon: Boxes },
+  { id: 'pipeline' as const, label: 'Pipeline', Icon: GitCommit },
+  { id: 'processtree' as const, label: 'Process tree', Icon: Network },
+  { id: 'object' as const, label: 'Object X-ray', Icon: Boxes },
 ];
 
-export const InteractivePipelineProcessFlowchart: React.FC<
-  InteractivePipelineProcessFlowchartProps
-> = ({ data, lesson, chapter }) => {
+export const InteractivePipelineProcessFlowchart: React.FC<InteractivePipelineProcessFlowchartProps> = ({ data, lesson, chapter }) => {
   const defaultTab = lesson ? getRecommendedFlowchartTab(lesson, chapter) : 'pipeline';
-  const [activeMode, setActiveMode] = useState<'pipeline' | 'processtree' | 'object'>(defaultTab);
+  const [activeMode, setActiveMode] = useState<FlowchartMode>(defaultTab);
   const [selectedStageIdx, setSelectedStageIdx] = useState<number>(0);
   const [isAutoStepping, setIsAutoStepping] = useState<boolean>(false);
   const [selectedMemberIdx, setSelectedMemberIdx] = useState<number>(0);
@@ -56,33 +57,28 @@ export const InteractivePipelineProcessFlowchart: React.FC<
   const activeStage: FlowchartStageNode = stages[selectedStageIdx] || stages[0];
   const blueprint = data.objectBlueprint;
   const packetSnapshot = getPipelinePacketsForStage(selectedStageIdx);
-
   const processNodes = getProcessTreeNodes(treeScenario);
   const activeProcessNode: ProcessTreeNode =
     processNodes.find((n) => n.id === selectedProcessId) || processNodes[processNodes.length - 1];
   const activeLineageIds = getProcessLineageIds(processNodes, activeProcessNode.id);
   const lineageSet = new Set(activeLineageIds);
-
   const handleScenarioSwitch = (nextScenario: ProcessTreeScenario) => {
     setTreeScenario(nextScenario);
     setSelectedProcessId(nextScenario === 'anomaly' ? 'proc-rogue-ps' : 'proc-pwsh');
   };
 
   const handleCopyCommand = (cmd: string) => {
-    if (typeof navigator !== 'undefined' && navigator.clipboard) {
-      navigator.clipboard.writeText(cmd).catch(() => {});
-    }
+    navigator.clipboard?.writeText(cmd).catch(() => {});
     setCopiedCmd(true);
     window.setTimeout(() => setCopiedCmd(false), 1800);
   };
-
   return (
     <div className="clay-tray p-6 sm:p-10 space-y-6" data-testid="interactive-pipeline-process-flowchart">
       <div className="flex flex-col gap-4 pb-4 border-b border-black/10 dark:border-white/10">
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-[0.75rem] font-mono font-bold uppercase tracking-wider opacity-80">
-            <Sparkles className="w-4 h-4" />
-            <span>Section 2 · Interactive SVG Architecture &amp; Flowchart Explorer</span>
+            <Sparkles className="w-4 h-4" aria-hidden="true" />
+            <span>Interactive flowchart explorer</span>
           </div>
           <h2 className="text-[1.375rem] sm:text-[1.625rem] font-bold">
             {activeMode === 'pipeline'
@@ -95,32 +91,36 @@ export const InteractivePipelineProcessFlowchart: React.FC<
             {activeMode === 'pipeline'
               ? data.pipelineSubtitle
               : activeMode === 'processtree'
-              ? 'Click any process node in the SVG hierarchy to trace its parent chain from Ring 0 (System PID 4) to Ring 3 user space.'
+              ? 'Select any process in the hierarchy to trace its parent chain from Ring 0 (System PID 4) to Ring 3 user space.'
               : blueprint.plainEnglishOverview}
           </p>
         </div>
 
-        <div className="clay-well p-1.5 rounded-full flex flex-wrap items-center gap-1.5 self-start shrink-0" role="tablist" aria-label="Interactive SVG flowchart mode">
-          {FLOWCHART_TABS.map(({ id, label, Icon }) => (
-            <button
-              key={id}
-              role="tab"
-              type="button"
-              aria-selected={activeMode === id}
-              onClick={() => setActiveMode(id)}
-              className={`px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer whitespace-nowrap transition-all ${
-                activeMode === id ? 'clay-btn-pink text-[#383139]' : 'opacity-80 hover:opacity-100'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{label}</span>
-            </button>
-          ))}
-        </div>
+        <TabList
+          idPrefix="flowchart"
+          label="Flowchart view"
+          className="clay-well p-1.5 rounded-full flex flex-wrap items-center gap-1.5 self-start shrink-0"
+          tabs={FLOWCHART_TABS.map(({ id, label, Icon }) => ({
+            id,
+            label: (
+              <>
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                <span>{label}</span>
+              </>
+            ),
+          }))}
+          activeId={activeMode}
+          onChange={(id) => setActiveMode(id as FlowchartMode)}
+          tabClassName={(active) =>
+            `px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer whitespace-nowrap transition-all ${
+              active ? 'clay-btn-pink' : 'hover:bg-[var(--dp-color-surface-compare)]'
+            }`
+          }
+        />
       </div>
 
       {activeMode === 'pipeline' && (
-        <div className="space-y-6" data-testid="pipeline-svg-panel">
+        <div className="space-y-6" data-testid="pipeline-svg-panel" {...tabPanelProps('flowchart', 'pipeline')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2 text-[0.75rem] font-mono">
               <span className="px-3 py-1 rounded-full clay-pill font-bold">Active Binding: {packetSnapshot.bindingRule}</span>
@@ -129,7 +129,8 @@ export const InteractivePipelineProcessFlowchart: React.FC<
             <button
               type="button"
               onClick={() => setIsAutoStepping((prev) => !prev)}
-              className={`px-3.5 py-1.5 rounded-full text-[0.75rem] font-mono font-bold flex items-center gap-1.5 cursor-pointer ${
+              aria-pressed={isAutoStepping}
+              className={`tap-target px-3.5 py-1.5 rounded-full text-[0.75rem] font-mono font-bold flex items-center gap-1.5 cursor-pointer ${
                 isAutoStepping ? 'clay-cushion-mint' : 'clay-btn-secondary'
               }`}
             >
@@ -150,14 +151,15 @@ export const InteractivePipelineProcessFlowchart: React.FC<
       )}
 
       {activeMode === 'processtree' && (
-        <div className="space-y-6" data-testid="processtree-svg-panel">
+        <div className="space-y-6" data-testid="processtree-svg-panel" {...tabPanelProps('flowchart', 'processtree')}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => handleScenarioSwitch('normal')}
-                className={`px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer transition-all ${
-                  treeScenario === 'normal' ? 'clay-cushion-mint' : 'clay-well opacity-80 hover:opacity-100'
+                aria-pressed={treeScenario === 'normal'}
+                className={`tap-target px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                  treeScenario === 'normal' ? 'clay-cushion-mint' : 'clay-well'
                 }`}
               >
                 <CheckCircle2 className="w-4 h-4" />
@@ -166,8 +168,9 @@ export const InteractivePipelineProcessFlowchart: React.FC<
               <button
                 type="button"
                 onClick={() => handleScenarioSwitch('anomaly')}
-                className={`px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer transition-all ${
-                  treeScenario === 'anomaly' ? 'clay-cushion-warm' : 'clay-well opacity-80 hover:opacity-100'
+                aria-pressed={treeScenario === 'anomaly'}
+                className={`tap-target px-4 py-2 rounded-full text-[0.8125rem] font-bold flex items-center gap-2 cursor-pointer transition-all ${
+                  treeScenario === 'anomaly' ? 'clay-cushion-warm' : 'clay-well'
                 }`}
               >
                 <ShieldAlert className="w-4 h-4" />
@@ -184,7 +187,9 @@ export const InteractivePipelineProcessFlowchart: React.FC<
       )}
 
       {activeMode === 'object' && (
-        <ObjectXRayPanel blueprint={blueprint} selectedMemberIdx={selectedMemberIdx} onSelectMember={setSelectedMemberIdx} />
+        <div {...tabPanelProps('flowchart', 'object')}>
+          <ObjectXRayPanel blueprint={blueprint} selectedMemberIdx={selectedMemberIdx} onSelectMember={setSelectedMemberIdx} />
+        </div>
       )}
     </div>
   );

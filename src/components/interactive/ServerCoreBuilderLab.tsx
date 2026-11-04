@@ -135,7 +135,7 @@ export const ServerCoreBuilderLab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleCopy}
-                className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-[0.72rem] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white text-[0.75rem] font-bold inline-flex items-center gap-1.5 cursor-pointer"
               >
                 {copied ? (
                   <>
@@ -152,7 +152,7 @@ export const ServerCoreBuilderLab: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDownloadPs1}
-                className="px-3.5 py-1 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[0.72rem] font-bold inline-flex items-center gap-1.5 cursor-pointer"
+                className="px-3.5 py-1 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-[0.75rem] font-bold inline-flex items-center gap-1.5 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Download .ps1</span>

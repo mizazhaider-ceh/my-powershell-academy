@@ -1,0 +1,68 @@
+/* ============================================================================
+   ATLAS: atmosphere
+   A blueprint grid that wakes up under the cursor, plus a thin scroll line.
+   ============================================================================ */
+
+.atlas-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--dp-color-ground);
+}
+
+.atlas-grid,
+.atlas-grid-hot {
+  position: absolute;
+  inset: 0;
+  background-size: 64px 64px;
+}
+
+.atlas-grid {
+  background-image:
+    linear-gradient(var(--a-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--a-grid) 1px, transparent 1px);
+  -webkit-mask-image: radial-gradient(ellipse 85% 60% at 60% 0%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 85% 60% at 60% 0%, #000 0%, transparent 78%);
+}
+
+.atlas-grid-hot {
+  background-image:
+    linear-gradient(var(--a-grid-hot) 1px, transparent 1px),
+    linear-gradient(90deg, var(--a-grid-hot) 1px, transparent 1px);
+  -webkit-mask-image: radial-gradient(17rem circle at var(--ptr-x, -50vw) var(--ptr-y, -50vh), #000, transparent 70%);
+  mask-image: radial-gradient(17rem circle at var(--ptr-x, -50vw) var(--ptr-y, -50vh), #000, transparent 70%);
+}
+
+.atlas-glow {
+  position: absolute;
+  top: -22rem;
+  left: 38%;
+  width: 62rem;
+  height: 34rem;
+  background: radial-gradient(closest-side, rgba(var(--a-accent-rgb), 0.16), transparent);
+  animation: atlas-breathe 9s ease-in-out infinite alternate;
+}
+
+.atlas-scroll-line {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .atlas-scroll-line {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    z-index: 60;
+    pointer-events: none;
+    background: var(--a-accent);
+    transform: scaleX(0);
+    transform-origin: 0 50%;
+    animation: atlas-progress linear both;
+    animation-timeline: scroll(root block);
+  }
+}

@@ -14,6 +14,11 @@ import { LessonCommandLadder } from '../components/lesson/LessonCommandLadder';
 import { LessonCodeAndTrapsSection } from '../components/lesson/LessonCodeAndTrapsSection';
 import { LessonPracticeAndQuizSection } from '../components/lesson/LessonPracticeAndQuizSection';
 import { LessonFooterNav } from '../components/lesson/LessonFooterNav';
+import { LessonTeacherIntro } from '../components/lesson/LessonTeacherIntro';
+import { LessonTeacherPractice } from '../components/lesson/LessonTeacherPractice';
+import { getLessonTeaching } from '../data/teaching';
+import { DepthNotice } from '../components/lesson/DepthNotice';
+import { estimateLessonTime } from '../utils/lessonTime';
 
 interface LessonViewProps {
   chapterId: string;
@@ -106,6 +111,8 @@ export const LessonView: React.FC<LessonViewProps> = ({ chapterId, lessonSlug, o
   const lessonIndex = lessons.findIndex((l) => l.id === currentLesson.id);
   const prevLesson = lessonIndex > 0 ? lessons[lessonIndex - 1] : null;
   const nextLesson = lessonIndex < lessons.length - 1 ? lessons[lessonIndex + 1] : null;
+  const teaching = getLessonTeaching(currentLesson.id);
+  const time = estimateLessonTime(currentLesson, teaching);
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -114,16 +121,16 @@ export const LessonView: React.FC<LessonViewProps> = ({ chapterId, lessonSlug, o
 
   return (
     <article className="max-w-[58rem] mx-auto px-3 sm:px-6 py-6 space-y-8">
-      <div className="fixed top-0 left-0 right-0 h-1.5 bg-black/5 dark:bg-white/5 z-50" aria-hidden="true">
-        <div className="h-full bg-[#1d4ed8] transition-all duration-150" style={{ width: `${scrollProgress}%` }} />
-      </div>
 
-      <LessonSidebar currentLesson={currentLesson} parentChapter={parentChapter} onNavigate={onNavigate} onScrollToSection={scrollToSection} />
-      <LessonHeaderHero currentLesson={currentLesson} parentChapter={parentChapter} plainEnglishTerms={plainEnglishTerms} />
+      <LessonSidebar currentLesson={currentLesson} parentChapter={parentChapter} onNavigate={onNavigate} onScrollToSection={scrollToSection} hasTeaching={!!teaching} progress={scrollProgress} time={time} />
+      <LessonHeaderHero currentLesson={currentLesson} parentChapter={parentChapter} plainEnglishTerms={plainEnglishTerms} time={time} />
       {currentLesson.guide && <LessonStartHere guide={currentLesson.guide} />}
+      {teaching && <LessonTeacherIntro key={`intro-${currentLesson.id}`} teaching={teaching} lessonId={currentLesson.id} />}
       <LessonContent currentLesson={currentLesson} parentChapter={parentChapter} flowchartData={flowchartData} />
+      <DepthNotice time={time} />
       {currentLesson.guide && <LessonCommandLadder guide={currentLesson.guide} />}
       <LessonCodeAndTrapsSection currentLesson={currentLesson} />
+      {teaching && <LessonTeacherPractice key={`studio-${currentLesson.id}`} lessonId={currentLesson.id} teaching={teaching} />}
 
       <LessonPracticeAndQuizSection
         currentLesson={currentLesson}

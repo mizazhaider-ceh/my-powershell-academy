@@ -1,0 +1,220 @@
+/* ============================================================================
+   SHARED: chapter route map and at-a-glance tiles
+   Theme-agnostic; uses dp-* and hx-* tokens only.
+   ============================================================================ */
+
+.jr-route {
+  --n: 4;
+  --p: 0;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.jr-route::before,
+.jr-route::after {
+  content: "";
+  position: absolute;
+  top: 1.45rem;
+  left: calc(50% / var(--n));
+  height: 3px;
+  border-radius: 3px;
+}
+
+.jr-route::before {
+  right: calc(50% / var(--n));
+  background: var(--hx-line);
+}
+
+.jr-route::after {
+  width: calc((100% - 100% / var(--n)) * var(--p));
+  background: linear-gradient(90deg, var(--dp-color-accent-bright), var(--hx-accent2));
+  transition: width 1s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+
+.jr-stop {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0 0.4rem;
+  text-align: center;
+}
+
+.jr-node {
+  display: grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--dp-color-ink-secondary);
+  background: var(--dp-color-surface);
+  box-shadow: inset 0 0 0 2px var(--hx-line);
+  cursor: pointer;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, background-color 0.25s ease;
+}
+
+.jr-node:hover {
+  transform: translateY(-3px) scale(1.06);
+  box-shadow: inset 0 0 0 2px var(--dp-color-accent);
+}
+
+.jr-stop[data-state="done"] .jr-node {
+  color: #ffffff;
+  background: var(--hx-good);
+  box-shadow: none;
+}
+
+.jr-stop[data-state="next"] .jr-node {
+  color: var(--dp-color-accent);
+  box-shadow: inset 0 0 0 3px var(--dp-color-accent);
+  animation: jr-pulse 2.2s ease-in-out infinite;
+}
+
+.jr-label {
+  display: grid;
+  gap: 0.15rem;
+  max-width: 12rem;
+}
+
+.jr-label b {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.jr-label small {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--dp-color-ink-secondary);
+}
+
+.jr-tag {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--dp-color-accent);
+}
+
+/* ---------- At-a-glance tiles ---------- */
+.gl-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.gl-tile {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 0.8rem;
+  background: var(--hx-chip);
+}
+
+.gl-tile b {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.gl-tile small {
+  font-size: 0.68rem;
+  color: var(--dp-color-ink-secondary);
+}
+
+.gl-dots {
+  display: inline-flex;
+  gap: 0.2rem;
+  align-items: center;
+  height: 1.15rem;
+}
+
+.gl-dots i {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--hx-line);
+}
+
+.gl-dots i[data-on="true"] {
+  background: var(--dp-color-accent);
+}
+
+.gl-art {
+  animation: gl-float 7s ease-in-out infinite;
+}
+
+@keyframes jr-pulse {
+  50% { transform: scale(1.08); }
+}
+
+@keyframes gl-float {
+  50% { transform: translateY(-5px); }
+}
+
+@media (max-width: 40rem) {
+  .jr-route {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+  }
+
+  .jr-route::before,
+  .jr-route::after {
+    top: 1.45rem;
+    bottom: auto;
+    left: 1.45rem;
+    width: 3px;
+  }
+
+  .jr-route::before {
+    right: auto;
+    height: calc(100% - 2.9rem);
+  }
+
+  .jr-route::after {
+    width: 3px;
+    height: calc((100% - 2.9rem) * var(--p));
+  }
+
+  .jr-stop {
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 0;
+    text-align: left;
+  }
+
+  .jr-label {
+    max-width: none;
+  }
+
+  .gl-tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jr-stop[data-state="next"] .jr-node,
+  .gl-art {
+    animation: none;
+  }
+
+  .jr-route::after {
+    transition: none;
+  }
+}

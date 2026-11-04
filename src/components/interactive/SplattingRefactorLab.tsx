@@ -123,7 +123,7 @@ export const SplattingRefactorLab: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="clay-well p-5 space-y-2">
-            <span className="text-[0.72rem] font-mono font-extrabold uppercase text-amber-700 dark:text-amber-300">
+            <span className="text-[0.75rem] font-mono font-extrabold uppercase text-amber-700 dark:text-amber-300">
               Before: Hard-to-Read Horizontal One-Liner
             </span>
             <pre className="p-3.5 rounded-xl clay-card font-mono text-[0.78rem] overflow-x-auto whitespace-pre-wrap break-all">
@@ -132,7 +132,7 @@ export const SplattingRefactorLab: React.FC = () => {
           </div>
 
           <div className="p-5 rounded-[1.5rem] clay-terminal space-y-2">
-            <span className="text-[0.72rem] font-mono font-extrabold uppercase text-[#a7f3d0]">
+            <span className="text-[0.75rem] font-mono font-extrabold uppercase text-[#a7f3d0]">
               After: Clean Production @Splatting (Notice @ instead of $)
             </span>
             <pre className="font-mono text-[0.78rem] text-[#fde68a] overflow-x-auto leading-relaxed">

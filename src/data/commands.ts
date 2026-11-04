@@ -1,6 +1,10 @@
-import { CommandEntry } from '../types';
+﻿import { CommandEntry } from '../types';
+import { COMMANDS_EXTRA_1 } from './commandsExtra1';
+import { COMMANDS_EXTRA_2 } from './commandsExtra2';
+import { COMMANDS_EXTRA_3 } from './commandsExtra3';
+import { COMMANDS_EXTRA_4 } from './commandsExtra4';
 
-export const COMMANDS: CommandEntry[] = [
+const CORE_COMMANDS: CommandEntry[] = [
   {
     name: 'Get-Help',
     verb: 'Get',
@@ -416,7 +420,7 @@ export const COMMANDS: CommandEntry[] = [
     verb: 'Select',
     noun: 'String',
     module: 'Microsoft.PowerShell.Utility',
-    purpose: 'Search inside files or text strings for regex or wildcard patterns (PowerShell’s object-oriented grep).',
+    purpose: 'Search inside files or text strings for regex or wildcard patterns (PowerShellâ€™s object-oriented grep).',
     syntax: 'Select-String [-Pattern] <String[]> [-Path <String[]>] [-CaseSensitive] [-SimpleMatch]',
     description:
       'Scans the text contents of files or piped strings for a pattern and returns rich MatchInfo objects containing Filename, Path, LineNumber, and Line.',
@@ -575,7 +579,7 @@ export const COMMANDS: CommandEntry[] = [
     purpose: 'Verify and repair the domain trust relationship between a workstation/server and its Active Directory Domain Controller.',
     syntax: 'Test-ComputerSecureChannel [-Repair] [-Credential <PSCredential>] [-Server <String>] [-Verbose]',
     description:
-      'Checks whether the local machine’s domain account password matches Active Directory. Passing -Repair resets and resynchronizes a broken trust relationship online without unjoining the domain or rebooting.',
+      'Checks whether the local machineâ€™s domain account password matches Active Directory. Passing -Repair resets and resynchronizes a broken trust relationship online without unjoining the domain or rebooting.',
     parameters: [
       { name: '-Repair', type: 'SwitchParameter', required: false, pipelineInput: 'False', description: 'Repairs a broken domain trust channel online.' },
       { name: '-Credential', type: 'PSCredential', required: false, pipelineInput: 'False', description: 'Domain credentials with permission to reset the computer account.' },
@@ -592,7 +596,7 @@ export const COMMANDS: CommandEntry[] = [
     commonMistakes: [
       'Running -Repair without providing domain admin credentials via -Credential when logged in as a local account.',
     ],
-    troubleshooting: 'Ensure the machine’s DNS client points to the Active Directory Domain Controller first.',
+    troubleshooting: 'Ensure the machineâ€™s DNS client points to the Active Directory Domain Controller first.',
     relatedCommands: ['Add-Computer', 'Get-ADComputer'],
     relatedLessonPath: '/learn/chapter-12/ad-users-groups-and-ous',
     isEssentialPocketknife: false,
@@ -659,6 +663,13 @@ export const COMMANDS: CommandEntry[] = [
     isEssentialPocketknife: false,
   },
 ];
+
+const ALL_COMMANDS = [...CORE_COMMANDS, ...COMMANDS_EXTRA_1, ...COMMANDS_EXTRA_2, ...COMMANDS_EXTRA_3, ...COMMANDS_EXTRA_4];
+
+/** The full cmdlet library. Core entries win if a name appears twice. */
+export const COMMANDS: CommandEntry[] = ALL_COMMANDS.filter(
+  (c, i) => ALL_COMMANDS.findIndex((o) => o.name.toLowerCase() === c.name.toLowerCase()) === i,
+);
 
 export const commandReference = COMMANDS;
 export const commands = COMMANDS;

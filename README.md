@@ -10,7 +10,7 @@ It is a fully static, client-side React app: no backend, no API keys, no trackin
 
 ## Curriculum Overview
 
-**4 Tracks · 16 Modules · 35 Lessons · 21-Cmdlet Reference · 31-Term Glossary · 30-Question Drill Suite · 6 Practice Labs**
+**4 Tracks · 16 Modules · 35 Lessons · 97-Cmdlet Reference · 117-Term Glossary · 72-Question Drill Suite · 6 Practice Labs**
 
 ### Track 1: Windows Internals
 | # | Module |

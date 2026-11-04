@@ -24,10 +24,10 @@ export const Hero: React.FC<HeroProps> = ({
       <div className="clay-cushion-pink p-7 sm:p-11 lg:p-14 space-y-9">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           <div className="lg:col-span-6 space-y-5">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full clay-pill text-[0.8125rem] font-extrabold text-[var(--dp-color-accent)]">
+            <div className="inline-flex flex-wrap items-center gap-x-2 px-4 py-1.5 rounded-full clay-pill text-[0.8125rem] font-extrabold text-[var(--dp-color-accent)]">
               <span className="font-mono font-extrabold">&gt;_</span>
               <span>Created by Muhammad Izaz Haider</span>
-              <span aria-hidden="true">·</span>
+              <span aria-hidden="true" className="hidden sm:inline">·</span>
               <span>Zero to Pro Masterclass</span>
             </div>
 
@@ -102,10 +102,6 @@ export const Hero: React.FC<HeroProps> = ({
                   <Layers className="w-4 h-4" />
                   <span>PowerShell Academy</span>
                 </span>
-                <span
-                  className="hidden sm:inline-block h-4 w-[1px] bg-blue-900/15 dark:bg-white/15"
-                  aria-hidden="true"
-                />
                 <span className="text-[var(--dp-color-ink-secondary)]">
                   Created by Muhammad Izaz Haider
                 </span>
@@ -144,7 +140,7 @@ export const Hero: React.FC<HeroProps> = ({
               <BookmarkCheck className="w-4 h-4 text-white" />
             </div>
             <div>
-              <span className="text-[0.72rem] font-mono font-extrabold uppercase tracking-wider text-[var(--dp-color-accent)] block">
+              <span className="text-[0.75rem] font-mono font-extrabold uppercase tracking-wider text-[var(--dp-color-accent)] block">
                 Continue Where You Left Off · {completedCount}/35 Lessons
                 Completed
               </span>

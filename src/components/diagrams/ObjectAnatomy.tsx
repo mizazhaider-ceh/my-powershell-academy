@@ -71,7 +71,7 @@ export const ObjectAnatomy: React.FC = () => {
                   <span className="font-semibold truncate">{item.name}</span>
                 </div>
                 <span
-                  className={`text-[10px] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono ${
+                  className={`text-[0.75rem] uppercase tracking-wider px-1.5 py-0.5 rounded font-mono ${
                     isProp
                       ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
                       : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300'
@@ -88,7 +88,7 @@ export const ObjectAnatomy: React.FC = () => {
           <div>
             <div className="flex items-center justify-between pb-3 border-b border-stone-200 dark:border-stone-800 mb-3">
               <div>
-                <span className="text-[10px] uppercase font-mono text-stone-600 dark:text-stone-400 font-semibold tracking-wider">
+                <span className="text-[0.75rem] uppercase font-mono text-stone-600 dark:text-stone-400 font-semibold tracking-wider">
                   Member Inspector
                 </span>
                 <h4 className="text-sm font-mono font-bold text-stone-900 dark:text-stone-100">
@@ -102,7 +102,7 @@ export const ObjectAnatomy: React.FC = () => {
 
             <div className="space-y-3 text-xs">
               <div>
-                <span className="text-stone-600 dark:text-stone-400 text-[11px] block mb-1">
+                <span className="text-stone-600 dark:text-stone-400 text-[0.75rem] block mb-1">
                   .NET Definition:
                 </span>
                 <code className="font-mono text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/50 px-2 py-1 rounded block border border-purple-200/50 dark:border-purple-900/50">
@@ -111,7 +111,7 @@ export const ObjectAnatomy: React.FC = () => {
               </div>
 
               <div>
-                <span className="text-stone-600 dark:text-stone-400 text-[11px] block mb-1">
+                <span className="text-stone-600 dark:text-stone-400 text-[0.75rem] block mb-1">
                   Description:
                 </span>
                 <p className="text-stone-700 dark:text-stone-300 leading-relaxed">
@@ -120,7 +120,7 @@ export const ObjectAnatomy: React.FC = () => {
               </div>
 
               <div>
-                <span className="text-stone-600 dark:text-stone-400 text-[11px] block mb-1">
+                <span className="text-stone-600 dark:text-stone-400 text-[0.75rem] block mb-1">
                   Sample Live Output or Action:
                 </span>
                 <div className="font-mono text-stone-800 dark:text-stone-200 bg-stone-200/60 dark:bg-stone-900 p-2 rounded">
@@ -131,7 +131,7 @@ export const ObjectAnatomy: React.FC = () => {
           </div>
 
           <div className="mt-4 pt-3 border-t border-stone-200 dark:border-stone-800">
-            <span className="text-[11px] font-mono text-stone-600 dark:text-stone-400 block mb-1">
+            <span className="text-[0.75rem] font-mono text-stone-600 dark:text-stone-400 block mb-1">
               Example PowerShell Invocations:
             </span>
             <div className="flex items-center justify-between bg-stone-900 text-stone-100 p-2.5 rounded-lg font-mono text-xs">

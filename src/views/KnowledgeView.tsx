@@ -22,7 +22,7 @@ export const KnowledgeView: React.FC<KnowledgeViewProps> = ({ onNavigate }) => {
         </h1>
         <p className="text-[1.0625rem] text-[var(--dp-color-ink-secondary)] font-medium leading-relaxed">
           Master all 16 modules through hands-on troubleshooting labs, live
-          UTF-16LE Base64 &amp; Event ID 4104 decoding, and our 30-question
+          UTF-16LE Base64 &amp; Event ID 4104 decoding, and our 72-question
           engineering gauntlet, covering Windows kernel rings, 4 KB paging,
           pipeline binding, Server Core deployment, and Ethical Hacking recon.
         </p>
@@ -75,17 +75,17 @@ export const KnowledgeView: React.FC<KnowledgeViewProps> = ({ onNavigate }) => {
       {/* Interactive Diagnostic Labs & Red/Blue Team Decoder Workbench */}
       <PracticeLabsWorkbench />
 
-      {/* Main Interactive 30-Question Quiz Runner */}
+      {/* Main Interactive 72-Question Quiz Runner */}
       <QuizRunner
         questions={quizQuestions}
-        title="Complete 16-Module Mastery Drill Bank (30 Questions)"
-        subtitle="Filter by question type below or test all 30 questions in sequence."
+        title="Complete 16-Module Mastery Drill Bank (72 Questions)"
+        subtitle="Filter by question type below or test all 72 questions in sequence."
       />
 
       <div className="clay-card p-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-[0.8125rem] font-mono">
         <div className="flex items-center gap-2 font-extrabold">
           <Award className="w-4 h-4 text-[var(--dp-color-accent)]" />
-          <span>30 Deep-Dive Questions + Interactive Labs · Created by Muhammad Izaz Haider</span>
+          <span>72 Deep-Dive Questions + Interactive Labs · Created by Muhammad Izaz Haider</span>
         </div>
         <button
           type="button"

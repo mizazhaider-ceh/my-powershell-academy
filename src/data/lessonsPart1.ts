@@ -12,14 +12,14 @@ export const LESSONS_PART_1: Lesson[] = [
     subtitle: 'From Windows NT 3.1 (1993) to Server 2025, WSL2, and why you never log in daily as Admin',
     estimatedMinutes: 15,
     oneSentenceSummary:
-      'Modern Windows Client and Windows Server share the exact same NT kernel, and the #1 habit that separates professionals from amateurs is using a standard account for daily work and elevating only when needed.',
+      'Modern Windows Client and Windows Server are built on the same NT kernel, and the most valuable security habit is using a standard account for daily work and elevating only when needed.',
     summary:
-      'Before we write a single line of automation, I want you to see how a single Windows machine thinks. We trace how Microsoft converged its consumer and enterprise operating systems onto one rock-solid NT kernel, compare the modern Windows ecosystem (Client, Server, WSL2, Azure), and lock in my non-negotiable Golden Rule of Least Privilege.',
+      'You will type your first PowerShell command (`whoami`) in this lesson. Then a short history of how Microsoft moved its consumer and enterprise operating systems onto one NT kernel, a tour of the modern Windows ecosystem (Client, Server, WSL2, Azure), and the Golden Rule of Least Privilege. The history is background: if you only want to start typing commands, skim it and come back later.',
     whyItMatters:
       'If you think Windows 11 on a laptop and Windows Server 2025 in a datacenter are completely different operating systems, you will waste years relearning the same internals. And if you log in daily with a Domain Admin or local Administrator account, a single mistyped command, or a single phishing link, owns your entire machine.',
     learningObjectives: [
       'Trace the evolution of Windows from 16-bit MS-DOS shells to the 32/64-bit Windows NT kernel (NT 3.1 to Server 2025)',
-      'Explain why Windows 11 and Windows Server 2025 share the exact same kernel (ntoskrnl.exe) and differ mainly in tuned defaults and Server Roles',
+      'Explain why Windows 11 and Windows Server 2025 are built on the same NT kernel (ntoskrnl.exe) and differ mainly in tuned defaults and Server Roles',
       'Identify the 4 pillars of the modern Windows ecosystem: Client, Server, Cloud (Azure/Entra ID), and Cross-Platform (WSL2 & PowerShell 7)',
       'Apply the Principle of Least Privilege by separating your daily standard user account from your elevated administrative credentials',
     ],
@@ -36,14 +36,14 @@ export const LESSONS_PART_1: Lesson[] = [
         heading: 'How We Got Here: Two Family Trees Becoming One',
         body: [
           'For its first fifteen years, Microsoft actually maintained two completely separate operating system families. On the consumer side stood Windows 1.0 (1985), Windows 3.x, Windows 95, Windows 98, and Windows Me, graphical shells sitting on top of MS-DOS. They were great for home games, but if one bad application overwrote memory, the entire PC froze.',
-          'Meanwhile, in 1993, Microsoft hired legendary DEC engineer Dave Cutler to architect a true 32-bit, preemptive, hardware-protected operating system from scratch: Windows NT 3.1 ("New Technology"). NT introduced strict memory isolation, security access tokens, and a hardware abstraction layer.',
-          'Here are the four historical milestones I always keep in mind:\n• 1993 (Windows NT 3.1): The birth of the modern NT kernel architecture we still run today.\n• 2000 (Windows 2000): Introduced Active Directory (AD), transforming Windows from isolated servers into unified enterprise domains.\n• 2001 (Windows XP): The great convergence. Microsoft retired the fragile Win9x line forever and moved every home and business PC onto the NT kernel.\n• 2016 to 2025 (Windows 10/11 & Server 2016/2019/2022/2025): Unified 64-bit kernel baseline across client, datacenter, and cloud.',
+          'Meanwhile, in 1993, Microsoft hired veteran DEC engineer Dave Cutler to architect a true 32-bit, preemptive, hardware-protected operating system from scratch: Windows NT 3.1 ("New Technology"). NT introduced strict memory isolation, security access tokens, and a hardware abstraction layer.',
+          'Here are the four historical milestones I always keep in mind:\n• 1993 (Windows NT 3.1): The birth of the modern NT kernel architecture we still run today.\n• 2000 (Windows 2000): Introduced Active Directory (AD), transforming Windows from isolated servers into unified enterprise domains.\n• 2001 (Windows XP): The great convergence. Microsoft retired the fragile Win9x line and moved home and business PCs onto the NT kernel.\n• 2016 to 2025 (Windows 10/11 & Server 2016/2019/2022/2025): Unified 64-bit kernel baseline across client, datacenter, and cloud.',
         ],
       },
       {
         heading: 'Client vs. Server: Same Engine, Different Tuning',
         body: [
-          'Here is a secret that surprises many beginners: Windows 11 and Windows Server 2025 run the exact same core kernel executable (`C:\\Windows\\System32\\ntoskrnl.exe`).',
+          'Here is a secret that surprises many beginners: Windows 11 and Windows Server 2025 are built on the same NT kernel, and both ship the same kernel file name (`C:\\Windows\\System32\\ntoskrnl.exe`).',
           'The difference is how the engine is tuned out of the box:\n• Windows Client (10/11) prioritizes foreground responsiveness (your mouse, browser, and active window get CPU priority) and ships with consumer apps.\n• Windows Server (2022/2025) prioritizes background network services and file sharing, supports massive hardware (terabytes of RAM and dozens of CPU sockets), can be installed completely headless without a desktop GUI (Server Core), and unlocks enterprise Server Roles like Active Directory Domain Services (AD DS), DNS, DHCP, and Hyper-V.',
         ],
       },
@@ -60,12 +60,12 @@ export const LESSONS_PART_1: Lesson[] = [
       {
         type: 'key',
         title: 'The One-Sentence Version',
-        body: 'Windows 11 and Windows Server share the exact same NT kernel, treat your Admin credentials like a surgical scalpel, never like an everyday butter knife.',
+        body: 'Windows 11 and Windows Server share the same NT kernel. Use your Admin credentials only when a task needs them, and work as a standard user the rest of the time.',
       },
       {
         type: 'try',
         title: 'Check Your Current Privilege Level Right Now',
-        body: 'Open PowerShell and run `whoami /groups | Select-String "S-1-16"`. If you see `High Mandatory Level`, your shell is running elevated as Administrator. If you see `Medium Mandatory Level`, you are running safely as a standard token.',
+        body: 'Click Start, type `PowerShell`, and press Enter. A window opens (usually blue) with a line of text that ends in `>`, such as `PS C:\\Users\\you>`. That line is the prompt: `PS` means PowerShell, the path is the folder you are in, and `>` means it is waiting for you to type. Click inside the window, type `whoami`, and press Enter. It prints the account you are signed in as (for example `mypc\\you`). This command only reads information, so it is completely safe. Do not type the `PS C:\\>` part yourself.',
       },
       {
         type: 'danger',
@@ -113,12 +113,13 @@ Is Elevated? : False`,
     mistakesAndTraps: [
       {
         mistake: 'Disabling UAC (User Account Control) because the popups feel annoying.',
-        cause: 'Thinking UAC is just anagging confirmation box rather than a token-isolation boundary.',
+        cause: 'Thinking UAC is just an annoying confirmation box rather than a token-isolation boundary.',
         fix: 'Keep UAC enabled and use a non-admin account for daily work, elevating only specific terminal windows when performing system administration.',
       },
     ],
     tryItYourself: [
-      'Open a non-elevated PowerShell window and run `[System.Environment]::OSVersion` to see the `Win32NT` identifier.',
+      'In the PowerShell window, run `[System.Environment]::OSVersion` to see the `Win32NT` identifier.',
+      'Next step (slightly harder): run `whoami /groups | Select-String "S-1-16"`. The `|` (pipe) hands the output of `whoami /groups` to `Select-String`, which keeps only the line that contains the integrity level. If you see `Medium Mandatory Level`, your window is a standard (not elevated) token. `High Mandatory Level` means the window was opened with "Run as administrator".',
       'Run `whoami /priv` in a normal PowerShell window, then open a second PowerShell window using "Run as administrator" and run `whoami /priv` again. Count how many extra privileges (like `SeDebugPrivilege`) appear in the elevated token!',
     ],
     knowledgeCheck: [
@@ -147,7 +148,7 @@ Is Elevated? : False`,
     chapterId: 'chapter-01',
     slug: 'processes-threads-and-handles',
     title: 'Processes, Threads, Access Tokens & Process Explorer',
-    subtitle: 'The Notepad story, the restaurant waiter analogy for threads, handle tables, and parent-child malware tells',
+    subtitle: 'The Notepad story, the restaurant kitchen analogy for threads, handle tables, and parent-child malware tells',
     estimatedMinutes: 20,
     oneSentenceSummary:
       'A program is a dead `.exe` recipe sitting on disk; a process is the living kitchen in RAM (with its own memory, handle table, and security token), and threads are the individual workers inside that kitchen.',
@@ -235,7 +236,7 @@ Is Elevated? : False`,
     codeExamples: [
       {
         title: 'Inspecting Live Processes, Threads, Handles, and Parent PIDs',
-        description: 'Use Get-Process and Get-CimInstance Win32_Process to inspect both resource consumption and parent-child lineage.',
+        description: 'Use Get-Process and Get-CimInstance Win32_Process to inspect both resource consumption and parent-child lineage. The output is a sample: your numbers and PowerShell edition (powershell.exe for Windows PowerShell 5.1, pwsh.exe for PowerShell 7) will differ.',
         code: `# 1. Inspect top 5 processes by Handle count and Thread count
 Get-Process |
   Sort-Object Handles -Descending |
@@ -302,12 +303,12 @@ ProcessId ParentProcessId Name     CommandLine
     summary:
       'Have you ever wondered how a system with 16 GB of physical RAM can keep 24 GB of applications open without crashing, or why a bug in your browser cannot overwrite the memory of your password manager? In this lesson, we explore Virtual Memory, 4 KB pages, Page Tables, and `pagefile.sys`, complete with an interactive RAM-and-Disk paging simulator.',
     whyItMatters:
-      'When administrators misread memory metrics (`WorkingSet` vs `PrivateMemorySize` vs `PageFileUsage`), they either waste thousands of dollars buying unnecessary RAM or misdiagnose disk thrashing caused by heavy page faults.',
+      'When administrators misread memory metrics (`WorkingSet` vs `PrivateMemorySize` vs `PageFileUsage`), they waste money buying unnecessary RAM or misdiagnose disk thrashing caused by heavy page faults.',
     learningObjectives: [
       'Explain why processes use Virtual Memory addresses instead of raw physical RAM addresses',
       'Describe how the Memory Manager maps 4 KB virtual pages to physical RAM frames or disk (`C:\\pagefile.sys`)',
       'Distinguish between a Soft Page Fault (already in RAM) and a Hard Page Fault (must be fetched from disk)',
-      'Inspect process memory footprints (`WorkingSet64` and `PagedMemorySize64`) using PowerShell',
+      'Inspect process memory footprints (`WorkingSet64` and `PrivateMemorySize64`) using PowerShell',
     ],
     keyTerms: [
       'Virtual Address Space',
@@ -315,7 +316,7 @@ ProcessId ParentProcessId Name     CommandLine
       'Page Table',
       'Working Set',
       'pagefile.sys (Paging File)',
-      'Hard Page Fault (Disk Thrashing)',
+      'Hard Page Fault (read from disk)',
     ],
     conceptSections: [
       {
@@ -330,7 +331,7 @@ ProcessId ParentProcessId Name     CommandLine
         heading: '4 KB Pages, Working Sets & C:\\pagefile.sys',
         body: [
           'Rather than managing memory one byte at a time, Windows slices memory into uniform **4 KB blocks called Pages**.',
-          '• **Active Pages (The Working Set):** The 4 KB pages a process is actively using right now stay in fast physical RAM. In PowerShell and Task Manager, the RAM a process currently holds is called its **Working Set**.\n• **Paging Out to Disk:** When physical RAM starts filling up, the Memory Manager looks for 4 KB pages that haven’t been touched in a while (for example, a minimized app you haven’t clicked in an hour) and moves them out to a hidden system file on your SSD called **`C:\\pagefile.sys`**.\n• **Hard Page Faults (Paging In):** The moment you click that minimized window again, the process tries to read its virtual page. The Page Table says *"Hold on, that page is currently parked on disk!"* The kernel pauses the thread for a few microseconds, reads the 4 KB page back from `pagefile.sys` into a free RAM frame, updates the Page Table, and resumes the thread.',
+          '• **Active Pages (The Working Set):** The 4 KB pages a process is actively using right now stay in fast physical RAM. In PowerShell and Task Manager, the RAM a process currently holds is called its **Working Set**.\n• **Paging Out to Disk:** When physical RAM starts filling up, the Memory Manager looks for 4 KB pages that haven’t been touched in a while (for example, a minimized app you haven’t clicked in an hour) and moves them out to a hidden system file on your SSD called **`C:\\pagefile.sys`**.\n• **Hard Page Faults (Paging In):** The moment you click that minimized window again, the process tries to read its virtual page. The Page Table says *"Hold on, that page is currently parked on disk!"* The kernel pauses the thread until the read finishes (milliseconds on a hard disk, a fraction of a millisecond on an SSD, still far slower than RAM), reads the 4 KB page back into a free RAM frame, updates the Page Table, and resumes the thread. Note that many hard faults are not about `pagefile.sys` at all: when a program or DLL is first used, Windows also reads its pages from the `.exe`/`.dll` file on disk. A few hard faults are normal; constant heavy paging that slows the whole machine is called thrashing.',
         ],
       },
       {
@@ -362,7 +363,7 @@ ProcessId ParentProcessId Name     CommandLine
       {
         cmdlet: 'Get-Process',
         aliases: ['gps', 'ps'],
-        syntax: 'Get-Process | Select-Object Name, WorkingSet64, PagedMemorySize64',
+        syntax: 'Get-Process | Select-Object Name, WorkingSet64, PrivateMemorySize64',
         parameters: [
           {
             name: 'WorkingSet64',
@@ -445,7 +446,7 @@ lsass        792          48.1          32.5`,
     oneSentenceSummary:
       'User Mode (Ring 3) is a locked sandbox where apps cannot touch hardware; to open a file or packet, an app must ask `NTDLL.DLL` to make a System Call across the boundary into Kernel Mode (Ring 0).',
     summary:
-      'Every modern CPU enforces hardware privilege rings. In this lesson, we draw the hard red line between User Mode (Ring 3) and Kernel Mode (Ring 0), trace a file-save request step-by-step from `Notepad.exe` through `NTDLL.DLL` into `ntoskrnl.exe`, meet the 6 Executive Managers, and understand how Handles act as hotel keycards for kernel objects.',
+      'Every modern CPU enforces hardware privilege rings. In this lesson, we draw the hard red line between User Mode (Ring 3) and Kernel Mode (Ring 0), trace a file-save request step-by-step from `Notepad.exe` through `NTDLL.DLL` into `ntoskrnl.exe`, meet the key Executive managers, and understand how Handles act as hotel keycards for kernel objects.',
     whyItMatters:
       'This single architectural boundary explains why a crashing game just closes its window while a buggy anti-cheat or storage driver causes a Blue Screen of Death (BSOD), and why EDR security sensors hook `NTDLL.DLL` to watch for malicious system calls.',
     learningObjectives: [
@@ -472,7 +473,7 @@ lsass        792          48.1          32.5`,
       {
         heading: 'Crossing the Border: Win32 API → NTDLL.DLL → Executive (ntoskrnl.exe)',
         body: [
-          'If Notepad in User Mode is forbidden from touching the SSD, how does it save `notes.txt`? It has to ask the Kernel to do the work on its behalf via a **System Call (Syscall)**:\n1. **Application (`Notepad.exe`):** Calls the documented Win32 function `WriteFile()` inside `kernel32.dll`.\n2. **The Gatekeeper (`NTDLL.DLL`):** The lowest layer of User Mode. `NTDLL.DLL` translates `WriteFile` into the native system call `NtWriteFile`, loads the syscall number into CPU registers, and executes the special `SYSCALL` CPU instruction to cross into Ring 0.\n3. **The Windows Executive (`ntoskrnl.exe`):** Inside Kernel Mode, the Executive houses six specialized managers:\n   - **Object Manager:** Creates and tracks kernel objects and hands out handles.\n   - **Security Reference Monitor (SRM):** Checks your process’s Access Token against the file’s permissions (ACL).\n   - **I/O Manager:** Packages the write request into an I/O Request Packet (IRP) and routes it to the right driver.\n   - **Memory Manager:** Manages virtual-to-physical 4 KB pages.\n   - **Process & Thread Manager:** Creates and terminates processes and threads.\n   - **Plug & Play / Power Manager:** Manages hardware discovery and power states.\n4. **Device Drivers & HAL:** The file system driver (`ntfs.sys`) and storage driver (`stornvme.sys`) translate the IRP into hardware commands through the **HAL (Hardware Abstraction Layer)**, which hides motherboard quirks so Windows runs identically on Intel, AMD, or ARM.',
+          'If Notepad in User Mode is forbidden from touching the SSD, how does it save `notes.txt`? It has to ask the Kernel to do the work on its behalf via a **System Call (Syscall)**:\n1. **Application (`Notepad.exe`):** Calls the documented Win32 function `WriteFile()` inside `kernel32.dll`.\n2. **The Gatekeeper (`NTDLL.DLL`):** The lowest layer of User Mode. `NTDLL.DLL` translates `WriteFile` into the native system call `NtWriteFile`, loads the syscall number into CPU registers, and executes the special `SYSCALL` CPU instruction to cross into Ring 0.\n3. **The Windows Executive (`ntoskrnl.exe`):** Inside Kernel Mode, the Executive houses many cooperating managers. Six you will meet most often:\n   - **Object Manager:** Creates and tracks kernel objects and hands out handles.\n   - **Security Reference Monitor (SRM):** Checks your process’s Access Token against the file’s permissions (ACL).\n   - **I/O Manager:** Packages the write request into an I/O Request Packet (IRP) and routes it to the right driver.\n   - **Memory Manager:** Manages virtual-to-physical 4 KB pages.\n   - **Process & Thread Manager:** Creates and terminates processes and threads.\n   - **Plug & Play / Power Manager:** Manages hardware discovery and power states.\n   - **Others:** The Cache Manager, the Configuration Manager (the registry) and more.\n4. **Device Drivers & HAL:** The file system driver (`ntfs.sys`) and storage driver (`stornvme.sys`) translate the IRP into hardware commands through the **HAL (Hardware Abstraction Layer)**, which hides motherboard and chipset differences from the rest of the kernel. (Windows runs on x64 and ARM64 because Microsoft builds separate versions for each, not because the HAL makes one binary run everywhere.)',
         ],
       },
       {
@@ -498,7 +499,7 @@ lsass        792          48.1          32.5`,
       {
         type: 'pro',
         title: 'Security Lens: Why Red Teams Talk About "Direct Syscalls"',
-        body: 'Endpoint Detection & Response (EDR) tools often monitor User Mode by placing hooks inside `NTDLL.DLL` to inspect API calls before they reach the kernel. Advanced attackers sometimes attempt "direct syscalls" to bypass user-mode hooks, which is why modern Windows Defender also uses Kernel callbacks (`ObRegisterCallbacks` and ETW-Ti) inside Ring 0!',
+        body: 'Endpoint Detection & Response (EDR) tools often monitor User Mode by placing hooks inside `NTDLL.DLL` to inspect API calls before they reach the kernel. Advanced attackers sometimes attempt "direct syscalls" to bypass user-mode hooks, which is why modern security products also collect telemetry from inside the kernel (for example through kernel callbacks and event tracing) instead of trusting user-mode hooks alone.',
       },
     ],
     commandBreakdowns: [
@@ -582,7 +583,7 @@ volmgr    Volume Manager Driver              Boot      \\SystemRoot\\System32\\d
     summary:
       'How do incident responders look at a machine with 180 running processes and spot a trojan in 10 seconds? They know the baseline! In this lesson, we step through the 7 core Windows system processes in boot order (`SYSTEM` PID 4, `SMSS`, `WININIT`, `SERVICES`, `LSASS`, `WINLOGON`, `SVCHOST`), test your eye in the interactive **Malware Process Hunter** game, and compare the three built-in service accounts (`LocalSystem`, `LocalService`, `NetworkService`).',
     whyItMatters:
-      'Attackers love naming their malware `svchost.exe`, `svch0st.exe`, or `lsass.exe` so administrators are afraid to kill it. Once you know that real `svchost.exe` is ALWAYS spawned by `services.exe` from `C:\\Windows\\System32\\` and real `lsass.exe` only ever has 1 instance, imposters stick out like a neon sign.',
+      'Attackers love naming their malware `svchost.exe`, `svch0st.exe`, or `lsass.exe` so administrators are afraid to kill it. Once you know that real `svchost.exe` is ALWAYS spawned by `services.exe` from `C:\\Windows\\System32\\` and real `lsass.exe` only ever has 1 instance, imposters become easy to spot.',
     learningObjectives: [
       'List the 7 core Windows system processes in boot order along with their legitimate image path and parent process',
       'Spot malicious imposter processes using the 3 Forensic Rules: Spelling/Lookalikes, Image Path (`C:\\Windows\\System32`), and Parent Process lineage',
@@ -601,13 +602,14 @@ volmgr    Volume Manager Driver              Boot      \\SystemRoot\\System32\\d
       {
         heading: 'The 7 Core Windows System Processes (In Boot Order)',
         body: [
-          'Every time Windows boots, these 7 processes start in a strict hierarchy:\n1. **`SYSTEM` (Always PID 4):** The home for Kernel Mode threads. Parent: `System Idle Process (PID 0)`. Path: `ntoskrnl.exe`.\n2. **`SMSS.EXE` (Session Manager Subsystem):** The very first User-Mode process! Spawned by `SYSTEM (PID 4)`. It creates **Session 0** (isolated background services) and **Session 1+** (your interactive desktop).\n3. **`WININIT.EXE` (Windows Initialization):** Spawned in Session 0 by `smss.exe`. Its job is to launch the two pillars of Session 0: `services.exe` and `lsass.exe`.\n4. **`SERVICES.EXE` (Service Control Manager - SCM):** Spawned by `wininit.exe`. Starts, stops, and manages all Windows services and is the **only legitimate parent of `svchost.exe`**.\n5. **`LSASS.EXE` (Local Security Authority Subsystem Service):** Spawned by `wininit.exe` (exactly **1 instance**). Validates passwords, generates Security Access Tokens, and holds Kerberos tickets and NTLM hashes. Because of this, attackers target `lsass.exe` with tools like Mimikatz.\n6. **`WINLOGON.EXE` (Windows Logon Manager):** Spawned in Session 1 by `smss.exe`. Manages the `Ctrl+Alt+Del` Secure Attention Sequence (SAS) logon screen and starts `userinit.exe` → `explorer.exe`.\n7. **`SVCHOST.EXE` (Service Host):** Spawned by `services.exe` (dozens of instances). Hosts Windows services packaged inside `.dll` files so a crash in one service doesn’t take down others.',
+          'Every time Windows boots, these 7 processes start in a strict hierarchy:\n1. **`SYSTEM` (Always PID 4):** The home for Kernel Mode threads. Parent: `System Idle Process (PID 0)`. Path: `ntoskrnl.exe`.\n2. **`SMSS.EXE` (Session Manager Subsystem):** The very first User-Mode process! Spawned by `SYSTEM (PID 4)`. It creates **Session 0** (isolated background services) and **Session 1+** (your interactive desktop).\n3. **`WININIT.EXE` (Windows Initialization):** Created in Session 0 by a short-lived copy of `smss.exe`. That copy exits soon after, so Process Explorer shows `wininit.exe` with no parent (this is normal). Its job is to launch the two pillars of Session 0: `services.exe` and `lsass.exe`.\n4. **`SERVICES.EXE` (Service Control Manager - SCM):** Spawned by `wininit.exe`. Starts, stops, and manages all Windows services and is the **only legitimate parent of `svchost.exe`**.\n5. **`LSASS.EXE` (Local Security Authority Subsystem Service):** Spawned by `wininit.exe` (exactly **1 instance**). Validates passwords, generates Security Access Tokens, and holds Kerberos tickets and NTLM hashes. Because of this, attackers target `lsass.exe` with tools like Mimikatz.\n6. **`WINLOGON.EXE` (Windows Logon Manager):** Created in the first interactive session (Session 1) by a short-lived copy of `smss.exe`, so it also shows no parent in Process Explorer (normal). Manages the `Ctrl+Alt+Del` Secure Attention Sequence (SAS) logon screen and starts `userinit.exe` → `explorer.exe`.\n7. **`SVCHOST.EXE` (Service Host):** Spawned by `services.exe` (dozens of instances). Hosts Windows services packaged inside `.dll` files so a crash in one service doesn’t take down others.',
+          'One more core process worth knowing is `CSRSS.EXE` (Client/Server Runtime Subsystem). There is one instance per session, it is also created by `smss.exe`, and it shows no parent either. That is why the list above is a learning set of 7, not every system process.',
         ],
       },
       {
         heading: 'My 3 Forensic Rules for Catching Imposters',
         body: [
-          'Whenever I inspect a suspicious process in Process Explorer or PowerShell, I ask three questions:\n1. **Is the spelling exact?** Attackers use zero-for-O (`svch0st.exe`) or capital-I-for-L (`Isass.exe`).\n2. **Is it living in `C:\\Windows\\System32\\`?** All 6 user-mode core executables (`smss`, `wininit`, `services`, `lsass`, `winlogon`, `svchost`) live inside `C:\\Windows\\System32\\`. If you ever see `svchost.exe` running from `C:\\Users\\Public\\`, `C:\\Temp\\`, or `AppData`, **it is 100% malware**.\n3. **Who is its Parent Process?** If `svchost.exe` was launched by `cmd.exe`, `powershell.exe`, or `explorer.exe` instead of `services.exe`, sound the alarm.',
+          'Whenever I inspect a suspicious process in Process Explorer or PowerShell, I ask three questions:\n1. **Is the spelling exact?** Attackers use zero-for-O (`svch0st.exe`) or capital-I-for-L (`Isass.exe`).\n2. **Is it living in `C:\\Windows\\System32\\`?** All 6 user-mode core executables (`smss`, `wininit`, `services`, `lsass`, `winlogon`, `svchost`) live inside `C:\\Windows\\System32\\`. If you ever see `svchost.exe` running from `C:\\Users\\Public\\`, `C:\\Temp\\`, or `AppData`, **it is almost certainly malware**.\n3. **Who is its Parent Process?** If `svchost.exe` was launched by `cmd.exe`, `powershell.exe`, or `explorer.exe` instead of `services.exe`, sound the alarm. (This check works for `svchost.exe`, `services.exe` and `lsass.exe`. `wininit.exe`, `winlogon.exe` and `csrss.exe` legitimately show no parent, so check their path, session and signature instead.)',
         ],
       },
       {
@@ -621,7 +623,7 @@ volmgr    Volume Manager Driver              Boot      \\SystemRoot\\System32\\d
       {
         type: 'key',
         title: 'The One-Sentence Version',
-        body: '`SYSTEM (PID 4)` → `smss.exe` → `wininit.exe` → (`services.exe` → `svchost.exe`) & (`lsass.exe`). Anything outside `C:\\Windows\\System32` is an imposter.',
+        body: '`SYSTEM (PID 4)` → `smss.exe` → `wininit.exe` → (`services.exe` → `svchost.exe`) & (`lsass.exe`). A core process running from outside `C:\\Windows\\System32` is an imposter.',
       },
       {
         type: 'try',
@@ -652,8 +654,11 @@ volmgr    Volume Manager Driver              Boot      \\SystemRoot\\System32\\d
     codeExamples: [
       {
         title: 'Auditing Core System Process Paths & Service Accounts with PowerShell',
-        description: 'Hunt for any core system process running outside C:\\Windows\\System32 and check which account each service runs under.',
-        code: `# 1. Verify ExecutablePath and ParentProcessId of all svchost.exe and lsass.exe instances
+        description: 'Hunt for any core system process running outside C:\\Windows\\System32 and check which account each service runs under. The output below is sample output for part 2 only (the counts differ on every machine); part 1 prints nothing when all paths are correct.',
+        code: `# 1. Run this in an elevated (Administrator) window: otherwise ExecutablePath is blank
+#    for protected processes such as lsass.exe and they are falsely flagged.
+#    Verify ExecutablePath and ParentProcessId of all svchost.exe and lsass.exe instances
+#    (prints nothing when every path is correct)
 Get-CimInstance Win32_Process -Filter "Name = 'svchost.exe' OR Name = 'lsass.exe'" |
   Where-Object { $_.ExecutablePath -ne 'C:\\Windows\\System32\\' + $_.Name } |
   Select-Object ProcessId, ParentProcessId, Name, ExecutablePath
@@ -679,7 +684,7 @@ Get-CimInstance Win32_Service -Filter "State = 'Running'" |
     ],
     tryItYourself: [
       'Complete both the **7 Core System Processes Stepper** and the **Malware Process Hunter** challenge below.',
-      'Run `Get-CimInstance Win32_Process -Filter "Name = \'lsass.exe\'" | Select-Object ProcessId, ParentProcessId, ExecutablePath` on your machine and verify which PID is its parent (`wininit.exe`).',
+      'Run `Get-CimInstance Win32_Process -Filter "Name = \'lsass.exe\'" | Select-Object ProcessId, ParentProcessId, ExecutablePath` on your machine and verify which PID is its parent (`wininit.exe`). Run it in an elevated window, otherwise `ExecutablePath` shows blank for `lsass.exe`.',
     ],
     knowledgeCheck: [
       {
@@ -710,10 +715,10 @@ Get-CimInstance Win32_Service -Filter "State = 'Running'" |
     summary:
       'What happens in the five seconds between pressing the physical power button and seeing the Windows logon screen? In this lesson, we dissect the 512-byte Master Boot Record (MBR) to see why legacy BIOS was limited to 4 partitions and 2 TB disks, compare it with modern UEFI + GPT, trace the 4 Windows Boot Phases, and learn how Windows 11 stops rootkits before the OS is even awake.',
     whyItMatters:
-      'Whether you are troubleshooting an "Operating System Not Found" boot failure, converting a server disk to GPT, or explaining why Windows 11 mandates UEFI Secure Boot and TPM 2.0, mastering the boot chain puts you in the top 5% of systems engineers.',
+      'Whether you are troubleshooting an "Operating System Not Found" boot failure, converting a server disk to GPT, or explaining why Windows 11 mandates UEFI Secure Boot and TPM 2.0, mastering the boot chain helps you diagnose boot failures quickly and explain the reasoning behind these requirements.',
     learningObjectives: [
       'Dissect the 512 bytes of a legacy MBR Sector 0 (446B Bootstrap, 64B Partition Table = 4 × 16B, 2B `0x55AA` magic signature)',
-      'Contrast Legacy BIOS + MBR (2 TB limit, 4 partitions, no signature checks) with Modern UEFI + GPT (128+ partitions, backup headers, Secure Boot)',
+      'Contrast Legacy BIOS + MBR (2 TB limit, 4 partitions, no signature checks) with Modern UEFI + GPT (up to 128 partition entries by default on Windows, backup headers, Secure Boot)',
       'Trace the 4 Windows Boot Phases: Pre-Boot → Windows Boot Manager (`bootmgfw.efi`) → OS Loader (`winload.efi`) → Kernel Init (`ntoskrnl.exe`)',
       'Explain the 4-layer Boot Defense relay race: Secure Boot, Trusted Boot, ELAM (Early Launch Anti-Malware), and Measured Boot (TPM)',
     ],
@@ -731,7 +736,7 @@ Get-CimInstance Win32_Service -Filter "State = 'Running'" |
         body: [
           'For thirty years, PCs booted using **BIOS** (1980s 16-bit firmware) paired with an **MBR (Master Boot Record)** disk layout. When you pressed the power button, BIOS blindly read the very first 512-byte sector of the hard drive (**Sector 0**) into RAM and executed whatever raw CPU instructions sat there.',
           'Let’s do the exact math of those **512 bytes** in Sector 0:\n• **Bytes 0 to 445 (446 bytes):** Tiny bootstrap machine code.\n• **Bytes 446 to 509 (64 bytes):** The Partition Table. Each partition entry requires **16 bytes** (`64 ÷ 16 = 4`), which is why MBR disks can only ever have **4 primary partitions**! And because MBR uses 32-bit sector addresses, it hits a hard wall at **2 TB**.\n• **Bytes 510 to 511 (2 bytes):** The Boot Signature (`0x55AA`).\n• **The Fatal Flaw:** If a single disk scratch or a "Bootkit" virus overwrote Sector 0, the PC was either unbootable or infected *before* Windows or antivirus even existed in RAM.',
-          'Modern computers replace BIOS/MBR with **UEFI (Unified Extensible Firmware Interface)** paired with **GPT (GUID Partition Table)**:\n• Supports **128+ partitions** on Windows and disks measured in **Zettabytes**.\n• Stores a **backup copy of the GPT partition table** at the very end of the disk, plus CRC32 checksums to self-heal corruption.\n• Boots normal `.efi` files from a dedicated FAT32 **EFI System Partition (ESP)** and verifies cryptographic digital signatures (**Secure Boot**).',
+          'Modern computers replace BIOS/MBR with **UEFI (Unified Extensible Firmware Interface)** paired with **GPT (GUID Partition Table)**:\n• Windows reserves **128 partition entries** by default, and GPT supports disks far beyond 2 TB (the theoretical limit is in the zettabyte range).\n• Stores a **backup copy of the GPT partition table** at the very end of the disk, plus CRC32 checksums to self-heal corruption.\n• Boots normal `.efi` files from a dedicated FAT32 **EFI System Partition (ESP)** and verifies cryptographic digital signatures (**Secure Boot**).',
         ],
       },
       {
@@ -744,7 +749,7 @@ Get-CimInstance Win32_Service -Filter "State = 'Running'" |
         heading: 'The 4-Stage Boot Defense Relay Race & Modern Tooling (WinGet)',
         body: [
           'How does Windows 11 make sure a rootkit hasn’t hijacked the boot chain? Four defenses pass the baton like a relay race:\n1. **Secure Boot (UEFI Hardware):** UEFI firmware checks the digital signature of `bootmgfw.efi` and `winload.efi` before executing them. Unsigned bootkits are blocked cold.\n2. **Trusted Boot (`winload.efi`):** Once `winload.efi` takes over, it verifies the cryptographic signature of `ntoskrnl.exe` and every boot-start driver.\n3. **ELAM (Early Launch Anti-Malware):** The **very first** third-party driver the kernel initializes is your antivirus/Defender ELAM driver. Because ELAM wakes up *before* any other non-Microsoft driver, it inspects every subsequent driver and blocks known-bad rootkits from loading.\n4. **Measured Boot (TPM 2.0):** Throughout the entire boot, hashes of every firmware, bootloader, and driver stage are recorded inside the hardware **TPM (Trusted Platform Module)** chip so BitLocker and security tools can prove the boot wasn’t tampered with.',
-          'Once your system is booted and you log in, how do pros install tools like Sysinternals without clicking shady download buttons in a web browser? Using **`winget`** (the official Windows Package Manager): `winget install Microsoft.Sysinternals.ProcessExplorer`.',
+          'Once your system is booted and you log in, how do you install tools like Process Explorer without clicking shady download buttons in a web browser? Using **`winget`** (the official Windows Package Manager, built into current Windows 10/11): `winget install Microsoft.Sysinternals.ProcessExplorer`. This installs only Process Explorer, not the whole Sysinternals Suite.',
         ],
       },
     ],
@@ -790,7 +795,7 @@ Get-CimInstance Win32_Service -Filter "State = 'Running'" |
     codeExamples: [
       {
         title: 'Checking Disk Partition Style (GPT vs MBR), Secure Boot, and TPM Status',
-        description: 'Verify that your machine is booted in modern UEFI mode with GPT partitioning, Secure Boot enabled, and a healthy TPM 2.0 chip.',
+        description: 'Verify that your machine is booted in modern UEFI mode with GPT partitioning, Secure Boot enabled, and a healthy TPM 2.0 chip. Run it in an elevated (Administrator) window: Confirm-SecureBootUEFI and Get-Tpm need elevation, and Confirm-SecureBootUEFI throws an error on a legacy BIOS machine. The output is sample output from a UEFI machine.',
         code: `# 1. Check whether disks use modern GPT or legacy MBR
 Get-Disk | Select-Object Number, FriendlyName, PartitionStyle,
   @{Name='Size_GB';Expression={[math]::Round($_.Size / 1GB, 1)}}
@@ -798,16 +803,23 @@ Get-Disk | Select-Object Number, FriendlyName, PartitionStyle,
 # 2. Check if UEFI Secure Boot is currently enabled
 Confirm-SecureBootUEFI
 
-# 3. Inspect the EFI System Partition (ESP) and Windows partitions
+# 3. Check the TPM chip
+Get-Tpm | Select-Object TpmPresent, TpmReady
+
+# 4. Inspect the EFI System Partition (ESP) and Windows partitions
 Get-Partition -DiskNumber 0 | Select-Object PartitionNumber, DriveLetter, Type, Size
 
-# 4. Install Sysinternals Suite silently from the command line using WinGet
+# 5. Optional, installs software: install Process Explorer (only that tool, not the whole Sysinternals Suite)
 winget install --id Microsoft.Sysinternals.ProcessExplorer --silent`,
         output: `Number FriendlyName          PartitionStyle Size_GB
 ------ ------------          -------------- -------
      0 NVMe Samsung SSD 990  GPT              512.0
 
 True
+
+TpmPresent TpmReady
+---------- --------
+      True     True
 
 PartitionNumber DriveLetter Type     Size
 --------------- ----------- ----     ----
@@ -860,15 +872,15 @@ PartitionNumber DriveLetter Type     Size
     id: '3-1',
     chapterId: 'chapter-03',
     slug: 'what-is-powershell',
-    title: 'What PowerShell Actually Is, The DRY Principle & 5.1 vs 7.5',
+    title: 'What PowerShell Actually Is, The DRY Principle & 5.1 vs 7',
     subtitle: 'Why Jeffrey Snover’s Monad replaced fragile text parsing, the three workspaces, and version differences that matter',
     estimatedMinutes: 18,
     oneSentenceSummary:
       'PowerShell is a two-in-one engine, an interactive command shell and a full `.NET` scripting language, that passes live objects instead of fragile text lines.',
     summary:
-      'In Chapters 1 and 2, we looked under the hood of one Windows machine. Now I’m handing you the steering wheel that controls one machine or ten thousand at once. We explore why Jeffrey Snover invented PowerShell (codenamed Monad), why the DRY ("Don’t Repeat Yourself") philosophy drives everything I automate, which of the three PowerShell environments to use, and the exact differences between Windows PowerShell 5.1 and PowerShell 7.5.',
+      'You can start this lesson without Chapters 1 and 2: everything you need is explained here. Now I’m handing you the steering wheel that controls one machine or ten thousand at once. We explore why Jeffrey Snover invented PowerShell (codenamed Monad), why the DRY ("Don’t Repeat Yourself") philosophy drives everything I automate, which of the three PowerShell environments to use, and the differences between Windows PowerShell 5.1 and the current PowerShell 7 LTS release. Windows PowerShell 5.1 is already installed on your PC and is perfectly fine for this course.',
     whyItMatters:
-      'Clicking through GUI wizards works when you create one user account. When you have to create 400 accounts, audit 80 servers, or configure a headless Windows Server Core VM with no mouse or desktop, GUI admins get stuck while PowerShell engineers finish in 3 seconds.',
+      'Clicking through GUI wizards works when you create one user account. When you have to create 400 accounts, audit 80 servers, or configure a headless Windows Server Core VM with no mouse or desktop, GUI admins click for hours while a PowerShell engineer runs one short script.',
     learningObjectives: [
       'Explain why PowerShell is both an interactive CLI shell and a full scripting language built on .NET',
       'Apply the DRY (Don’t Repeat Yourself) principle to decide when to automate a task',
@@ -879,7 +891,7 @@ PartitionNumber DriveLetter Type     Size
       'Monad Manifesto (Jeffrey Snover)',
       'DRY (Don’t Repeat Yourself)',
       'Windows PowerShell 5.1 (Desktop Edition)',
-      'PowerShell 7.5 (Core Edition / pwsh.exe)',
+      'PowerShell 7 (Core Edition / pwsh.exe)',
       '.NET Runtime & CLR',
       '$PSVersionTable',
     ],
@@ -900,9 +912,9 @@ PartitionNumber DriveLetter Type     Size
         ],
       },
       {
-        heading: 'Windows PowerShell 5.1 vs. PowerShell 7.5: Side by Side',
+        heading: 'Windows PowerShell 5.1 vs. PowerShell 7: Side by Side',
         body: [
-          'You will encounter two editions of PowerShell in the real world, and they can live side-by-side on the same PC:\n• **Windows PowerShell 5.1 (`powershell.exe`):** Ships pre-installed in every copy of Windows 10/11 and Windows Server (`PSEdition: Desktop`). Built on the legacy **.NET Framework 4.x**. Windows-only and feature-frozen (security patches only).\n• **PowerShell 7.5 (`pwsh.exe`):** Installed separately via `winget install Microsoft.PowerShell` (`PSEdition: Core`). Built on **modern .NET (8/9)**, open-source, runs on **Windows, Linux, and macOS**, and adds huge quality-of-life features like pipeline chain operators (`&&` and `||`), `ForEach-Object -Parallel`, and ternary operators (`? :`).',
+          'You will encounter two editions of PowerShell in the real world, and they can live side-by-side on the same PC:\n• **Windows PowerShell 5.1 (`powershell.exe`):** Ships pre-installed in every copy of Windows 10/11 and Windows Server (`PSEdition: Desktop`). Built on the legacy **.NET Framework 4.x**. Windows-only and feature-frozen (security patches only).\n• **PowerShell 7 (`pwsh.exe`):** Use the current LTS (long-term support) release. Installed separately via `winget install Microsoft.PowerShell` (`PSEdition: Core`). Built on **modern .NET**, open-source, runs on **Windows, Linux, and macOS**, and adds quality-of-life features like pipeline chain operators (`&&` runs the second command only if the first succeeded, `||` only if it failed), `ForEach-Object -Parallel`, and ternary operators (`? :`).',
         ],
       },
     ],
@@ -915,12 +927,12 @@ PartitionNumber DriveLetter Type     Size
       {
         type: 'try',
         title: 'Check Which Engine You Are In Right Now',
-        body: 'Type `$PSVersionTable` and press Enter. Look at two lines: `PSVersion` (`5.1.x` vs `7.5.x`) and `PSEdition` (`Desktop` vs `Core`).',
+        body: 'Type `$PSVersionTable` and press Enter. Look at two lines: `PSVersion` (`5.1.x` vs `7.x.x`) and `PSEdition` (`Desktop` vs `Core`).',
       },
       {
         type: 'gotcha',
         title: 'Why Both 5.1 and 7 Matter',
-        body: 'When you log into a fresh Windows Server Core machine for the first time, you are dropped into Windows PowerShell 5.1 (`powershell.exe`). Always know which features are 7-only (like `&&`) so your scripts never break on a bare server!',
+        body: 'When you connect to a Windows Server Core machine for the first time, you land at a plain `cmd.exe` prompt (on Server 2022 and later, the SConfig menu opens automatically). Type `powershell` to start Windows PowerShell 5.1 (`powershell.exe`); PowerShell 7 is not there unless someone installed it. Always know which features are 7-only (like `&&`) so your scripts never break on a bare server!',
       },
     ],
     commandBreakdowns: [
@@ -932,7 +944,7 @@ PartitionNumber DriveLetter Type     Size
           {
             name: 'PSVersion',
             type: 'Version (Property)',
-            description: 'Displays the exact PowerShell engine version (e.g., 5.1.26100 or 7.5.0).',
+            description: 'Displays the exact PowerShell engine version (e.g., 5.1.26100.x for Windows PowerShell or 7.x.x for PowerShell 7).',
           },
           {
             name: 'PSEdition',
@@ -946,7 +958,7 @@ PartitionNumber DriveLetter Type     Size
     codeExamples: [
       {
         title: 'Inspecting $PSVersionTable and Installing PowerShell 7 via WinGet',
-        description: 'Check your active PowerShell edition and install or upgrade PowerShell 7 directly from the terminal.',
+        description: 'Check your active PowerShell edition. Step 3 is optional and installs or upgrades PowerShell 7 from the terminal. The output is sample output from a PowerShell 7 session (Windows PowerShell 5.1 shows PSVersion 5.1.x and PSEdition Desktop instead).',
         code: `# 1. Inspect the active PowerShell engine details
 $PSVersionTable
 
@@ -954,13 +966,13 @@ $PSVersionTable
 $PSVersionTable.PSVersion
 $PSVersionTable.PSEdition
 
-# 3. Install or update PowerShell 7 using WinGet
+# 3. Optional (changes your system): install or update PowerShell 7 using WinGet
 winget install --id Microsoft.PowerShell --source winget`,
         output: `Name                           Value
 ----                           -----
-PSVersion                      7.5.0
+PSVersion                      7.4.6
 PSEdition                      Core
-GitCommitId                    7.5.0
+GitCommitId                    7.4.6
 OS                             Microsoft Windows 10.0.26100
 Platform                       Win32NT
 PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}
@@ -1017,9 +1029,9 @@ WSManStackVersion              3.0`,
     oneSentenceSummary:
       'Every native PowerShell cmdlet follows the strict `ApprovedVerb-SingularNoun` law (`Get-Process`, `New-LocalUser`, `Stop-Service`), so you can guess and discover commands you have never seen before.',
     summary:
-      'In bash or `cmd.exe`, command names look like random historical accidents (`ls`, `grep`, `awk`, `netstat`, `ipconfig`). PowerShell abolished that chaos with one strict law: **Verb-Noun**. In this lesson, we dissect the anatomy of a cmdlet, learn why the Noun is ALWAYS singular, use `Get-Command` with wildcards (`*`) to find anything in seconds, and see why aliases (`ls`, `dir`, `%`, `?`) belong in interactive typing, never in saved scripts.',
+      'In bash or `cmd.exe` (older command-line tools), command names look like random historical accidents (`ls`, `grep`, `awk`, `netstat`, `ipconfig`). You do not need to know any of them. PowerShell abolished that chaos with one strict law: **Verb-Noun**. In this lesson, we dissect the anatomy of a cmdlet, learn why the Noun is ALWAYS singular, use `Get-Command` with wildcards (`*`) to find anything in seconds, and see why aliases (`ls`, `dir`, `%`, `?`) belong in interactive typing, never in saved scripts.',
     whyItMatters:
-      'Once you internalize the Verb-Noun law and `Get-Command`, you never get stuck in an interview, on a production outage, or on an air-gapped server without internet access.',
+      'Once you know the Verb-Noun law and `Get-Command`, you can find the command you need on your own, even on a server with no internet access.',
     learningObjectives: [
       'Deconstruct any cmdlet invocation into Verb, Singular Noun, Parameter (`-Name`), and Argument',
       'Use `Get-Verb` and `Get-Command` (with `-Verb`, `-Noun`, and `*` wildcards) to discover cmdlets',
@@ -1040,7 +1052,7 @@ WSManStackVersion              3.0`,
         body: [
           'Look at the visual anatomy diagram below for `Get-Process -Name explorer`. Every PowerShell cmdlet is built like a clear English sentence:\n• **Verb (The Action):** What you want to do, chosen from Microsoft’s official list of ~100 approved verbs (`Get`, `Set`, `New`, `Remove`, `Start`, `Stop`, `Restart`, `Enable`, `Disable`, `Test`, `Invoke`).\n• **Singular Noun (The Target):** The *single thing* you are acting on (`Process`, `Service`, `LocalUser`, `ADUser`, `NetIPAddress`, `FirewallRule`).',
           'Memorize this rule right now: **The Noun in a PowerShell cmdlet is ALWAYS singular!** Even when you want to list 200 processes or 300 services, the command is `Get-Process` (never `Get-Processes`) and `Get-Service` (never `Get-Services`).',
-          'Why is this law so powerful? Suppose you walk up to a server and need to manage firewall rules or DNS records for the first time in your life. You already know the verb to inspect things is `Get`. You type `Get-*Firewall*` or `Get-Command -Verb Get -Noun *Dns*` - and PowerShell hands you the exact cmdlet on a silver platter.',
+          'Why is this law so powerful? Suppose you walk up to a server and need to manage firewall rules or DNS records for the first time in your life. You already know the verb to inspect things is `Get`. You type `Get-Command *Firewall*` or `Get-Command -Verb Get -Noun *Dns*` (the `*` is a wildcard that matches any characters) - and PowerShell lists the matching cmdlets for you.',
         ],
       },
       {
@@ -1126,7 +1138,7 @@ WSManStackVersion              3.0`,
     codeExamples: [
       {
         title: 'Discovering Cmdlets with Wildcards and Resolving Aliases',
-        description: 'Use Get-Verb, Get-Command, and Get-Alias to explore unknown commands without touching a search engine.',
+        description: 'Use Get-Verb, Get-Command, and Get-Alias to explore unknown commands without touching a search engine. The output is sample output from Windows PowerShell 5.1 (PowerShell 7 adds an AliasPrefix and Description column to Get-Verb).',
         code: `# 1. Check approved verbs that start with 'R' (Notice: Remove, Restart, Resume - no 'Delete'!)
 Get-Verb -Verb R*
 
@@ -1138,22 +1150,23 @@ Get-Alias -Name gci
 
 # 4. Find all aliases that point to Get-ChildItem
 Get-Alias -Definition Get-ChildItem`,
-        output: `Verb    AliasPrefix Group     Description
-----    ----------- -----     -----------
-Read    rd          Communications
-Receive rcv         Communications
-Redo    re          Common
-Register reg        Lifecycle
-Remove  ri          Common
-Rename  ren         Common
-Repair  rp          Diagnostic
-Request req         Communications
-Reset   rs          Common
-Resize  rz          Common
-Resolve rv          Diagnostic
-Restart rstr        Lifecycle
-Restore rsto        Data
-Resume  rsm         Lifecycle
+        output: `Verb     Group
+----     -----
+Redo     Common
+Remove   Common
+Rename   Common
+Reset    Common
+Resize   Common
+Restore  Data
+Register Lifecycle
+Request  Lifecycle
+Restart  Lifecycle
+Resume   Lifecycle
+Repair   Diagnostic
+Resolve  Diagnostic
+Read     Communications
+Receive  Communications
+Revoke   Security
 
 CommandType Name              Version Source
 ----------- ----              ------- ------
@@ -1168,7 +1181,11 @@ Cmdlet      Set-LocalUser     1.0.0.0 Microsoft.PowerShell.LocalAccounts
 CommandType Name                 Version Source
 ----------- ----                 ------- ------
 Alias       gci -> Get-ChildItem
+
+CommandType Name                 Version Source
+----------- ----                 ------- ------
 Alias       dir -> Get-ChildItem
+Alias       gci -> Get-ChildItem
 Alias       ls -> Get-ChildItem`,
       },
     ],
@@ -1181,7 +1198,7 @@ Alias       ls -> Get-ChildItem`,
     ],
     tryItYourself: [
       'Run `Get-Command -Noun *Service*` to discover every cmdlet that works with services.',
-      'Run `Get-Alias -Name ?` and `Get-Alias -Name %` to see which two essential pipeline cmdlets those single-character symbols represent.',
+      'Run `Get-Alias -Definition Where-Object` and `Get-Alias -Definition ForEach-Object` to see which essential pipeline cmdlets the single-character aliases `?` and `%` stand for. (Do not type `Get-Alias -Name ?`: the `?` is a wildcard that matches every one-letter alias.)',
     ],
     knowledgeCheck: [
       {
@@ -1216,9 +1233,9 @@ Alias       ls -> Get-ChildItem`,
     summary:
       'There are thousands of PowerShell cmdlets across Windows, Azure, Active Directory, and VMware. Trying to memorize them all is impossible, and pointless. Instead, I want you to carry my 3-tool **Self-Reliance Pocketknife**: `Get-Command`, `Get-Help`, and `Get-Member`. In this lesson, you will learn how to update offline help on a fresh machine, jump straight to working code with `Get-Help -Examples`, decode syntax blocks like a compiler, and read `about_*` conceptual guides.',
     whyItMatters:
-      'When you are inside a secure datacenter or configuring a fresh Server Core VM before routing is working, you cannot copy-paste from a web forum. If you know how to read `Get-Help -Examples` and `Get-Help -Full`, you are 100% self-sufficient.',
+      'When you are inside a secure datacenter or configuring a fresh Server Core VM before routing is working, you cannot copy-paste from a web forum. If you know how to read `Get-Help -Examples` and `Get-Help -Full` (after running `Update-Help` or `Save-Help` while you still have internet), you can work out most commands without a web forum.',
     learningObjectives: [
-      'Download and refresh local documentation in an elevated session using `Update-Help`',
+      'Download and refresh local documentation with `Update-Help` (PowerShell 7+: `-Scope CurrentUser`, no Administrator needed)',
       'Choose the right `Get-Help` switch (`-Examples`, `-Detailed`, `-Full`, `-Online`, `-ShowWindow`)',
       'Decode every bracket in a PowerShell syntax diagram: `[-Name <String[]>]` vs `[-Id] <Int32>` vs `<String>`',
       'Use `Show-Command` to generate valid cmdlet syntax visually and read `about_*` conceptual topics',
@@ -1235,14 +1252,14 @@ Alias       ls -> Get-ChildItem`,
       {
         heading: 'Updating Offline Help & Picking the Right Switch',
         body: [
-          'To keep the Windows ISO small, fresh installations of Windows and Windows Server ship with only bare-bones help stubs. Therefore, the very first thing I do on a new workstation or Server Core build (in an **Administrator** shell) is run **`Update-Help -Force`**.',
+          'To keep the Windows ISO small, fresh installations of Windows and Windows Server ship with only bare-bones help stubs. Therefore, the first thing I do on a new workstation or Server Core build is download the full help with **`Update-Help`**. You do not need Administrator for this in PowerShell 7+: run **`Update-Help -Scope CurrentUser`** and the help is saved in your own profile. (Windows PowerShell 5.1 has no `-Scope` parameter; it saves help under `C:\\Windows\\System32`, so there you need an elevated window and `Update-Help -Force`. If you would rather not change anything, skip this step: `Get-Help <cmdlet> -Online` always works when you have internet.) `Update-Help` itself needs internet access; on a server with no internet, use `Save-Help` on a connected machine and point `Update-Help -SourcePath` at the saved folder.',
           'Once help is downloaded, here is how I use **`Get-Help`** every day:\n• **`Get-Help Stop-Process -Examples`:** My #1 shortcut! Skips the wall of text and shows real, copy-pasteable code examples immediately.\n• **`Get-Help Stop-Process -Full`:** The complete technical manual, including parameter tables that tell you whether each parameter accepts pipeline input (`ByValue` or `ByPropertyName`) and wildcards.\n• **`Get-Help Stop-Process -Online`:** Opens the official Microsoft Learn page in your browser.\n• **`help Stop-Process` (or `man Stop-Process`):** Unlike `Get-Help` (which dumps the entire page at once), the `help` function pipes the output through `more` so you can scroll one screen at a time with the `Spacebar`!',
         ],
       },
       {
         heading: 'How to Decode Any PowerShell Syntax Block in 10 Seconds',
         body: [
-          'When you run `Get-Help Get-Process`, you see a `SYNTAX` block filled with square brackets `[ ]` and angle brackets `< >`. Most beginners gloss right over it. Once you learn the 4 bracket rules, you can read any cmdlet like X-ray vision:\n1. **Everything inside `[square brackets]` is OPTIONAL.** If both the parameter and its value are inside outer brackets, like `[-ComputerName <String[]>]` - the entire parameter is optional.\n2. **No outer square brackets means MANDATORY.** In `Stop-Process -Id <Int32[]>`, there are no brackets around `-Id <Int32[]>`, which means you *must* supply `-Id` or the command will prompt you for it!\n3. **Parameter name in brackets, value outside `[-Name] <String[]>` means POSITIONAL.** Because `[-Name]` is inside brackets, typing the word `-Name` is optional (`Get-Process explorer` works just like `Get-Process -Name explorer`).\n4. **`<Type[]>` inside angle brackets tells you the Data Type.** `<String>` accepts a single text string; `<String[]>` (with empty brackets `[]` attached to the type name!) means it accepts a **comma-separated array** of multiple strings (`Get-Process -Name explorer, pwsh, lsass`).',
+          'When you run `Get-Help Get-Process`, you see a `SYNTAX` block filled with square brackets `[ ]` and angle brackets `< >`. Most beginners gloss right over it. Once you learn the 4 bracket rules, you can read any cmdlet’s syntax with confidence:\n1. **Everything inside `[square brackets]` is OPTIONAL.** If both the parameter and its value are inside outer brackets, like `[-ComputerName <String[]>]` - the entire parameter is optional.\n2. **No outer square brackets means MANDATORY.** In `Stop-Process -Name <String[]>`, there are no brackets around `-Name <String[]>`, which means you *must* supply `-Name` or the command will prompt you for it!\n3. **Parameter name in brackets, value outside: `[-Name] <String[]>` means POSITIONAL.** Because `[-Name]` is inside brackets, typing the word `-Name` is optional (`Get-Process explorer` works just like `Get-Process -Name explorer`). The same goes for `Stop-Process [-Id] <Int32[]>`: `-Id` is mandatory *and* positional, so `Stop-Process 4120` works.\n4. **`<Type[]>` inside angle brackets tells you the Data Type.** `<String>` accepts a single text string; `<String[]>` (with empty brackets `[]` attached to the type name!) means it accepts a **comma-separated array** of multiple strings (`Get-Process -Name explorer, pwsh, lsass`).',
         ],
       },
       {
@@ -1262,7 +1279,7 @@ Alias       ls -> Get-ChildItem`,
       {
         type: 'try',
         title: 'Run Get-Help -Examples on Any Command',
-        body: 'Run `Get-Help Select-String -Examples` right now. Notice how 30 seconds of reading the examples saves 15 minutes of guessing syntax.',
+        body: 'Run `Get-Help Select-String -Examples` right now. Notice how a minute of reading the examples usually saves a lot of guessing about syntax.',
       },
       {
         type: 'pro',
@@ -1293,7 +1310,7 @@ Alias       ls -> Get-ChildItem`,
           },
         ],
         examples: [
-          'Update-Help -Force',
+          'Update-Help -Scope CurrentUser',
           'Get-Help Get-Process -Examples',
           'Get-Help Get-Service -Full',
           'Get-Help about_Execution_Policies',
@@ -1303,9 +1320,12 @@ Alias       ls -> Get-ChildItem`,
     codeExamples: [
       {
         title: 'Using the Self-Reliance Pocketknife: Update-Help, -Examples, -Parameter, and about_*',
-        description: 'Query working code examples, inspect a single parameter’s pipeline rules, and search conceptual about_ guides.',
-        code: `# 1. Download/refresh local help files (run in an elevated Administrator shell)
-Update-Help -Force -ErrorAction SilentlyContinue
+        description: 'Query working code examples, inspect a single parameter’s pipeline rules, and search conceptual about_ guides. The output is sample output and will differ slightly on your machine.',
+        code: `# 1. Download/refresh local help files. PowerShell 7+: no Administrator needed.
+Update-Help -Scope CurrentUser
+
+# 1b. Windows PowerShell 5.1 has no -Scope parameter: run this in an elevated window instead
+# Update-Help -Force
 
 # 2. View practical, copy-pasteable examples for a cmdlet
 Get-Help Get-ChildItem -Examples
@@ -1335,9 +1355,9 @@ about_Pipeline_Chain_Operators    HelpFile          Describes chaining pipelines
     ],
     mistakesAndTraps: [
       {
-        mistake: 'Running `Update-Help` in a standard (non-Administrator) PowerShell window and getting "Access is denied" errors.',
-        cause: 'System module help files live inside protected folders like `C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\`.',
-        fix: 'Run `Update-Help` inside an elevated Administrator shell (or pass `-Scope CurrentUser` in PowerShell 7).',
+        mistake: 'Running `Update-Help` in Windows PowerShell 5.1 from a standard (non-Administrator) window and getting "Access is denied" errors.',
+        cause: 'In 5.1, system module help files live inside protected folders like `C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\`, and `Update-Help` has no `-Scope` parameter. (Hiding the errors with `-ErrorAction SilentlyContinue` only hides the reason it failed.)',
+        fix: 'In PowerShell 7+ use `Update-Help -Scope CurrentUser`, which needs no elevation. In Windows PowerShell 5.1 either run `Update-Help` in an elevated Administrator shell or skip it and use `Get-Help <cmdlet> -Online`.',
       },
     ],
     tryItYourself: [
@@ -1379,7 +1399,7 @@ about_Pipeline_Chain_Operators    HelpFile          Describes chaining pipelines
     oneSentenceSummary:
       'Every command in PowerShell outputs live `.NET` objects packed with Properties (facts you read with `.Property`) and Methods (actions you trigger with `.Method()`), and `Get-Member` is your X-ray scanner to see all of them.',
     summary:
-      'This is the mental shift that turns PowerShell from "just another command line" into a superpower. When you run `Get-Service` or `Get-Process`, PowerShell does NOT return text lines, it returns live `.NET` objects. In this lesson, we compare a Class (the blueprint) with an Object (the live instance), distinguish Properties from Methods, and master `Get-Member` (`gm`), the third blade of your Self-Reliance Pocketknife.',
+      'This is the mental shift that turns PowerShell from "just another command line" into a much more powerful tool. When you run `Get-Service` or `Get-Process`, PowerShell does NOT return text lines, it returns live `.NET` objects. In this lesson, we compare a Class (the blueprint) with an Object (the live instance), distinguish Properties from Methods, and master `Get-Member` (`gm`), the third blade of your Self-Reliance Pocketknife.',
     whyItMatters:
       'Beginners constantly guess property names based on column headers on the screen (like typing `$_.CPU(s)` or `$_.NPM(K)`) and wonder why their scripts return blank output. When you pipe to `Get-Member` first, you never guess a property name again.',
     learningObjectives: [
@@ -1407,7 +1427,7 @@ about_Pipeline_Chain_Operators    HelpFile          Describes chaining pipelines
       {
         heading: 'Get-Member (gm): Your Object X-Ray Scanner',
         body: [
-          'When you run `Get-Process` on the screen, PowerShell only shows you 7 columns (`Handles`, `NPM(K)`, `PM(K)`, `WS(K)`, `CPU(s)`, `Id`, `ProcessName`) so the table fits on your monitor. Underneath that table, each `Process` object actually carries **over 60 hidden properties and 25 methods!**',
+          'When you run `Get-Process` on the screen, PowerShell only shows you a handful of columns so the table fits on your monitor (Windows PowerShell 5.1 shows `Handles`, `NPM(K)`, `PM(K)`, `WS(K)`, `CPU(s)`, `Id`, `SI`, `ProcessName`; PowerShell 7 shows `PM(M)` and `WS(M)` in megabytes instead). Underneath that table, each `Process` object actually carries **dozens of hidden properties and methods** (around 90 members in Windows PowerShell 5.1).',
           'How do you see the real blueprint? Pipe any command into **`Get-Member`** (alias `gm`):\n`Get-Process | Get-Member`',
           'Look closely at three things in `Get-Member`’s output:\n• **`TypeName` at the very top:** Tells you the exact `.NET` class (`System.Diagnostics.Process`).\n• **`MemberType` column:** Shows `Property` (native .NET property), `AliasProperty` (a shortcut nickname like `WS` pointing to `WorkingSet`), `ScriptProperty` (calculated on the fly, like `CPU`), and `Method` (callable action).\n• **`Definition` column:** Shows the data type (`int`, `string`, `datetime`) and whether a property is read-only (`{get;}`) or read-write (`{get;set;}`).',
         ],
@@ -1426,7 +1446,7 @@ about_Pipeline_Chain_Operators    HelpFile          Describes chaining pipelines
       },
       {
         type: 'gotcha',
-        title: 'Never Forgot the Parentheses () on a Method!',
+        title: 'Don’t Forget the Parentheses () on a Method!',
         body: 'If you type `"hello".ToUpper` *without* parentheses, PowerShell does not run the method, it just prints the method’s definition signature! Always include `()`: `"hello".ToUpper()`.',
       },
     ],
@@ -1457,7 +1477,7 @@ about_Pipeline_Chain_Operators    HelpFile          Describes chaining pipelines
     codeExamples: [
       {
         title: 'Using Get-Member to X-Ray Objects, Read Properties, and Call Methods',
-        description: 'Inspect the hidden properties of a Service or Process object and call methods on a String and DateTime object.',
+        description: 'Inspect the hidden properties of a Service or Process object and call methods on a String and DateTime object. The output is abridged sample output (the member list is longer on a real machine, and the date is whenever you run it plus 7 days).',
         code: `# 1. X-Ray a Service object (showing all property types: Property, AliasProperty, ScriptProperty)
 Get-Service -Name wuauserv | Get-Member -MemberType Properties
 
@@ -1492,7 +1512,7 @@ Windows Update
 Running
 Manual
 SRV-DC01
-Monday, November 10, 2026 11:45:00 PM`,
+Tuesday, November 10, 2026 11:45:00 PM`,
       },
     ],
     mistakesAndTraps: [
@@ -1519,7 +1539,7 @@ Monday, November 10, 2026 11:45:00 PM`,
         explanation: 'Properties are read via $object.PropertyName, whereas Methods are invoked with parentheses $object.MethodName().',
       },
       {
-        question: 'If you run Get-Process and see a column header called "WS(K)", how do you find the real property name to use in a script?',
+        question: 'If you run Get-Process in Windows PowerShell 5.1 and see a column header called "WS(K)", how do you find the real property name to use in a script?',
         options: [
           'Reboot the computer',
           'Pipe the command to Get-Member (Get-Process | Get-Member -MemberType Properties)',
@@ -1563,7 +1583,7 @@ Monday, November 10, 2026 11:45:00 PM`,
       {
         heading: 'How to See Hidden Properties: Format-List * and The "Format Right" Law',
         body: [
-          'Want to see the actual values of all 60+ hidden properties on a single process or Active Directory user? Pipe one item into **`Format-List *`** (or `fl *`):\n`Get-Process -Id $PID | Format-List *`',
+          'Want to see the actual values of all the hidden properties on a single process or Active Directory user? Pipe one item into **`Format-List *`** (or `fl *`):\n`Get-Process -Id $PID | Format-List *`',
           'PowerShell provides three primary formatting cmdlets:\n• **`Format-Table` (`ft`):** Displays objects in rows and columns (`-AutoSize` tightens column widths; `-Wrap` prevents long text from truncating with `...`).\n• **`Format-List` (`fl`):** Displays one property per line. Essential when inspecting an object with 10+ properties.\n• **`Format-Wide` (`fw`):** Displays a single property (like `Name`) across multiple compact columns (`Format-Wide -Column 4`).',
           '**CRITICAL RULE ("Format Right"):** The moment you pipe `Process` objects into `Format-Table`, PowerShell throws away the `Process` objects and replaces them with `Microsoft.PowerShell.Commands.Internal.Format.*` drawing instructions! Therefore, **`Format-*` must ALWAYS be the very last thing on your command line.** If you want to pick specific columns *and* still sort, filter, or export to CSV/HTML/JSON, use **`Select-Object`**, never `Format-Table`!',
         ],
@@ -1573,7 +1593,7 @@ Monday, November 10, 2026 11:45:00 PM`,
         body: [
           'What if you want `Select-Object` or `Format-Table` to display a property that doesn’t exist yet, like converting bytes into Gigabytes, or calculating how many minutes each process has been running (`New-TimeSpan`)?',
           'Both `Select-Object` and `Format-Table` accept a **Calculated Property Hashtable**:\n`@{ Label = "ColumnTitle"; Expression = { <code using $_> } }`\n*(Note: You can also use `Name` or `N` instead of `Label`, and `E` instead of `Expression`!)*',
-          'For example, to show every process’s name and how long it has been running since `.StartTime`:\n`Get-Process | Where-Object StartTime | Select-Object Name, Id, @{Label="RunningTime"; Expression={ (New-TimeSpan -Start $_.StartTime -End (Get-Date)).ToString("hh\\:mm\\:ss") }}`',
+          'For example, to show every process’s name and how long it has been running since `.StartTime`:\n`Get-Process | Where-Object StartTime | Select-Object Name, Id, @{Label="RunningTime"; Expression={ (New-TimeSpan -Start $_.StartTime -End (Get-Date)).ToString("d\\.hh\\:mm\\:ss") }}`',
         ],
       },
       {
@@ -1593,7 +1613,7 @@ Monday, November 10, 2026 11:45:00 PM`,
       {
         type: 'try',
         title: 'Prove That Format-Table Destroys Objects',
-        body: 'Run `Get-Process | Select-Object Name, Id | Get-Member` (still `System.Diagnostics.Process`!), then run `Get-Process | Format-Table Name, Id | Get-Member` (transformed into `Internal.Format` objects!).',
+        body: 'Run `Get-Process | Select-Object Name, Id | Get-Member`: the type becomes `Selected.System.Diagnostics.Process`, a new object that keeps just the properties you chose (as NoteProperties) and loses the methods. Then run `Get-Process | Format-Table Name, Id | Get-Member`: the type becomes `Internal.Format` drawing instructions that no longer contain your data at all.',
       },
       {
         type: 'pro',
@@ -1716,15 +1736,15 @@ SRV-CORE01     26100           94 2026-11-03 11:45`,
     estimatedMinutes: 30,
     diagramId: 'pipeline-visualizer',
     oneSentenceSummary:
-      'The pipe symbol (`|`) streams live `.NET` objects from one cmdlet to the next, matching parameters automatically first `ByValue` (exact object type match) and second `ByPropertyName` (matching property name).',
+      'The pipe symbol (`|`) streams live `.NET` objects from one cmdlet to the next, matching parameters automatically first `ByValue` (the incoming object’s type fits the parameter) and second `ByPropertyName` (matching property name).',
     summary:
-      'The pipeline (`|`) is the heart of PowerShell. Instead of saving intermediate files or writing 15-line loops, you snap simple cmdlets together like Lego bricks (`Get-Process | Out-GridView -PassThru | Stop-Process`). But have you ever wondered why `"wuauserv" | Get-Service` works cleanly while `"notepad" | Get-Process` throws a red error? In this lesson, we open up the PowerShell parameter-binding engine so you can predict and build any pipeline with 100% confidence.',
+      'The pipeline (`|`) is the heart of PowerShell. Instead of saving intermediate files or writing 15-line loops, you snap simple cmdlets together like Lego bricks (`Get-Process | Out-GridView -PassThru | Select-Object Name, Id`). But have you ever wondered why `"wuauserv" | Get-Service` works cleanly while `"notepad" | Get-Process` throws a red error? In this lesson, we open up the PowerShell parameter-binding engine so you can predict why a pipeline works or fails, and check it yourself with `Get-Help`.',
     whyItMatters:
-      'Understanding `ByValue` vs. `ByPropertyName` is the exact dividing line between a beginner who copy-pastes pipelines hoping they work and an engineer who can wire any two cmdlets together (even across completely different modules like Active Directory and CSV files).',
+      'Understanding `ByValue` vs. `ByPropertyName` is what lets you wire two cmdlets together on purpose instead of copy-pasting pipelines and hoping they work (even across different modules like Active Directory and CSV files).',
     learningObjectives: [
       'Trace how live objects stream one-by-one across a multi-stage pipeline (`Get-Process | Where-Object | Select-Object`)',
       'Use `Out-GridView -PassThru` to build interactive GUI pickers that feed selected objects back into the pipeline',
-      'Explain the two parameter binding modes: `ByValue` (matches object TypeName) and `ByPropertyName` (matches a property name on the incoming object)',
+      'Explain the two parameter binding modes: `ByValue` (the incoming object’s type fits the parameter) and `ByPropertyName` (matches a property name on the incoming object)',
       'Check `Get-Help <Cmdlet> -Full` (or `-Parameter`) to prove why `"wuauserv" | Get-Service` succeeds and how `[PSCustomObject]@{Name="explorer"} | Get-Process` binds `ByPropertyName`',
     ],
     keyTerms: [
@@ -1740,13 +1760,13 @@ SRV-CORE01     26100           94 2026-11-03 11:45`,
         heading: 'The Object Conveyor Belt & Out-GridView -PassThru',
         body: [
           'Picture the pipe symbol (`|`) as a factory conveyor belt. Cmdlet A places live objects onto the belt one at a time; Cmdlet B picks each object up, inspects or transforms it, and places the result onto the next section of belt.',
-          'One of my favorite demonstrations of the object conveyor belt is **`Out-GridView -PassThru`**:\n`Get-Process | Out-GridView -PassThru | Stop-Process -WhatIf`\nHere is what happens:\n1. `Get-Process` puts all live `System.Diagnostics.Process` objects onto the belt.\n2. `Out-GridView -PassThru` opens an interactive graphical window where you can filter and click 2 or 3 processes and click **OK**. Because you added **`-PassThru`**, the exact `Process` objects you clicked are placed back onto the conveyor belt!\n3. `Stop-Process` receives those selected `Process` objects and stops them.',
+          'One of my favorite demonstrations of the object conveyor belt is **`Out-GridView -PassThru`**:\n`Get-Process | Out-GridView -PassThru | Select-Object Name, Id`\nHere is what happens:\n1. `Get-Process` puts all live `System.Diagnostics.Process` objects onto the belt.\n2. `Out-GridView -PassThru` opens an interactive graphical window (on a Windows desktop; it does not exist on Server Core) where you can filter and click 2 or 3 processes and click **OK**. Because you added **`-PassThru`**, the exact `Process` objects you clicked are placed back onto the conveyor belt!\n3. `Select-Object Name, Id` receives only those selected objects and shows two columns. This demo is harmless: it only reads and displays information.\n\nLater you will swap `Select-Object` for a command that changes things, such as `Stop-Process`. Before you do that, add **`-WhatIf`**: it is a safety switch that makes a command print what it *would* do without actually doing it. (`Stop-Process -Id 1234 -WhatIf` prints "What if: Performing the operation Stop-Process on target ..." and nothing is stopped.) Never practise `Stop-Process` on processes you do not recognise.',
         ],
       },
       {
         heading: 'Under the Hood: How PowerShell Connects the Pipe (ByValue vs. ByPropertyName)',
         body: [
-          'When Cmdlet B receives an object from the pipeline, which of Cmdlet B’s parameters gets that object? PowerShell never guesses blindly, it checks `Get-Help CmdletB -Full` and tries two rules in strict order:\n• **Attempt 1 - `ByValue` (Match by Object Type):** PowerShell checks the incoming object’s `.NET TypeName`. Does Cmdlet B have a parameter marked `Accept pipeline input? True (ByValue)` that accepts that exact type? If yes, the entire object plugs right in!\n• **Attempt 2 - `ByPropertyName` (Match by Property Name):** If `ByValue` doesn’t match, PowerShell looks inside the incoming object’s properties. Does the incoming object have a property (say, `.Name` or `.Id`) whose name matches a parameter on Cmdlet B marked `Accept pipeline input? True (ByPropertyName)`? If yes, PowerShell extracts that property’s value and passes it to the matching parameter!',
+          'When Cmdlet B receives an object from the pipeline, which of Cmdlet B’s parameters gets that object? PowerShell never guesses blindly, it checks `Get-Help CmdletB -Full` and tries two rules in strict order:\n• **Attempt 1 - `ByValue` (Match by Object Type):** PowerShell checks the incoming object’s `.NET TypeName`. Does Cmdlet B have a parameter marked `Accept pipeline input? True (ByValue)` that accepts that type (or a type it can be treated as, such as a derived type)? If yes, the entire object plugs right in!\n• **Attempt 2 - `ByPropertyName` (Match by Property Name):** If `ByValue` doesn’t match, PowerShell looks inside the incoming object’s properties. Does the incoming object have a property (say, `.Name` or `.Id`) whose name matches a parameter on Cmdlet B marked `Accept pipeline input? True (ByPropertyName)`? If yes, PowerShell extracts that property’s value and passes it to the matching parameter!\n\n(Simplified: PowerShell actually tries both rules first without type conversion and then again allowing conversion. See `Get-Help about_Parameter_Binding` for the full story.)',
         ],
       },
       {
@@ -1792,14 +1812,14 @@ SRV-CORE01     26100           94 2026-11-03 11:45`,
         ],
         examples: [
           'Get-Service | Out-GridView -Title "All Services"',
-          'Get-Process | Out-GridView -PassThru | Stop-Process -WhatIf',
+          'Get-Process | Out-GridView -PassThru | Select-Object Name, Id',
         ],
       },
     ],
     codeExamples: [
       {
         title: 'Testing ByValue vs. ByPropertyName Parameter Binding Live',
-        description: 'Compare Get-Service (which accepts String ByValue) with Get-Process (which accepts Name ByPropertyName).',
+        description: 'Compare Get-Service (which accepts String ByValue) with Get-Process (which accepts Name ByPropertyName). The output is sample output from PowerShell 7 (Windows PowerShell 5.1 shows PM(K) and WS(K) columns instead).',
         code: `# 1. Check pipeline binding rules on Get-Service vs Get-Process
 Get-Help Get-Service -Parameter Name
 Get-Help Get-Process -Parameter Name
@@ -1881,7 +1901,7 @@ Running  bits               Background Intelligent Transfer Service
       {
         heading: 'Pipe (|) vs. Semicolon (;) vs. Conditional Chains (&& and ||)',
         body: [
-          'Don’t confuse **piping** with **chaining**:\n• **`CmdA | CmdB` (The Object Pipe):** Runs `CmdA` and feeds its output objects directly into `CmdB` as input.\n• **`CmdA ; CmdB` (Unconditional Semicolon - Works in 5.1 and 7):** Runs `CmdA`, finishes it, and then runs `CmdB` completely independently, even if `CmdA` failed with an error! No data passes from `CmdA` to `CmdB`.\n• **`CmdA && CmdB` (Conditional AND - PowerShell 7+ ONLY):** Runs `CmdA`, and runs `CmdB` **only if `CmdA` succeeded**.\n• **`CmdA || CmdB` (Conditional OR - PowerShell 7+ ONLY):** Runs `CmdA`, and runs `CmdB` **only if `CmdA` failed** (great for fallback actions!).',
+          'Don’t confuse **piping** with **chaining**:\n• **`CmdA | CmdB` (The Object Pipe):** Runs `CmdA` and feeds its output objects directly into `CmdB` as input.\n• **`CmdA ; CmdB` (Unconditional Semicolon - Works in 5.1 and 7):** Runs `CmdA`, finishes it, and then runs `CmdB` completely independently, even if `CmdA` failed with an error! No data passes from `CmdA` to `CmdB`.\n• **`CmdA && CmdB` (Conditional AND - PowerShell 7+ ONLY):** Runs `CmdA`, and runs `CmdB` **only if `CmdA` succeeded**.\n• **`CmdA || CmdB` (Conditional OR - PowerShell 7+ ONLY):** Runs `CmdA`, and runs `CmdB` **only if `CmdA` failed** (great for fallback actions!). Both operators look at whether the command *succeeded* (an error means it failed), not at the value it returned: `Test-Path C:\\Missing` returns `False` but still succeeds, so `Test-Path C:\\Missing || ...` never runs the fallback. To react to True/False, use `if`.',
         ],
       },
       {
@@ -1920,31 +1940,40 @@ Running  bits               Background Intelligent Transfer Service
     codeExamples: [
       {
         title: 'Comparing ; vs && and || and Formatting Multi-Line Pipelines',
-        description: 'Run sequential commands with ;, conditional chains in PowerShell 7 with && / ||, and clean multi-line pipelines.',
+        description: 'Run sequential commands with ;, conditional chains in PowerShell 7 with && / ||, and clean multi-line pipelines. The output is sample output from PowerShell 7 (the date, error wording and services differ on your machine). Note that && and || react to success or failure, not to True or False.',
         code: `# 1. Semicolon (;) runs both commands independently in ALL PowerShell versions (5.1 & 7)
 Write-Output "Step 1: Checking Date" ; Get-Date
 
 # 2. PowerShell 7+ Conditional Chains (&& and ||)
 Test-Path C:\\Windows && Write-Output "Windows folder exists!"
-Test-Path C:\\NonExistentFolder || Write-Output "Fallback: Folder was missing!"
 
-# 3. Clean multi-line pipeline (natural line break right after each '|' symbol)
+# Test-Path returns False for a missing folder but still SUCCEEDS, so a || after it never fires.
+# Use a command that really fails (Get-Item writes an error when the path is missing):
+Get-Item C:\\NonExistentFolder || Write-Output "Fallback: Folder was missing!"
+
+# 3. The version-independent way to react to True/False (works in 5.1 and 7)
+if (-not (Test-Path C:\\NonExistentFolder)) { Write-Output "Folder is missing (checked with if)" }
+
+# 4. Clean multi-line pipeline (natural line break right after each '|' symbol)
 Get-Service |
   Where-Object Status -eq 'Running' |
   Sort-Object DisplayName |
   Select-Object -First 5 Name, DisplayName, Status`,
         output: `Step 1: Checking Date
 Tuesday, November 3, 2026 11:50:00 PM
+True
 Windows folder exists!
+Get-Item: Cannot find path 'C:\\NonExistentFolder' because it does not exist.
 Fallback: Folder was missing!
+Folder is missing (checked with if)
 
-Name     DisplayName                               Status
-----     -----------                               ------
-Appinfo  Application Information                   Running
-AudioSrv Windows Audio                             Running
-BFE      Base Filtering Engine                     Running
-BITS     Background Intelligent Transfer Service   Running
-BrokerInfrastructure Background Tasks Infrastructure Service Running`,
+Name                 DisplayName                                Status
+----                 -----------                                ------
+Appinfo              Application Information                   Running
+BITS                 Background Intelligent Transfer Service   Running
+BrokerInfrastructure Background Tasks Infrastructure Service   Running
+BFE                  Base Filtering Engine                     Running
+CertPropSvc          Certificate Propagation                   Running`,
       },
     ],
     mistakesAndTraps: [
@@ -2027,7 +2056,7 @@ BrokerInfrastructure Background Tasks Infrastructure Service Running`,
         heading: 'Zero-Indexed Arrays: Counting from 0 and Passing Lists to Cmdlets',
         body: [
           'The comma (`,`) is PowerShell’s array-building operator, and `@(...)` is the explicit array wrapper:\n`$servers = @("DC01", "DC02", "SQL01", "WEB01")`',
-          'Every array in PowerShell is **zero-indexed** (we start counting at `0`):\n• `$servers[0]` → First item (`"DC01"`)\n• `$servers[1]` → Second item (`"DC02"`)\n• `$servers[-1]` → Last item (`"WEB01"` - negative indices count backward from the end!)\n• `$servers[0..2]` → Slice of items 0, 1, and 2\n• `$servers.Count` → Total number of items (`4`)\n• `$servers += "APP01"` → Appends a new item to the array.',
+          'Every array in PowerShell is **zero-indexed** (we start counting at `0`):\n• `$servers[0]` → First item (`"DC01"`)\n• `$servers[1]` → Second item (`"DC02"`)\n• `$servers[-1]` → Last item (`"WEB01"` - negative indices count backward from the end!)\n• `$servers[0..2]` → Slice of items 0, 1, and 2\n• `$servers.Count` → Total number of items (`4`)\n• `$servers += "APP01"` → Appends a new item to the array (PowerShell actually builds a brand-new, slightly bigger array each time, which is fine for small lists but slow for thousands of items).',
           '**Pro Move:** Remember how `Get-Help` showed `-Name <String[]>` with `[]` brackets? That means you can pass an array variable right into the parameter:\n`$targets = @("wuauserv", "bits", "Spooler")`\n`Get-Service -Name $targets`',
         ],
       },
@@ -2035,8 +2064,8 @@ BrokerInfrastructure Background Tasks Infrastructure Service Running`,
         heading: 'Strong Type Casting: Why "5" + "5" Is "55" Until You Use [int]',
         body: [
           'By default, PowerShell variables are dynamically typed (a box can hold a string now and an integer later). But if you place a **type accelerator in square brackets** on the left side of the variable (`[int]$port = 443`), you **lock** that box so it only accepts integers!',
-          'Why is type casting so critical? Look at what happens with the `+` and `*` operators:\n• `"50" + "50"` (two strings) → concatenates into **`"5050"`**!\n• `[int]"50" + [int]"50"` (two integers) → adds mathematically to **`100`**!\n• `"50" * 3` (string times integer) → repeats the string **`"505050"`**!\n• `[int]"50" * 3` → **`150`**.',
-          'The 7 `.NET` type accelerators I use constantly:\n• `[string]` - Text (`"Hello"`)\n• `[int]` - 32-bit whole number (`42`)\n• `[long]` - 64-bit whole number (great for huge byte counts)\n• `[decimal]` / `[double]` - Decimal numbers (`3.14`)\n• `[bool]` - Boolean (`$true` or `$false`)\n• `[datetime]` - Parses a string into a real calendar object (`[datetime]"2026-12-25"`)\n• `[array]` & `[hashtable]` - Collections (`@()` and `@{}`).',
+          'Why is type casting so critical? Look at what happens with the `+` and `*` operators:\n• `"50" + "50"` (two strings) → concatenates into **`"5050"`**!\n• `[int]"50" + [int]"50"` (two integers) → adds mathematically to **`100`**!\n• `"50" * 3` (string times integer) → repeats the string **`"505050"`**!\n• `[int]"50" * 3` → **`150`**.\n\n**The rule: the type of the LEFT operand decides.** `"50" + 1` gives the string **`"501"`** (a string on the left, so `1` is converted to text), but `1 + "50"` gives the number **`51`** (a number on the left, so `"50"` is converted to a number).',
+          'Nine `.NET` type accelerators I use constantly:\n• `[string]` - Text (`"Hello"`)\n• `[int]` - 32-bit whole number (`42`)\n• `[long]` - 64-bit whole number (great for huge byte counts)\n• `[decimal]` / `[double]` - Decimal numbers (`3.14`)\n• `[bool]` - Boolean (`$true` or `$false`)\n• `[datetime]` - Parses a string into a real calendar object (`[datetime]"2026-12-25"`)\n• `[array]` & `[hashtable]` - Collections (`@()` and `@{}`).',
         ],
       },
     ],
@@ -2054,7 +2083,7 @@ BrokerInfrastructure Background Tasks Infrastructure Service Running`,
       {
         type: 'gotcha',
         title: 'Do Not Include $ When Calling Get-Variable or Remove-Variable',
-        body: 'Write `$myVar = 10` when using the `$` syntax, stretched to `Remove-Variable -Name myVar` (no `$`!) when calling the cmdlet.',
+        body: 'Write `$myVar = 10` when you use the `$` syntax, but write `Remove-Variable -Name myVar` (no `$`!) when you call the cmdlet. The `*-Variable` cmdlets take the variable’s name, not its value.',
       },
     ],
     commandBreakdowns: [
@@ -2142,19 +2171,19 @@ As [int]   : 100`,
     chapterId: 'chapter-06',
     slug: 'quotes-and-secure-io',
     title: 'The Quote Expansion Trap, Write-Host vs Write-Output & SecureString',
-    subtitle: 'Why single quotes freeze variables, why Write-Host bypasses the pipeline, and how to mask passwords properly',
+    subtitle: 'Why single quotes freeze variables, why Write-Host output skips the Success stream, and how to mask passwords properly',
     estimatedMinutes: 25,
     oneSentenceSummary:
-      'Double quotes (`"Hello $name"`) expand variables while single quotes (`\'Hello $name\'`) print literally; `Write-Output` feeds the pipeline while `Write-Host` draws directly on the screen; and `Read-Host -AsSecureString` keeps passwords out of plain text.',
+      'Double quotes (`"Hello $name"`) expand variables while single quotes (`\'Hello $name\'`) print literally; `Write-Output` feeds the pipeline while `Write-Host` writes to the Information stream (shown on screen, not sent down the pipeline); and `Read-Host -AsSecureString` keeps passwords out of plain text.',
     summary:
-      'Three classic traps catch almost every PowerShell learner in their first month: using single quotes when they wanted a variable to expand, trying to pipe `Write-Host` into a file and getting an empty file, and prompting for passwords in plain text with `Read-Host`. In this lesson, we eliminate all three traps forever.',
+      'Three classic traps catch almost every PowerShell learner in their first month: using single quotes when they wanted a variable to expand, trying to pipe `Write-Host` into a file and getting an empty file, and prompting for passwords in plain text with `Read-Host`. In this lesson, we learn to avoid all three.',
     whyItMatters:
-      'When you build user-provisioning scripts or server automation tools, you must know how to format dynamic strings (`"$($user.Name)"`), emit pipeline-friendly output (`Write-Output`), and pass encrypted credentials (`SecureString` and `PSCredential`).',
+      'When you build user-provisioning scripts or server automation tools, you must know how to format dynamic strings (`"$($user.Name)"`), emit pipeline-friendly output (`Write-Output`), and pass protected credentials (`SecureString` and `PSCredential`).',
     learningObjectives: [
-      'Predict string output inside Double Quotes (`"..."` - expands variables and `$()` subexpressions) vs. Single Quotes (`\'...\'` - 100% literal)',
+      'Predict string output inside Double Quotes (`"..."` - expands variables and `$()` subexpressions) vs. Single Quotes (`\'...\'` - literal)',
       'Use the subexpression operator `$($object.Property)` when embedding object properties inside double-quoted strings',
-      'Explain why `Write-Output "text" | Out-File` works while `Write-Host "text" | Out-File` creates an empty file',
-      'Prompt for numeric input (`[int](Read-Host)`) and encrypted passwords (`Read-Host -AsSecureString` and `Get-Credential`)',
+      'Explain why `Write-Output "text" | Out-File` works while `Write-Host "text" | Out-File` creates an empty file (different output streams)',
+      'Prompt for numeric input (`[int](Read-Host)`) and passwords (`Read-Host -AsSecureString` and `Get-Credential`) without showing them on screen',
     ],
     keyTerms: [
       'Double Quotes ("..." - Expandable String)',
@@ -2173,16 +2202,16 @@ As [int]   : 100`,
         ],
       },
       {
-        heading: 'Write-Output vs. Write-Host: Why Write-Host Cannot Be Piped!',
+        heading: 'Write-Output vs. Write-Host: Why Write-Host Output Never Reaches Out-File',
         body: [
           'Look at these two commands:\n• `Write-Output "Server Ready" | Out-File status.txt` → Writes `"Server Ready"` into `status.txt`.\n• `Write-Host "Server Ready" | Out-File status.txt` → Prints `"Server Ready"` on your monitor and leaves `status.txt` **completely empty!**',
-          'Why? Because PowerShell has separate output streams:\n• **`Write-Output` (Stream #1 - Success Stream):** Places the object onto the **pipeline conveyor belt**. If nothing catches it at the end of the pipeline, PowerShell displays it on screen; if you pipe it to `Out-File` or assign it to `$result = ...`, it travels down the pipe.\n• **`Write-Host` (Stream #6 - Information/Console Stream):** Bypasses the pipeline conveyor belt completely and paints pixels directly onto the console window (supporting `-ForegroundColor Green` and `-NoNewline`). Use `Write-Host` only for colorful human status messages in interactive menus, never for returning data!',
+          'Why? Because PowerShell has separate output streams:\n• **`Write-Output` (Stream #1 - Success Stream):** Places the object onto the **pipeline conveyor belt**. If nothing catches it at the end of the pipeline, PowerShell displays it on screen; if you pipe it to `Out-File` or assign it to `$result = ...`, it travels down the pipe.\n• **`Write-Host` (Stream #6 - Information Stream):** Since PowerShell 5.0 it writes to the Information stream, not the Success stream, so nothing goes down the pipe to `Out-File`. The host displays it on screen (supporting `-ForegroundColor Green` and `-NoNewline`). You can still capture it on purpose with `6>&1` or `*>`, but it is not meant for returning data. Use `Write-Host` only for colorful human status messages in interactive menus.',
         ],
       },
       {
         heading: 'Interactive Input & Never Storing Plain-Text Passwords (SecureString)',
         body: [
-          'When a script needs input from a human operator, use **`Read-Host`**:\n• **The String Return Trap:** `Read-Host` ALWAYS returns a `[string]`. If you ask for a number (`$count = Read-Host "How many?"`), cast it immediately: **`[int]$count = Read-Host "How many?"`**.\n• **Masking Passwords (`-AsSecureString`):** Never prompt for a password in plain text where someone looking over your shoulder (or reading console history) can see it! Add **`-AsSecureString`**:\n  `$securePwd = Read-Host "Enter Password" -AsSecureString`\n  This masks every keystroke (`*`) and stores the password in memory as an encrypted `System.Security.SecureString` object that cmdlets like `New-LocalUser -Password $securePwd` require.\n• **Full Username + Password (`Get-Credential`):** Prompts for both username and password and returns a `PSCredential` object ready for `-Credential`.',
+          'When a script needs input from a human operator, use **`Read-Host`**:\n• **The String Return Trap:** `Read-Host` ALWAYS returns a `[string]`. If you ask for a number (`$count = Read-Host "How many?"`), cast it immediately: **`[int]$count = Read-Host "How many?"`**.\n• **Masking Passwords (`-AsSecureString`):** Never prompt for a password in plain text where someone looking over your shoulder (or reading console history) can see it! Add **`-AsSecureString`**:\n  `$securePwd = Read-Host "Enter Password" -AsSecureString`\n  This masks every keystroke (`*`) and stores the password in memory as a `System.Security.SecureString` object, the type that password parameters expect. On Windows a SecureString is only protected with the current user’s data-protection key (DPAPI): better than plain text, but not strong encryption, and Microsoft discourages it for new cross-platform code. (PowerShell 7.1+ also has `Read-Host -MaskInput`, which masks the typing but returns a plain string. It does not exist in Windows PowerShell 5.1.) For example, `New-LocalUser` takes its `-Password` as a SecureString.\n• **Full Username + Password (`Get-Credential`):** Prompts for both username and password and returns a `PSCredential` object ready for `-Credential`.',
         ],
       },
     ],
@@ -2207,7 +2236,7 @@ As [int]   : 100`,
       {
         cmdlet: 'Read-Host',
         aliases: [],
-        syntax: 'Read-Host [[-Prompt] <Object>] [-AsSecureString] [-MaskInput]',
+        syntax: 'Read-Host [[-Prompt] <Object>] [-AsSecureString] [-MaskInput (PowerShell 7.1+ only)]',
         parameters: [
           {
             name: '-Prompt',
@@ -2217,12 +2246,12 @@ As [int]   : 100`,
           {
             name: '-AsSecureString',
             type: 'SwitchParameter',
-            description: 'Masks input characters and returns an encrypted System.Security.SecureString object.',
+            description: 'Masks input characters and returns a System.Security.SecureString object (protected with the current user’s key on Windows, not strong encryption).',
           },
         ],
         examples: [
           '[int]$port = Read-Host -Prompt "Enter TCP Port"',
-          '$pwd = Read-Host -Prompt "Enter Admin Password" -AsSecureString',
+          '$securePwd = Read-Host -Prompt "Enter Admin Password" -AsSecureString',
         ],
       },
       {
@@ -2242,7 +2271,7 @@ As [int]   : 100`,
     codeExamples: [
       {
         title: 'Double vs. Single Quotes, Subexpressions $(), and SecureString Input',
-        description: 'Demonstrate string expansion, subexpression evaluation, and creating a SecureString for user creation.',
+        description: 'Demonstrate string expansion, subexpression evaluation, and the line that creates a SecureString for user creation (commented out so the demo does not stop to ask for input).',
         code: `# 1. Double Quotes (expand) vs Single Quotes (literal)
 $admin = "Izaz"
 Write-Output "Double quotes : Hello $admin"
@@ -2266,7 +2295,7 @@ The variable $svc holds a ServiceController object.`,
     mistakesAndTraps: [
       {
         mistake: 'Using `Write-Host` inside a function or pipeline and wondering why the next cmdlet receives nothing.',
-        cause: '`Write-Host` writes directly to the console screen instead of the pipeline output stream.',
+        cause: '`Write-Host` writes to the Information stream (shown on the console) instead of the Success stream that feeds the pipeline, so `| Out-File` or `$x = ...` receives nothing.',
         fix: 'Use `Write-Output` (or simply state the variable/object name on its own line) whenever you want output to pass down the pipeline.',
       },
     ],
@@ -2308,16 +2337,16 @@ The variable $svc holds a ServiceController object.`,
     chapterId: 'chapter-07',
     slug: 'filter-left-and-where-object',
     title: 'Source Filtering (-Filter) vs Where-Object & The Complete Operator Reference',
-    subtitle: 'How $_ represents each object in turn and why filtering at the source is 100x faster over the network',
+    subtitle: 'How $_ represents each object in turn and why filtering at the source usually beats filtering later in the pipeline',
     estimatedMinutes: 25,
     oneSentenceSummary:
-      'Always follow the "Filter Left" law: filter at the source cmdlet (`-Filter` or `-Name`) first whenever possible, and use `Where-Object` (`$_`) in the pipeline when you need rich multi-condition comparisons.',
+      'Always follow the "Filter Left" law: filter at the source cmdlet first (with its `-Filter`, `-FilterHashtable` or similar parameter) whenever possible, and use `Where-Object` (`$_`) in the pipeline when you need rich multi-condition comparisons.',
     summary:
       'Why does PowerShell use `-eq` and `-gt` instead of `=` and `>`? And what is the difference between `Get-ChildItem -Filter *.dll` versus `Get-ChildItem | Where-Object Name -like "*.dll"`? In this lesson, we master the Golden Rule of "Filter Left", learn how `Where-Object` evaluates every object on the conveyor belt using `$_` (`$PSItem`), and master every comparison and boolean operator.',
     whyItMatters:
-      'If you query an Active Directory server with 100,000 users using `Get-ADUser -Filter * | Where-Object Department -eq "IT"`, you drag all 100,000 accounts across the network before filtering. Using `-Filter "Department -eq \'IT\'"` filters on the Domain Controller and returns in 20 milliseconds.',
+      'If you query an Active Directory server with 100,000 users using `Get-ADUser -Filter * | Where-Object Department -eq "IT"`, you drag all 100,000 accounts across the network before filtering. Using `-Filter "Department -eq \'IT\'"` asks the Domain Controller to do the filtering, so only the matching accounts travel back. How much faster that is depends on your network and directory size, so measure it yourself with `Measure-Command` (see the exercises below).',
     learningObjectives: [
-      'Apply the "Filter Left" performance rule: check if the source cmdlet has `-Filter` or `-Name` before piping to `Where-Object`',
+      'Apply the "Filter Left" performance rule: check whether the source cmdlet has its own filtering parameter (such as `-Filter` or `-FilterHashtable`) before piping to `Where-Object`',
       'Explain why PowerShell uses `-eq`, `-ne`, `-gt`, `-ge`, `-lt`, `-le` instead of `>` or `=`',
       'Write both simplified `Where-Object Property -op Value` and full scriptblock `Where-Object { $_.Property -op Value }` filters',
       'Combine multiple conditions using `-and`, `-or`, `-not` (`!`), `-like` (wildcards `*`), and `-match` (regex)',
@@ -2334,7 +2363,7 @@ The variable $svc holds a ServiceController object.`,
       {
         heading: 'The "Filter Left" Law: Source Filtering (-Filter) vs. Pipeline Filtering (Where-Object)',
         body: [
-          'When you need to filter results, you have two places to do it:\n1. **Filter at the Source ("Filter Left" - Fastest):** Many cmdlets (`Get-ChildItem`, `Get-CimInstance`, `Get-ADUser`, `Get-WinEvent`) have a built-in **`-Filter`** (or `-Name`) parameter. When you use `-Filter`, the underlying provider (NTFS, WMI, or Active Directory) filters the data **before** creating `.NET` objects or sending them across the network.\n2. **Filter in the Pipeline (`Where-Object` - Most Flexible):** Not every cmdlet has a `-Filter` parameter (for example, `Get-Process` only filters by `-Name` or `-Id`, not by CPU or RAM). When the source cmdlet cannot filter by the property you want, pipe the objects into **`Where-Object`**!',
+          'When you need to filter results, you have two places to do it:\n1. **Filter at the Source ("Filter Left" - Fastest):** Many cmdlets have a parameter that filters at the source, but the name and the syntax differ by cmdlet:\n   • `Get-ChildItem -Filter *.dll` uses simple file wildcards.\n   • `Get-CimInstance Win32_Service -Filter "State = \'Running\'"` uses WQL syntax.\n   • `Get-ADUser -Filter "Department -eq \'IT\'"` uses the Active Directory filter syntax.\n   • `Get-WinEvent` has no `-Filter`: it uses `-FilterHashtable @{ LogName = \'System\'; Id = 41 }` (or `-FilterXPath` / `-FilterXml`).\n   (Careful: `Get-ChildItem -Name` is only a switch that returns names instead of objects, it does not filter.) When you use one of these, the underlying provider (NTFS, WMI, Active Directory, the event log) filters the data **before** creating `.NET` objects or sending them across the network.\n2. **Filter in the Pipeline (`Where-Object` - Most Flexible):** Not every cmdlet can filter by the property you want (for example, `Get-Process` only filters by `-Name` or `-Id`, not by CPU or RAM). When the source cmdlet cannot filter by the property you want, pipe the objects into **`Where-Object`**!',
         ],
       },
       {
@@ -2383,7 +2412,7 @@ The variable $svc holds a ServiceController object.`,
     codeExamples: [
       {
         title: 'Source Filtering (-Filter) vs. Single and Compound Where-Object Filters',
-        description: 'Compare fast source filtering on Get-ChildItem with rich multi-condition filtering in Where-Object.',
+        description: 'Compare fast source filtering on Get-ChildItem with rich multi-condition filtering in Where-Object. The output is sample output (the file names, services and memory numbers on your machine will differ).',
         code: `# 1. Filter Left (at the source): NTFS provider filters BEFORE returning objects
 Get-ChildItem -Path C:\\Windows\\System32 -Filter *.dll | Select-Object -First 3 Name, Length
 
@@ -2423,6 +2452,7 @@ pwsh      8820  124.5`,
     tryItYourself: [
       'Find all services that are set to start automatically (`StartType -eq "Automatic"`) but are currently stopped (`Status -ne "Running"`). (Hint: this is a classic sysadmin health check!)',
       'Find all processes using more than 50 MB of RAM (`$_.WorkingSet64 -gt 50MB`).',
+      'Measure it yourself: compare `Measure-Command { Get-ChildItem C:\\Windows\\System32 -Filter *.dll }` with `Measure-Command { Get-ChildItem C:\\Windows\\System32 | Where-Object Name -like "*.dll" }` and look at the `TotalMilliseconds` of each. Run each twice (the second run is warmer) and compare the numbers on your own machine.',
     ],
     knowledgeCheck: [
       {
@@ -2489,13 +2519,13 @@ pwsh      8820  124.5`,
       {
         heading: 'Select-Object -Property vs. -ExpandProperty',
         body: [
-          'Here is a subtle distinction you will use constantly in scripts:\n• `Get-Service -Name wuauserv | Select-Object -Property Status`\n  Returns a `PSCustomObject` wrapper that still has a column header called `Status`.\n• `Get-Service -Name wuauserv | Select-Object -ExpandProperty Status` (or `(Get-Service wuauserv).Status`)\n  Strips away the object wrapper and returns the **raw value itself** (`Running`), which is critical when feeding a list of plain strings into another command.',
+          'Here is a subtle distinction you will use constantly in scripts:\n• `Get-Service -Name wuauserv | Select-Object -Property Status`\n  Returns a new object (type `Selected.System.ServiceProcess.ServiceController`) that still has a column header called `Status`.\n• `Get-Service -Name wuauserv | Select-Object -ExpandProperty Status` (or `(Get-Service wuauserv).Status`)\n  Strips away the object wrapper and returns the **raw value itself** (`Running`), which is critical when feeding a list of plain strings into another command.',
         ],
       },
       {
         heading: 'The Safety Seatbelts: -WhatIf, -Confirm, and -Verbose',
         body: [
-          'Every PowerShell cmdlet that changes, stops, or deletes something (`Stop-Process`, `Stop-Service`, `Remove-Item`, `Remove-ADUser`, `New-LocalUser`) supports two lifesaving risk-mitigation parameters:\n• **`-WhatIf` (The Dry-Run Simulator):** Tells PowerShell: *"Do NOT actually execute this change, just print on screen exact lines showing what WOULD happen if I ran it for real!"*\n  Example: `Get-Process -Name note* | Stop-Process -WhatIf`\n  Output: `What if: Performing the operation "Stop-Process" on target "notepad (4812)".`\n• **`-Confirm`:** Forces an interactive `[Y] Yes [A] Yes to All [N] No` prompt before each object is modified.\n• **`-Verbose`:** Prints extra diagnostic progress lines showing what the cmdlet is doing under the hood.',
+          'Many cmdlets that change, stop, or delete something (`Stop-Process`, `Stop-Service`, `Remove-Item`, `Remove-ADUser`, `New-LocalUser`) support two lifesaving risk-mitigation parameters (not all of them do: check the `SYNTAX` block in `Get-Help` for `[-WhatIf] [-Confirm]`):\n• **`-WhatIf` (The Dry-Run Simulator):** Tells PowerShell: *"Do NOT actually execute this change, just print on screen exact lines showing what WOULD happen if I ran it for real!"*\n  Example: `Get-Process -Name note* | Stop-Process -WhatIf`\n  Output: `What if: Performing the operation "Stop-Process" on target "notepad (4812)".`\n• **`-Confirm`:** Forces an interactive `[Y] Yes [A] Yes to All [N] No` prompt before each object is modified.\n• **`-Verbose`:** Prints extra diagnostic progress lines showing what the cmdlet is doing under the hood.',
         ],
       },
     ],
@@ -2661,13 +2691,13 @@ What if: Performing the operation "Stop-Process" on target "explorer (5412)".`,
       {
         heading: 'The Big Idea: PSProviders (The Adapter) vs. PSDrives (The Drive)',
         body: [
-          'Why learn ten different command sets when one works everywhere? PowerShell uses a two-layer architecture:\n• **PSProvider (`Get-PSProvider`):** A plug-in adapter that translates a data store into a folder-and-item hierarchy. Built-in providers include `FileSystem`, `Registry`, `Environment`, `Variable`, `Alias`, `Function`, and `Certificate` (and importing the `ActiveDirectory` module adds the `ActiveDirectory` provider!).\n• **PSDrive (`Get-PSDrive`):** A named drive exposed by a provider:\n  - `FileSystem` provider exposes `C:`, `D:`, `Temp:`\n  - `Registry` provider exposes **`HKLM:`** (`HKEY_LOCAL_MACHINE`) and **`HKCU:`** (`HKEY_CURRENT_USER`)\n  - `Environment` provider exposes **`Env:`**\n  - `Variable` provider exposes **`Variable:`**\n  - `Certificate` provider exposes **`Cert:`**',
+          'Why learn ten different command sets when one works everywhere? PowerShell uses a two-layer architecture:\n• **PSProvider (`Get-PSProvider`):** A plug-in adapter that translates a data store into a folder-and-item hierarchy. Built-in providers include `FileSystem`, `Registry`, `Environment`, `Variable`, `Alias`, `Function`, and `Certificate` (and importing the `ActiveDirectory` module adds the `ActiveDirectory` provider!).\n• **PSDrive (`Get-PSDrive`):** A named drive exposed by a provider:\n  - `FileSystem` provider exposes `C:`, `D:` (and `Temp:` in PowerShell 7)\n  - `Registry` provider exposes **`HKLM:`** (`HKEY_LOCAL_MACHINE`) and **`HKCU:`** (`HKEY_CURRENT_USER`)\n  - `Environment` provider exposes **`Env:`**\n  - `Variable` provider exposes **`Variable:`**\n  - `Certificate` provider exposes **`Cert:`**',
         ],
       },
       {
         heading: 'Browsing the Registry and Environment Like Regular Folders',
         body: [
-          'Watch how natural this feels:\n• List all environment variables: `Get-ChildItem Env:`\n• Read a single environment variable: `$env:COMPUTERNAME` or `$env:USERNAME`\n• Change into the Local Machine Registry hive: `Set-Location HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion`\n• List subkeys right inside the Registry: `Get-ChildItem`\n• Read the values inside the Startup `Run` key (a favorite hiding spot for malware!): `Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run`',
+          'Watch how natural this feels:\n• List all environment variables: `Get-ChildItem Env:`\n• Read a single environment variable: `$env:COMPUTERNAME` or `$env:USERNAME`\n• Change into the Local Machine Registry hive: `Set-Location HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion`\n• List subkeys right inside the Registry: `Get-ChildItem`\n• Read the values inside the Startup `Run` key (a favorite hiding spot for malware, but only one of several places that can start a program automatically): `Get-ItemProperty HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run`',
         ],
       },
     ],
@@ -2680,7 +2710,7 @@ What if: Performing the operation "Stop-Process" on target "explorer (5412)".`,
       {
         type: 'try',
         title: 'Audit Autorun Registry Keys in One Line',
-        body: 'Run `Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` and `Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` to see every program configured to launch automatically at login!',
+        body: 'Run `Get-ItemProperty HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` and `Get-ItemProperty HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Run` to see two of the common places where programs are set to launch automatically at login. (It is not the full list: `RunOnce`, the 32-bit `WOW6432Node` keys, Startup folders, scheduled tasks and services can start programs too.)',
       },
       {
         type: 'gotcha',
@@ -2713,7 +2743,7 @@ What if: Performing the operation "Stop-Process" on target "explorer (5412)".`,
     codeExamples: [
       {
         title: 'Exploring PSProviders, PSDrives, Environment Variables, and Registry Keys',
-        description: 'Use the exact same navigation cmdlets across FileSystem, Env:, and HKLM: Registry drives.',
+        description: 'Use the exact same navigation cmdlets across FileSystem, Env:, and HKLM: Registry drives. The output is sample output from PowerShell 7 (the Temp: drive exists only in PowerShell 7, and your numbers, paths and user name will differ).',
         code: `# 1. List all loaded PSProviders and the drives they expose
 Get-PSProvider | Select-Object Name, Drives
 
@@ -2788,12 +2818,12 @@ Temp              142.30        369.70 FileSystem    C:\\Users\\izaz\\AppData\\L
     chapterId: 'chapter-08',
     slug: 'files-and-select-string',
     title: 'Precision File Hunting (Get-ChildItem), Bulk Creation (New-Item) & Select-String',
-    subtitle: 'Master -Filter vs -Recurse, create 150 files from a list in one command, and grep file contents',
+    subtitle: 'Master -Filter vs -Recurse, create 150 files from a list with a short loop, and grep file contents',
     estimatedMinutes: 25,
     oneSentenceSummary:
       'Use `Get-ChildItem -Filter *.dll -Recurse` to search directory trees at native speed, `New-Item` to create files or folders in bulk, and `Select-String` to search for text patterns inside thousands of files.',
     summary:
-      'In this lesson, we put the FileSystem provider through a real engineering workout. We compare the four ways people search for `.dll` files in `C:\\Windows` (and see why only `-Filter *.dll -Recurse` gives you fast, deep results), generate 150 files from a text list in two lines of code, and use `Select-String` (PowerShell’s object-oriented `grep`) to hunt for secrets or error codes inside log files.',
+      'In this lesson, we put the FileSystem provider through a real engineering workout. We compare the four ways people search for `.dll` files in `C:\\Windows` (and see why only `-Filter *.dll -Recurse` gives you fast, deep results), generate 150 files from a text list with a short `ForEach-Object` loop, and use `Select-String` (PowerShell’s object-oriented `grep`) to hunt for secrets or error codes inside log files.',
     whyItMatters:
       'Searching log files across a server, scaffolding project directories, or hunting for configuration files containing a specific IP address or password keyword are daily realities for every administrator and security analyst.',
     learningObjectives: [
@@ -2814,14 +2844,14 @@ Temp              142.30        369.70 FileSystem    C:\\Users\\izaz\\AppData\\L
       {
         heading: 'The 4 Get-ChildItem Variations Every Engineer Must Know Cold',
         body: [
-          'Suppose you need to find `.dll` files inside `C:\\Windows`. Look closely at the exact difference between these four commands:\n1. **`Get-ChildItem -Path C:\\Windows -Filter *.dll`**\n   Fast source filter, **top folder only** (does NOT look inside subfolders like `System32`).\n2. **`Get-ChildItem -Path C:\\Windows -Filter *.dll -Recurse -ErrorAction SilentlyContinue`**\n   **The Winner for Deep Hunts!** Fast source filter **AND** searches every subfolder recursively.\n3. **`Get-ChildItem -Path C:\\Windows | Where-Object Name -like "*.dll"`**\n   Fetches all items in the top folder first, then filters in the pipeline (no subfolders).\n4. **`Get-ChildItem -Path C:\\Windows -Recurse | Where-Object Name -like "*.dll"`**\n   Slowest! Pulls **every single file on the disk** across the pipeline before `Where-Object` checks if the name ends in `.dll`. Always prefer `#2` (`-Filter *.dll -Recurse`)!',
+          'Suppose you need to find `.dll` files inside `C:\\Windows`. Look closely at the exact difference between these four commands:\n1. **`Get-ChildItem -Path C:\\Windows -Filter *.dll`**\n   Fast source filter, **top folder only** (does NOT look inside subfolders like `System32`).\n2. **`Get-ChildItem -Path C:\\Windows -Filter *.dll -Recurse -ErrorAction SilentlyContinue`**\n   **The Winner for Deep Hunts!** Fast source filter **AND** searches every subfolder recursively.\n3. **`Get-ChildItem -Path C:\\Windows | Where-Object Name -like "*.dll"`**\n   Fetches all items in the top folder first, then filters in the pipeline (no subfolders).\n4. **`Get-ChildItem -Path C:\\Windows -Recurse | Where-Object Name -like "*.dll"`**\n   Slowest! Pulls **every single file under `C:\\Windows`** across the pipeline before `Where-Object` checks if the name ends in `.dll`. Always prefer `#2` (`-Filter *.dll -Recurse`)!',
         ],
       },
       {
         heading: 'Bulk File & Folder Creation with New-Item',
         body: [
           'In PowerShell, **`New-Item`** creates both folders and files (and even Registry keys!) depending on **`-ItemType`**:\n• Create a folder: `New-Item -Path C:\\Lab -Name Reports -ItemType Directory`\n• Create a file: `New-Item -Path C:\\Lab\\Reports -Name readme.txt -ItemType File -Value "Initial log"`',
-          '**The Bulk Creation Trick:** Because `New-Item -Name <String[]>` accepts an array of names (or pipeline input), you can create 150 files from a text list (`files.txt`) in two lines:\n`$names = Get-Content -Path C:\\Lab\\files.txt`\n`New-Item -Path C:\\Lab\\Output -Name $names -ItemType File`',
+          '**The Bulk Creation Trick:** `New-Item -Name` accepts only ONE name (a single `[String]`), so passing an array to `-Name` fails with a "Cannot convert System.Object[] to String" style error. Instead, read the names and send them one at a time through `ForEach-Object` (`$_` is the current name; you will see this cmdlet properly in a later lesson). You can create 150 files from a text list (`files.txt`) with a short loop:\n`$names = Get-Content -Path C:\\Lab\\files.txt`\n`$names | ForEach-Object { New-Item -Path C:\\Lab\\Output -Name $_ -ItemType File }`',
         ],
       },
       {
@@ -2840,8 +2870,8 @@ Temp              142.30        369.70 FileSystem    C:\\Users\\izaz\\AppData\\L
       },
       {
         type: 'try',
-        title: 'Create 5 Files in One Command Without a Loop',
-        body: 'Run `New-Item -Path $env:TEMP -Name "srv1.txt","srv2.txt","srv3.txt" -ItemType File -Force` and watch `New-Item` create all three files in a single call!',
+        title: 'Create 3 Files in One Pipeline',
+        body: 'Run `"srv1.txt","srv2.txt","srv3.txt" | ForEach-Object { New-Item -Path $env:TEMP -Name $_ -ItemType File }` and watch three empty files appear in your temp folder. (`New-Item -Name` takes a single name, so the loop feeds it one name at a time.) Clean up afterwards with `Remove-Item $env:TEMP\\srv?.txt`.',
       },
       {
         type: 'pro',
@@ -2894,22 +2924,28 @@ Temp              142.30        369.70 FileSystem    C:\\Users\\izaz\\AppData\\L
     codeExamples: [
       {
         title: 'Fast Recursive File Hunting, Bulk Creation from a List, and Select-String',
-        description: 'Compare -Filter with -Recurse, create multiple files from an array, and grep inside files with Select-String.',
+        description: 'Compare -Filter with -Recurse, create multiple files from a list with a ForEach-Object loop, and grep inside files with Select-String. The output is sample output (file names and sizes differ on your machine).',
         code: `# 1. Fast recursive search for .dll files using -Filter and -Recurse
 Get-ChildItem -Path C:\\Windows\\System32 -Filter *.dll -Recurse -ErrorAction SilentlyContinue |
   Select-Object -First 3 Name, FullName, Length
 
-# 2. Bulk-create a directory and multiple files from an array in one shot
+# 2. Create a directory, then create several files from a list.
+#    New-Item -Name accepts ONE name, so a loop feeds it one name at a time.
 $labDir = Join-Path $env:TEMP 'PSAcademyLab'
 New-Item -Path $labDir -ItemType Directory -Force | Out-Null
 
 $fileNames = @('web01.log', 'db01.log', 'dc01.log')
-New-Item -Path $labDir -Name $fileNames -ItemType File -Value "2026-11-03 INFO: Service healthy\`n2026-11-03 ERROR: Timeout on port 443" -Force | Out-Null
+$fileNames | ForEach-Object {
+  New-Item -Path $labDir -Name $_ -ItemType File -Value "2026-11-03 INFO: Service healthy\`n2026-11-03 ERROR: Timeout on port 443" -Force | Out-Null
+}
 
 # 3. Search inside all .log files for 'ERROR' and return structured MatchInfo properties
 Get-ChildItem -Path $labDir -Filter *.log -Recurse |
   Select-String -Pattern 'ERROR' |
-  Select-Object Filename, LineNumber, Line`,
+  Select-Object Filename, LineNumber, Line
+
+# 4. Clean up the practice folder when you are done
+# Remove-Item -Path $labDir -Recurse`,
         output: `Name             FullName                                 Length
 ----             --------                                 ------
 aadcloudap.dll   C:\\Windows\\System32\\aadcloudap.dll       540672

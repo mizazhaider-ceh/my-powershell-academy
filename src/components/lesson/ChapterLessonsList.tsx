@@ -8,6 +8,9 @@ import {
   Code2,
 } from 'lucide-react';
 import { Chapter } from '../../types';
+import { COMMANDS } from '../../data/commands';
+
+const KNOWN_CMDLETS = new Set(COMMANDS.map((c) => c.name.toLowerCase()));
 
 interface ChapterLessonsListProps {
   currentChapter: Chapter;
@@ -62,17 +65,23 @@ export const ChapterLessonsList: React.FC<ChapterLessonsListProps> = ({
               Core Cmdlets Featured
             </span>
             <div className="flex flex-wrap gap-2">
-              {currentChapter.relatedCmdlets.map((cmd, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => onNavigate(`/commands/${cmd.toLowerCase()}`)}
-                  className="clay-pill font-mono text-[0.75rem] font-extrabold px-3 py-1 flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Code2 className="w-3.5 h-3.5 text-[var(--dp-color-accent)]" />
-                  <span>{cmd}</span>
-                </button>
-              ))}
+              {currentChapter.relatedCmdlets.map((cmd, i) =>
+                KNOWN_CMDLETS.has(cmd.toLowerCase()) ? (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => onNavigate(`/commands/${cmd.toLowerCase()}`)}
+                    className="clay-pill font-mono text-[0.75rem] font-extrabold px-3 py-1 flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Code2 className="w-3.5 h-3.5 text-[var(--dp-color-accent)]" />
+                    <span>{cmd}</span>
+                  </button>
+                ) : (
+                  <span key={i} className="clay-pill font-mono text-[0.75rem] font-extrabold px-3 py-1">
+                    {cmd}
+                  </span>
+                ),
+              )}
             </div>
           </div>
         </div>
@@ -125,6 +134,7 @@ export const ChapterLessonsList: React.FC<ChapterLessonsListProps> = ({
       </section>
 
       <nav
+        id="module-checkpoint"
         aria-label="Module pagination"
         className="grid grid-cols-1 sm:grid-cols-2 gap-4"
       >

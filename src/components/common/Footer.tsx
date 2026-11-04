@@ -32,7 +32,8 @@ const ENVIRONMENTS = [
 ];
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop = () =>
+    window.scrollTo({ top: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
 
   return (
     <footer className="max-w-[76rem] mx-auto px-3 sm:px-6 pb-12 pt-8">
@@ -60,10 +61,10 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </p>
 
             <div className="flex flex-wrap gap-2 pt-1">
-              <span className="px-3 py-1 rounded-full clay-pill font-mono text-[0.72rem] font-extrabold text-[var(--dp-color-accent)]">
+              <span className="px-3 py-1 rounded-full clay-pill font-mono text-[0.75rem] font-extrabold text-[var(--dp-color-accent)]">
                 16 Modules · 35 Lessons
               </span>
-              <span className="px-3 py-1 rounded-full clay-pill font-mono text-[0.72rem] font-extrabold">
+              <span className="px-3 py-1 rounded-full clay-pill font-mono text-[0.75rem] font-extrabold">
                 6 Interactive Cyber Labs
               </span>
             </div>
@@ -79,7 +80,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   <button
                     type="button"
                     onClick={() => onNavigate(track.path)}
-                    className="hover:text-[var(--dp-color-accent)] text-left cursor-pointer transition-colors flex items-center gap-2"
+                    className="tap-target hover:text-[var(--dp-color-accent)] text-left cursor-pointer transition-colors flex items-center gap-2"
                   >
                     <span className={`w-2 h-2 rounded-full ${track.dot} shrink-0`} />
                     <span>{track.label}</span>
@@ -101,7 +102,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                     <button
                       type="button"
                       onClick={() => onNavigate(page.path)}
-                      className="hover:text-[var(--dp-color-accent)] inline-flex items-center gap-2 cursor-pointer transition-colors"
+                      className="tap-target hover:text-[var(--dp-color-accent)] inline-flex items-center gap-2 cursor-pointer transition-colors"
                     >
                       <Icon className="w-3.5 h-3.5 text-[var(--dp-color-accent)]" />
                       <span>{page.label}</span>
@@ -140,7 +141,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <button
               type="button"
               onClick={scrollToTop}
-              className="clay-btn-secondary px-4 py-2 text-[0.78rem] font-extrabold inline-flex items-center gap-1.5 cursor-pointer"
+              className="tap-target clay-btn-secondary px-4 py-2 text-[0.78rem] font-extrabold inline-flex items-center justify-center gap-1.5 cursor-pointer"
             >
               <span>Back to Top</span>
               <ArrowUp className="w-3.5 h-3.5 text-[var(--dp-color-accent)]" />

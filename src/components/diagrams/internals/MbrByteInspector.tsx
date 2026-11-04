@@ -27,7 +27,7 @@ export const MbrByteInspector: React.FC = () => {
           }`}
         >
           <div>Bootstrap Code</div>
-          <div className="text-[10px] opacity-80">
+          <div className="text-[0.75rem] opacity-80">
             446 Bytes (0x000 to 0x1BD)
           </div>
         </button>
@@ -40,7 +40,7 @@ export const MbrByteInspector: React.FC = () => {
           }`}
         >
           <div>Partition Table</div>
-          <div className="text-[10px] opacity-80">64 Bytes (4 × 16B)</div>
+          <div className="text-[0.75rem] opacity-80">64 Bytes (4 × 16B)</div>
         </button>
         <button
           onClick={() => setRegion('sig')}
@@ -51,7 +51,7 @@ export const MbrByteInspector: React.FC = () => {
           }`}
         >
           <div>0x55AA</div>
-          <div className="text-[10px] opacity-80">2 Bytes</div>
+          <div className="text-[0.75rem] opacity-80">2 Bytes</div>
         </button>
       </div>
 

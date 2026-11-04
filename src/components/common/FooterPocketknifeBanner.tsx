@@ -39,7 +39,8 @@ export const FooterPocketknifeBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleCopyPocketknife}
-            className="px-3.5 py-1.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-[0.75rem] inline-flex items-center gap-1.5 shrink-0 self-start sm:self-center cursor-pointer"
+            className="tap-target px-3.5 py-1.5 rounded-full bg-[#2563eb] hover:bg-[#1d4ed8] text-white font-extrabold text-[0.75rem] inline-flex items-center justify-center gap-1.5 shrink-0 self-start sm:self-center cursor-pointer"
+            aria-live="polite"
           >
             {copied ? (
               <>

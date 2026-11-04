@@ -113,7 +113,7 @@ export const Base64Event4104Lab: React.FC = () => {
           />
 
           <div className="space-y-1.5">
-            <span className="text-[0.72rem] font-mono font-extrabold uppercase tracking-wider text-[var(--dp-color-ink-secondary)] block">
+            <span className="text-[0.75rem] font-mono font-extrabold uppercase tracking-wider text-[var(--dp-color-ink-secondary)] block">
               2. UTF-16LE Byte Stream (First 12 Chars - Notice 00 Null Bytes):
             </span>
             <div className="p-3 rounded-[0.875rem] clay-card font-mono text-[0.78rem] font-bold text-[var(--dp-color-accent)] break-all">
@@ -124,7 +124,7 @@ export const Base64Event4104Lab: React.FC = () => {
 
         <div className="lg:col-span-6 p-5 rounded-[1.5rem] clay-terminal space-y-4 font-mono text-[0.8125rem]">
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[#93c5fd] text-[0.72rem] uppercase tracking-wider font-extrabold">
+            <div className="flex items-center justify-between text-[#93c5fd] text-[0.75rem] uppercase tracking-wider font-extrabold">
               <span className="flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5" />
                 <span>3. Resulting -EncodedCommand String</span>
@@ -137,7 +137,7 @@ export const Base64Event4104Lab: React.FC = () => {
           </div>
 
           <div className="pt-3 border-t border-white/10 space-y-1.5">
-            <div className="flex items-center justify-between text-[#a7f3d0] text-[0.72rem] uppercase tracking-wider font-extrabold">
+            <div className="flex items-center justify-between text-[#a7f3d0] text-[0.75rem] uppercase tracking-wider font-extrabold">
               <span className="flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5" />
                 <span>4. What Blue Team Sees (Event ID 4104 + AMSI)</span>
@@ -145,7 +145,7 @@ export const Base64Event4104Lab: React.FC = () => {
               <span>De-obfuscated in RAM</span>
             </div>
             <div className="p-3 rounded-[0.875rem] bg-black/30 text-[#e2e8f0] space-y-1">
-              <div className="text-[#93c5fd] text-[0.72rem]">
+              <div className="text-[#93c5fd] text-[0.75rem]">
                 LogName: Microsoft-Windows-PowerShell/Operational · EventID: 4104
               </div>
               <div className="text-[#a7f3d0] font-bold break-all">

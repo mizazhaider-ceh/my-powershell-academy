@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Chapter, Lesson as LessonType } from '../../types';
+import { setLessonDepth, useLessonDepth } from '../../utils/lessonDepth';
+import type { LessonTimeEstimate } from '../../utils/lessonTime';
 
 interface LessonSidebarProps {
   currentLesson: LessonType;
   parentChapter?: Chapter;
   onNavigate: (path: string) => void;
   onScrollToSection: (id: string) => void;
+  hasTeaching?: boolean;
+  progress?: number;
+  time?: LessonTimeEstimate;
+}
+
+interface Link {
+  id: string;
+  label: string;
+  full?: boolean;
 }
 
 export const LessonSidebar: React.FC<LessonSidebarProps> = ({
@@ -13,41 +24,53 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
   parentChapter,
   onNavigate,
   onScrollToSection,
+  hasTeaching = false,
+  progress = 0,
+  time,
 }) => {
-  const quickLinks = [
-    { id: 'sec-overview', label: '1. Objectives & Terms' },
-    ...(currentLesson.guide ? [{ id: 'sec-start', label: 'Start Here (A to Z)' }] : []),
-    { id: 'sec-flowchart', label: '2. Visual Flowchart' },
-    { id: 'sec-concepts', label: '3. Deep-Dive Guide' },
-    ...(currentLesson.guide ? [{ id: 'sec-ladder', label: 'Beginner → Pro Commands' }] : []),
-    ...(currentLesson.commandBreakdowns?.length
-      ? [{ id: 'sec-syntax', label: '4. Cmdlet Syntax' }]
-      : []),
-    ...(currentLesson.codeExamples?.length
-      ? [{ id: 'sec-examples', label: '5. Examples' }]
-      : []),
-    ...(currentLesson.mistakesAndTraps?.length
-      ? [{ id: 'sec-traps', label: '6. Common Traps' }]
-      : []),
-    ...(currentLesson.knowledgeCheck?.length
-      ? [{ id: 'sec-quiz', label: '7. Check Yourself' }]
-      : []),
+  const depth = useLessonDepth();
+  const [active, setActive] = useState('sec-overview');
+
+  const allLinks: Link[] = [
+    { id: 'sec-overview', label: 'Goals & terms' },
+    ...(currentLesson.guide ? [{ id: 'sec-start', label: 'Start here' }] : []),
+    ...(hasTeaching ? [{ id: 'sec-teacher', label: "Teacher's opening" }] : []),
+    { id: 'sec-flowchart', label: 'Visual explorer' },
+    { id: 'sec-concepts', label: 'Deep dive', full: true },
+    ...(currentLesson.guide ? [{ id: 'sec-ladder', label: 'Commands' }] : []),
+    ...(currentLesson.commandBreakdowns?.length ? [{ id: 'sec-syntax', label: 'Syntax', full: true }] : []),
+    ...(currentLesson.codeExamples?.length ? [{ id: 'sec-examples', label: 'Examples', full: true }] : []),
+    ...(currentLesson.mistakesAndTraps?.length ? [{ id: 'sec-traps', label: 'Traps' }] : []),
+    ...(hasTeaching ? [{ id: 'sec-studio', label: "Teacher's studio" }] : []),
+    ...(currentLesson.knowledgeCheck?.length ? [{ id: 'sec-quiz', label: 'Check yourself' }] : []),
   ];
+  const links = allLinks.filter((link) => depth === 'full' || !link.full);
+  const linkKey = links.map((l) => l.id).join('|');
+
+  useEffect(() => {
+    const visible = new Set<string>();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => (entry.isIntersecting ? visible.add(entry.target.id) : visible.delete(entry.target.id)));
+        const first = linkKey.split('|').find((id) => visible.has(id));
+        if (first) setActive(first);
+      },
+      { rootMargin: '-25% 0px -60% 0px' },
+    );
+    linkKey.split('|').forEach((id) => {
+      const node = document.getElementById(id);
+      if (node) observer.observe(node);
+    });
+    return () => observer.disconnect();
+  }, [linkKey, currentLesson.id]);
 
   return (
-    <div className="space-y-3">
-      <nav
-        aria-label="Breadcrumb"
-        className="flex flex-wrap items-center gap-2 text-[0.8125rem] font-mono font-bold px-2"
-      >
-        <button
-          type="button"
-          onClick={() => onNavigate('/learn')}
-          className="hover:underline cursor-pointer opacity-80 hover:opacity-100"
-        >
+    <>
+      <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-[0.8125rem] font-mono font-bold px-2 -mb-4">
+        <button type="button" onClick={() => onNavigate('/learn')} className="hover:underline cursor-pointer opacity-80 hover:opacity-100">
           All 16 Modules
         </button>
-        <span aria-hidden="true">·</span>
+        <span aria-hidden="true">/</span>
         {parentChapter && (
           <>
             <button
@@ -57,32 +80,38 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
             >
               Module {parentChapter.number}: {parentChapter.title}
             </button>
-            <span aria-hidden="true">·</span>
+            <span aria-hidden="true">/</span>
           </>
         )}
-        <span className="px-2.5 py-0.5 rounded-full clay-btn-pink text-[#383139]">
-          Lesson {currentLesson.id}
-        </span>
+        <span className="px-2.5 py-0.5 rounded-full clay-pill">Lesson {currentLesson.id}</span>
       </nav>
 
-      <nav
-        aria-label="Lesson sections"
-        className="clay-navbar px-3 py-2 flex items-center gap-1.5 overflow-x-auto text-[0.75rem] font-bold"
-      >
-        <span className="px-2.5 py-1 opacity-70 font-mono shrink-0">
-          Jump to:
-        </span>
-        {quickLinks.map((link) => (
-          <button
-            key={link.id}
-            type="button"
-            onClick={() => onScrollToSection(link.id)}
-            className="px-3 py-1.5 rounded-full clay-well hover:bg-[#dbeafe] transition-colors cursor-pointer whitespace-nowrap shrink-0"
-          >
-            {link.label}
+      <div className="lj-bar">
+        <nav className="lj-links" aria-label="Lesson sections">
+          {links.map((link) => (
+            <button
+              key={link.id}
+              type="button"
+              className="lj-link"
+              aria-current={active === link.id ? 'true' : undefined}
+              onClick={() => onScrollToSection(link.id)}
+            >
+              {link.label}
+            </button>
+          ))}
+        </nav>
+        <div className="lj-depth" role="group" aria-label="Lesson depth">
+          <button type="button" aria-pressed={depth === 'core'} onClick={() => setLessonDepth('core')} title="The guided route">
+            Core{time ? ` ${time.core} min` : ''}
           </button>
-        ))}
-      </nav>
-    </div>
+          <button type="button" aria-pressed={depth === 'full'} onClick={() => setLessonDepth('full')} title="Everything, including the reference sections">
+            Full{time ? ` ${time.full} min` : ''}
+          </button>
+        </div>
+        <div className="lj-progress" role="progressbar" aria-label="Reading progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)}>
+          <i style={{ width: `${progress}%` }} />
+        </div>
+      </div>
+    </>
   );
 };

@@ -1,6 +1,7 @@
-import { GlossaryItem } from '../types';
+﻿import { GlossaryItem } from '../types';
+import { GLOSSARY_EXTRA } from './glossaryExtra';
 
-export const GLOSSARY: GlossaryItem[] = [
+const CORE_GLOSSARY: GlossaryItem[] = [
   // ==========================================================================
   // WINDOWS INTERNALS
   // ==========================================================================
@@ -44,7 +45,7 @@ export const GLOSSARY: GlossaryItem[] = [
     term: 'Handle & Handle Table',
     category: 'Windows Internals',
     definition:
-      'An opaque numeric claim ticket stored in a process’s Handle Table that references a protected Kernel Object (such as an open file, registry key, or process) after the Security Reference Monitor validates the process’s Access Token.',
+      'An opaque numeric claim ticket stored in a processâ€™s Handle Table that references a protected Kernel Object (such as an open file, registry key, or process) after the Security Reference Monitor validates the processâ€™s Access Token.',
     example: 'Get-Process | Sort-Object Handles -Descending | Select-Object -First 5 Name, Id, Handles',
     relatedTerms: ['Process vs. Thread', 'Executive (ntoskrnl.exe)'],
     relatedLessonPath: '/learn/chapter-02/user-vs-kernel-mode-syscalls',
@@ -151,7 +152,7 @@ export const GLOSSARY: GlossaryItem[] = [
     term: 'Parameter Binding (ByValue vs. ByPropertyName)',
     category: 'Pipeline & Objects',
     definition:
-      'How a receiving cmdlet binds incoming pipeline objects to its parameters: it first attempts ByValue (matching the incoming object’s exact .NET TypeName) and second attempts ByPropertyName (matching a property name on the incoming object to a parameter name).',
+      'How a receiving cmdlet binds incoming pipeline objects to its parameters: it first attempts ByValue (matching the incoming objectâ€™s exact .NET TypeName) and second attempts ByPropertyName (matching a property name on the incoming object to a parameter name).',
     example: '[PSCustomObject]@{ Name = "explorer" } | Get-Process',
     relatedTerms: ['.NET Object (Properties & Methods)'],
     relatedLessonPath: '/learn/chapter-05/pipeline-mechanics-and-binding',
@@ -222,7 +223,7 @@ export const GLOSSARY: GlossaryItem[] = [
     term: 'WinRM (Windows Remote Management - Ports 5985 / 5986)',
     category: 'Administration & Remoting',
     definition:
-      'Microsoft’s implementation of the WS-Management protocol used by PowerShell Remoting (Enter-PSSession and Invoke-Command). Listens on TCP 5985 (HTTP) and TCP 5986 (HTTPS) with Kerberos payload encryption in domain environments.',
+      'Microsoftâ€™s implementation of the WS-Management protocol used by PowerShell Remoting (Enter-PSSession and Invoke-Command). Listens on TCP 5985 (HTTP) and TCP 5986 (HTTPS) with Kerberos payload encryption in domain environments.',
     example: 'Test-WSMan -ComputerName SRV-CORE01',
     relatedTerms: ['Kerberos Double-Hop Problem'],
     relatedLessonPath: '/learn/chapter-11/winrm-and-remoting',
@@ -308,6 +309,12 @@ export const GLOSSARY: GlossaryItem[] = [
     relatedLessonPath: '/learn/chapter-16/hardening-jea-and-threat-hunting',
   },
 ];
+
+const ALL_TERMS = [...CORE_GLOSSARY, ...GLOSSARY_EXTRA];
+
+export const GLOSSARY: GlossaryItem[] = ALL_TERMS.filter(
+  (g, i) => ALL_TERMS.findIndex((o) => o.term.toLowerCase() === g.term.toLowerCase()) === i,
+);
 
 export const glossary = GLOSSARY;
 export const glossaryItems = GLOSSARY;

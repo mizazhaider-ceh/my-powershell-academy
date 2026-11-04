@@ -2,6 +2,8 @@ import { LessonGuide } from '../../types';
 
 export const GUIDES_PART_2: Record<string, LessonGuide> = {
   '3-2': {
+    oneSentence:
+      'Every cmdlet is Verb-Noun (Get-Service, Stop-Process), so knowing the verb and the noun lets you guess a command you have never seen, then confirm it.',
     analogy:
       'Think of a cmdlet name as a tiny English sentence: a verb (what to do) followed by a single thing (what to do it to). "Get Process", "Stop Service", "New LocalUser". It is like a library where every book title follows one rule, so even in a library you have never visited you can guess where to look. Aliases such as `ls` or `%` are nicknames between friends: handy in conversation, but confusing in a formal letter (a saved script).',
     plainEnglish: [
@@ -84,7 +86,7 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
         {
           title: 'Find every command about services',
           code: 'Get-Command -Noun Service',
-          whatItDoes: 'Lists all commands whose noun is Service, such as Get-Service, Start-Service and Stop-Service.',
+          whatItDoes: 'Lists all commands whose noun is Service, such as Get-Service, Start-Service and Stop-Service. The sample output below is shortened.',
           parts: [
             { part: 'Get-Command', meaning: 'The command finder.' },
             { part: '-Noun Service', meaning: 'Filters the search to commands that act on the noun "Service".' },
@@ -183,18 +185,20 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '3-3': {
+    oneSentence:
+      'You never need to memorize thousands of commands because Get-Help and Get-Command let you find and read any cmdlet in seconds.',
     analogy:
       'Think of Get-Help as the instruction manual that came inside the box of every command. You would not memorize the manual of every gadget you own. You just know where to find it, and how to jump straight to the page with pictures (the examples). Once you can read the little symbols in the manual, you can use any gadget, even one you have never seen.',
     plainEnglish: [
       'PowerShell has thousands of commands, and nobody remembers them all. Professionals remember how to ask for help.',
       '`Get-Help` shows a short description. Add `-Examples` for real sample commands, `-Parameter` for one option, or `-Full` for everything.',
       'The syntax line uses symbols: `[ ]` means optional, `< >` is the type of value expected, and `[[-Name] <String>]` means the parameter name itself may be left out.',
-      'Help text is downloaded separately. `Update-Help` fetches the newest version and works offline too with `Save-Help`.',
+      'Help text is downloaded separately. `Update-Help` fetches the newest version, and `Save-Help` lets you copy it to a machine with no internet.',
     ],
     beforeYouStart: [
       'PowerShell 5.1 or 7 open in a normal window. Beginner and intermediate commands only read.',
       'Know the Verb-Noun idea from lesson 3-2.',
-      'Updating help (pro tier) needs an elevated window and internet, so use a lab machine.',
+      'Updating help needs internet. In PowerShell 7+ `Update-Help -Scope CurrentUser` works in a normal window; Windows PowerShell 5.1 has no -Scope and needs an elevated window, so it is optional (`Get-Help <cmdlet> -Online` needs no update).',
     ],
     atoZSteps: [
       {
@@ -224,7 +228,7 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
       },
       {
         title: 'Step 7: Keep help fresh',
-        detail: 'On a lab machine, open an elevated window and run `Update-Help`. Without it you may only see a short stub.',
+        detail: 'Optional, and it needs internet. In PowerShell 7+ run `Update-Help -Scope CurrentUser` in your normal window (no Administrator needed). In Windows PowerShell 5.1 there is no -Scope parameter, so you would need an elevated window and `Update-Help -Force`; if you would rather not, skip this step and use `Get-Help <cmdlet> -Online`. Without updated help you may only see a short stub.',
       },
     ],
     wordsYouWillMeet: [
@@ -318,7 +322,7 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
             { part: 'Update-Help -SourcePath', meaning: 'Installs help from a local or network folder instead of the internet.' },
             { part: '-Force', meaning: 'Allows updating more than once per day.' },
           ],
-          watchOut: 'Update-Help writes into the Windows folder, so it needs an elevated window. Create C:\\HelpCache first. Test on a lab VM.',
+          watchOut: 'In Windows PowerShell 5.1, Update-Help writes into the Windows folder, so it needs an elevated window (PowerShell 7+ can use -Scope CurrentUser instead). Create C:\\HelpCache first. Test on a lab VM.',
         },
         {
           title: 'Read the syntax straight from the command',
@@ -353,6 +357,8 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '4-1': {
+    oneSentence:
+      'Everything PowerShell returns is a live object with properties (data) and methods (actions), and Get-Member is the X-ray that shows them all.',
     analogy:
       'Think of every result in PowerShell as a real object on a table, like a car. A car has properties (colour, speed, fuel level) that you can read, and methods (start, stop, honk) that make it do something. `Get-Member` is the X-ray scanner that shows you everything about the car, including features that are not painted on the outside.',
     plainEnglish: [
@@ -524,6 +530,8 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '4-2': {
+    oneSentence:
+      'The screen is a lie: Format-Table and Format-List only shape the display, and the real objects carry properties you can surface with Select-Object and Get-Member.',
     analogy:
       'Think of the PowerShell screen as a shop window. The shop owner arranges only a few nice items in the window (the default columns), but the whole stock sits in the back room (all the properties). Format cmdlets only decorate the window. If you need to carry the goods somewhere else, you must pick the real items from the back room first. And [PSCustomObject] lets you build your own tidy box of goods.',
     plainEnglish: [
@@ -685,11 +693,13 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '5-1': {
+    oneSentence:
+      'The pipe sends whole objects to the next command, and whether a pipe works depends on parameter binding: ByValue when the type fits, ByPropertyName when the names match.',
     analogy:
       'Imagine a sushi conveyor belt. The chef (the first command) puts whole plates (objects) on the belt, and the next person (the second command) picks up plates. But the picker only grabs a plate if it matches what they are looking for: either the whole plate is the right kind (ByValue), or the plate has a label that matches the picker\'s tray name (ByPropertyName). If neither matches, the plate rides past and you get an error.',
     plainEnglish: [
       'The pipe `|` sends whole objects, not text, from one command to the next. The second command must know which of its parameters should receive them.',
-      'ByValue: PowerShell looks at the type of the incoming object. If it matches a parameter that accepts that type from the pipeline, it binds.',
+      'ByValue: PowerShell looks at the type of the incoming object. If it fits a parameter that accepts that type (or a type it can be treated as) from the pipeline, it binds.',
       'ByPropertyName: if ByValue fails, PowerShell looks for a property on the incoming object whose name matches a parameter name (or its alias).',
       'That is why `"bits" | Get-Service` works but `"explorer" | Get-Process` fails. Get-Service accepts text ByValue for -Name, while Get-Process only accepts -Name ByPropertyName, and a plain string has no Name property.',
       'You never have to guess. `Get-Help <cmdlet> -Parameter *` tells you "Accept pipeline input?" for every parameter.',
@@ -853,6 +863,8 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '5-2': {
+    oneSentence:
+      'Chaining with a semicolon always works, but the && and || operators exist only in PowerShell 7, so on a 5.1 Server Core they fail.',
     analogy:
       'Think of cooking dinner. A pipe `|` is like handing each ingredient straight to the next cook. A semicolon `;` is like saying "do step one, then step two" no matter how step one went. `&&` is "only start the sauce if the pasta is done" and `||` is "if the pasta burned, order pizza". And writing a long recipe on several lines is just good handwriting so everyone can read it.',
     plainEnglish: [
@@ -1019,6 +1031,8 @@ export const GUIDES_PART_2: Record<string, LessonGuide> = {
     ],
   },
   '6-1': {
+    oneSentence:
+      'A variable is a named box written with a dollar sign, it can hold one value or a whole zero-indexed array, and casting locks in the type you want.',
     analogy:
       'A variable is a labelled box on a shelf. You write a name on the box (`$name`) and put something inside. An array is a row of boxes numbered from zero: the first box is number 0, not 1. A data type is the kind of thing the box is allowed to hold: an egg tray only takes eggs, so a strongly-typed variable refuses to hold the wrong kind of value.',
     plainEnglish: [

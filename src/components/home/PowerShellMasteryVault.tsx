@@ -129,7 +129,7 @@ export const PowerShellMasteryVault: React.FC<PowerShellMasteryVaultProps> = ({
           </p>
 
           <div className="p-4 rounded-[1.25rem] clay-terminal font-mono text-[0.82rem] space-y-2">
-            <div className="text-[#93c5fd] text-[0.72rem] uppercase font-extrabold">
+            <div className="text-[#93c5fd] text-[0.75rem] uppercase font-extrabold">
               Live Terminal Example:
             </div>
             <pre className="text-[#fde68a] font-bold overflow-x-auto">

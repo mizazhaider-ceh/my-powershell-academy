@@ -5,6 +5,12 @@ import { CommandBuilderLab } from '../components/interactive/CommandBuilderLab';
 import { ModuleGridSection } from '../components/home/ModuleGridSection';
 import { PowerShellMasteryVault } from '../components/home/PowerShellMasteryVault';
 import { ArchitectureComparisonSection } from '../components/home/ArchitectureComparisonSection';
+import { HomeStatsStrip } from '../components/home/HomeStatsStrip';
+import { PipelineShowcase } from '../components/home/PipelineShowcase';
+import { LearningLoopSection } from '../components/home/LearningLoopSection';
+import { CmdletMarquee } from '../components/home/CmdletMarquee';
+import { LabsShowcase } from '../components/home/LabsShowcase';
+import { useHomeStats } from '../components/home/useHomeStats';
 import {
   getCompletedLessons,
   getLastVisitedLesson,
@@ -18,6 +24,7 @@ interface HomeViewProps {
 export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
   const [completedIds, setCompletedIds] = useState<string[]>([]);
   const [lastLesson, setLastLesson] = useState<LastVisitedLesson | null>(null);
+  const stats = useHomeStats();
 
   useEffect(() => {
     const sync = () => {
@@ -38,7 +45,12 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         lastLesson={lastLesson}
       />
 
-      {/* 2. Shared Tray: Pipeline Stepper + Live Command Builder + 16 Illustrated Module Cards */}
+      {/* 2. The platform at a glance, then the live pipeline demo and the teaching method */}
+      <HomeStatsStrip stats={stats} />
+      <PipelineShowcase onNavigate={onNavigate} />
+      <LearningLoopSection />
+
+      {/* 3. Shared Tray: Pipeline Stepper + Live Command Builder + 16 Illustrated Module Cards */}
       <section className="clay-tray p-6 sm:p-10 lg:p-12 space-y-12">
         <PipelineWalkthroughSection />
         <CommandBuilderLab />
@@ -48,10 +60,14 @@ export const HomeView: React.FC<HomeViewProps> = ({ onNavigate }) => {
         />
       </section>
 
-      {/* 3. Deep-Dive Engineering Vault: Automatic Variables, 5.1 vs 7.5 Matrix & Golden Laws */}
+      {/* 4. Cmdlet marquee and the six hands-on labs */}
+      <CmdletMarquee onNavigate={onNavigate} />
+      <LabsShowcase onNavigate={onNavigate} />
+
+      {/* 5. Deep-Dive Engineering Vault: Automatic Variables, 5.1 vs 7.5 Matrix & Golden Laws */}
       <PowerShellMasteryVault onNavigate={onNavigate} />
 
-      {/* 4. Architecture Comparisons, Classic Traps & Closing CTA */}
+      {/* 6. Architecture Comparisons, Classic Traps & Closing CTA */}
       <ArchitectureComparisonSection onNavigate={onNavigate} />
     </div>
   );

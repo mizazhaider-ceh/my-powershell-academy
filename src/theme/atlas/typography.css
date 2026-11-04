@@ -1,0 +1,73 @@
+/* ============================================================================
+   ATLAS: typography and base
+   One grotesque family at two registers, plus a precise mono for labels and code.
+   ============================================================================ */
+
+html[data-theme="atlas"] {
+  scrollbar-width: thin;
+  scrollbar-color: var(--a-line-strong) transparent;
+
+  body {
+    background-color: var(--dp-color-ground);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.003em;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--atlas-sans);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-weight: 650;
+    letter-spacing: -0.045em;
+  }
+
+  p,
+  li {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: rgba(var(--a-accent-rgb), 0.28);
+    color: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--a-accent);
+    outline-offset: 2px;
+    border-radius: 0.35rem;
+  }
+
+  code,
+  kbd,
+  pre,
+  .font-mono {
+    font-feature-settings: "calt", "ss01";
+  }
+
+  .clay-display-title {
+    font-family: var(--atlas-sans);
+    font-weight: 650;
+    font-size: clamp(2.8rem, 6.2vw, 5.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.055em;
+  }
+
+  /* Gradient headline spans resolve to the single signal blue */
+  .bg-clip-text.text-transparent {
+    background-image: none;
+    -webkit-text-fill-color: currentColor;
+    color: var(--a-accent);
+    animation: none;
+  }
+
+  .lesson-prose p {
+    color: var(--dp-color-ink-secondary);
+  }
+}

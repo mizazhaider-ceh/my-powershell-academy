@@ -103,7 +103,7 @@ export const VirtualMemoryPager: React.FC = () => {
               return (
                 <div
                   key={idx}
-                  className={`p-2 rounded-lg border font-mono text-[11px] truncate ${
+                  className={`p-2 rounded-lg border font-mono text-[0.75rem] truncate ${
                     page
                       ? 'border-blue-500/40 bg-blue-500/10 text-blue-900 dark:text-blue-200 font-semibold'
                       : 'border-dashed border-stone-300 dark:border-stone-800 text-stone-400'
@@ -130,7 +130,7 @@ export const VirtualMemoryPager: React.FC = () => {
               {diskPages.map((dp, i) => (
                 <div
                   key={i}
-                  className="p-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-mono text-[11px] truncate"
+                  className="p-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-900 dark:text-amber-200 font-mono text-[0.75rem] truncate"
                 >
                   {dp}
                 </div>
