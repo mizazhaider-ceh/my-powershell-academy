@@ -16,8 +16,10 @@ export const LessonSidebar: React.FC<LessonSidebarProps> = ({
 }) => {
   const quickLinks = [
     { id: 'sec-overview', label: '1. Objectives & Terms' },
+    ...(currentLesson.guide ? [{ id: 'sec-start', label: 'Start Here (A to Z)' }] : []),
     { id: 'sec-flowchart', label: '2. Visual Flowchart' },
     { id: 'sec-concepts', label: '3. Deep-Dive Guide' },
+    ...(currentLesson.guide ? [{ id: 'sec-ladder', label: 'Beginner → Pro Commands' }] : []),
     ...(currentLesson.commandBreakdowns?.length
       ? [{ id: 'sec-syntax', label: '4. Cmdlet Syntax' }]
       : []),

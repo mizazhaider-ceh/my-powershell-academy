@@ -68,6 +68,24 @@ test('Curriculum coverage: all 16 modules across 4 specialized engineering track
   });
 });
 
+test('Every lesson has a complete A-to-Z guide with beginner, intermediate and pro tiers', () => {
+  lessons.forEach((lesson) => {
+    const g = lesson.guide;
+    assert.ok(g, `Lesson ${lesson.id} must have a guide`);
+    assert.ok(g.analogy.length > 40, `Lesson ${lesson.id} guide needs an analogy`);
+    assert.ok(g.atoZSteps.length >= 5, `Lesson ${lesson.id} guide needs at least 5 A-to-Z steps`);
+    assert.ok(g.wordsYouWillMeet.length >= 4, `Lesson ${lesson.id} guide needs vocabulary`);
+    assert.ok(g.recap.length >= 3, `Lesson ${lesson.id} guide needs a recap`);
+    for (const tier of [g.beginner, g.intermediate, g.pro]) {
+      assert.ok(tier.commands.length >= 3, `Lesson ${lesson.id} each tier needs at least 3 commands`);
+      tier.commands.forEach((c) => {
+        assert.ok(c.code.trim() && c.whatItDoes.trim(), `Lesson ${lesson.id} command "${c.title}" needs code and explanation`);
+        assert.ok(c.parts.length >= 1, `Lesson ${lesson.id} command "${c.title}" needs a piece-by-piece breakdown`);
+      });
+    }
+  });
+});
+
 test('Lessons depth & dynamic SVG flowchart generation across all 35 lessons', () => {
   assert.equal(lessons.length, 35, 'Expected 35 comprehensive lessons across 16 modules');
   lessons.forEach((lesson) => {

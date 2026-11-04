@@ -9,6 +9,8 @@ import {
 import { LessonSidebar } from '../components/lesson/LessonSidebar';
 import { LessonHeaderHero } from '../components/lesson/LessonHeaderHero';
 import { LessonContent } from '../components/lesson/LessonContent';
+import { LessonStartHere } from '../components/lesson/LessonGuideSections';
+import { LessonCommandLadder } from '../components/lesson/LessonCommandLadder';
 import { LessonCodeAndTrapsSection } from '../components/lesson/LessonCodeAndTrapsSection';
 import { LessonPracticeAndQuizSection } from '../components/lesson/LessonPracticeAndQuizSection';
 import { LessonFooterNav } from '../components/lesson/LessonFooterNav';
@@ -118,7 +120,9 @@ export const LessonView: React.FC<LessonViewProps> = ({ chapterId, lessonSlug, o
 
       <LessonSidebar currentLesson={currentLesson} parentChapter={parentChapter} onNavigate={onNavigate} onScrollToSection={scrollToSection} />
       <LessonHeaderHero currentLesson={currentLesson} parentChapter={parentChapter} plainEnglishTerms={plainEnglishTerms} />
+      {currentLesson.guide && <LessonStartHere guide={currentLesson.guide} />}
       <LessonContent currentLesson={currentLesson} parentChapter={parentChapter} flowchartData={flowchartData} />
+      {currentLesson.guide && <LessonCommandLadder guide={currentLesson.guide} />}
       <LessonCodeAndTrapsSection currentLesson={currentLesson} />
 
       <LessonPracticeAndQuizSection

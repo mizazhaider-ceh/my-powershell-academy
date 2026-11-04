@@ -135,6 +135,47 @@ export interface LessonKnowledgeCheck {
   explanation: string;
 }
 
+export interface GuideCommandPart {
+  part: string;
+  meaning: string;
+}
+
+export interface GuideCommand {
+  title: string;
+  code: string;
+  whatItDoes: string;
+  parts: GuideCommandPart[];
+  sampleOutput?: string;
+  watchOut?: string;
+}
+
+export interface GuideTier {
+  intro: string;
+  commands: GuideCommand[];
+}
+
+export interface GuideStep {
+  title: string;
+  detail: string;
+}
+
+export interface GuideWord {
+  word: string;
+  meaning: string;
+}
+
+export interface LessonGuide {
+  analogy: string;
+  plainEnglish: string[];
+  beforeYouStart: string[];
+  atoZSteps: GuideStep[];
+  wordsYouWillMeet: GuideWord[];
+  beginner: GuideTier;
+  intermediate: GuideTier;
+  pro: GuideTier;
+  recap: string[];
+}
+
 export interface Lesson {
   id: string;
   chapterId: string;
@@ -156,6 +197,7 @@ export interface Lesson {
   mistakesAndTraps: LessonMistake[];
   tryItYourself: string[];
   knowledgeCheck: LessonKnowledgeCheck[];
+  guide?: LessonGuide;
 }
 
 export interface CommandParameter {
